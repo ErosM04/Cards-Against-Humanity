@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-ThemeData burgerTheme = ThemeData(
+ThemeData appTheme = ThemeData(
   brightness: Brightness.dark,
   colorScheme: const ColorScheme.dark(
     primary: Color.fromARGB(255, 242, 135, 5),
