@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="cards_against_humanity"
+        android:label="Cards Against Humanity"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
