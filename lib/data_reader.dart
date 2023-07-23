@@ -6,9 +6,15 @@ class CsvReader {
 
   Future<List<List>> getQuestions() async => await _loadCSV('question');
 
-  getAnswers() async {
-    final List list = await _loadCSV('answers');
-    list.forEach((element) => print(element));
+  Future<List<String>> getAnswers() async {
+    final list = await _loadCSV('answers');
+    List<String> answers = [];
+
+    for (var answer in list) {
+      answers.add(answer[0]);
+    }
+
+    return answers;
   }
 
   Future<List<List>> _loadCSV(String filename) async =>

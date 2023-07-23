@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cards_against_humanity/data_reader.dart';
 import 'package:cards_against_humanity/game_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
@@ -107,40 +106,27 @@ class _StartPageState extends State<StartPage> {
         int? seed = int.tryParse(seedController.text.replaceAll(' ', ''));
         int? playerNumber =
             int.tryParse(playerNumberController.text.replaceAll(' ', ''));
-        // widget.csvReader.getAnswers();
-        // widget.csvReader
-        //     .getQuestions()
-        //     .then((list) => (seed != null && playerNumber != null)
-        //         ? Navigator.of(context).push(MaterialPageRoute(
-        //             builder: (context) => GamePage(
-        //               seed: seed,
-        //               playerNumber: playerNumber,
-        //               questionList: list,
-        //               random: CasualityManager(
-        //                 seed: seed,
-        //                 playerNumber: playerNumber,
-        //                 randomAnswerCard: Random(seed),
-        //                 randomQuestionCard: Random(seed + 1),
-        //               ),
-        //             ),
-        //           ))
-        //         : setState(() => seedController.text = 'Cojion'));
-
-        // if (seed != null && playerNumber != null) {
-        //   Navigator.of(context).push(MaterialPageRoute(
-        //     builder: (context) => GamePage(
-        //       seed: seed,
-        //       playerNumber: playerNumber,
-        //       questionList: questions,
-        //       random: CasualityManager(
-        //         seed: seed,
-        //         playerNumber: playerNumber,
-        //         randomAnswerCard: Random(seed),
-        //         randomQuestionCard: Random(seed + 1),
-        //       ),
-        //     ),
-        //   ));
-        // }
+        if (seed != null && playerNumber != null) {
+          List<List<dynamic>> questionList = [];
+          widget.csvReader.getQuestions().then((list) {
+            questionList = list;
+            return widget.csvReader.getAnswers();
+          }).then((answerList) => Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => GamePage(
+                    seed: seed,
+                    playerNumber: playerNumber,
+                    random: CasualityManager(
+                      seed: seed,
+                      playerNumber: playerNumber,
+                      randomAnswerCard: Random(seed),
+                      randomQuestionCard: Random(seed + 1),
+                      questionList: questionList,
+                      answerList: answerList,
+                    )),
+              )));
+        } else {
+          setState(() => seedController.text = 'Cojion');
+        }
       } catch (e) {
         setState(() => seedController.text = 'Cojion');
       }
