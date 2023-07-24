@@ -1,14 +1,13 @@
 import 'dart:math';
 import 'package:cards_against_humanity/data_reader.dart';
-import 'package:cards_against_humanity/game_page.dart';
+import 'package:cards_against_humanity/game/game_page.dart';
+import 'package:cards_against_humanity/game/master_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/textfield.dart';
 import 'package:cards_against_humanity/theme.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const CardsAgainstHumanity());
-}
+void main() => runApp(const CardsAgainstHumanity());
 
 class CardsAgainstHumanity extends StatelessWidget {
   const CardsAgainstHumanity({super.key});
@@ -39,59 +38,67 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            'Cards Against Humanity',
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          ),
+        ),
         body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Text(
-                      'Codice partita:',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Codice partita:',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              CustomTextField(controller: seedController),
-              const SizedBox(height: 100),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Text(
-                      'Numero giocatore:',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(fontSize: 20),
-                    ),
-                  ],
+                CustomTextField(controller: seedController),
+                const SizedBox(height: 100),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Numero giocatore:',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              CustomTextField(controller: playerNumberController),
-              const SizedBox(height: 100),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: ElevatedButton(
-                  onPressed: () => startGame(),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Play',
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                CustomTextField(controller: playerNumberController),
+                const SizedBox(height: 100),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: ElevatedButton(
+                    onPressed: () => startGame(),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Play',
+                            style: TextStyle(
+                                fontSize: 25, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              )
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -103,27 +110,38 @@ class _StartPageState extends State<StartPage> {
             playerNumberController.text.replaceAll(' ', '') == '3' ||
             playerNumberController.text.replaceAll(' ', '') == '4')) {
       try {
-        int? seed = int.tryParse(seedController.text.replaceAll(' ', ''));
-        int? playerNumber =
-            int.tryParse(playerNumberController.text.replaceAll(' ', ''));
+        int? seed = int.tryParse(seedController.text
+            .replaceAll(' ', '')
+            .replaceAll('.', '')
+            .replaceAll('-', ''));
+        int? playerNumber = int.tryParse(playerNumberController.text
+            .replaceAll(' ', '')
+            .replaceAll('.', '')
+            .replaceAll('-', ''));
         if (seed != null && playerNumber != null) {
           List<List<dynamic>> questionList = [];
           widget.csvReader.getQuestions().then((list) {
             questionList = list;
             return widget.csvReader.getAnswers();
-          }).then((answerList) => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => GamePage(
-                    seed: seed,
-                    playerNumber: playerNumber,
-                    random: CasualityManager(
-                      seed: seed,
-                      playerNumber: playerNumber,
-                      randomAnswerCard: Random(seed),
-                      randomQuestionCard: Random(seed + 1),
-                      questionList: questionList,
-                      answerList: answerList,
-                    )),
-              )));
+          }).then((answerList) {
+            CasualityManager rand = CasualityManager(
+              seed: seed,
+              playerNumber: playerNumber,
+              randomAnswerCard: Random(seed),
+              randomQuestionCard: Random(seed + 1),
+              questionList: questionList,
+              answerList: answerList,
+            );
+
+            // If this is the 1st player starts as a master
+            return (playerNumber == 1)
+                ? Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MasterGamePage(rand)))
+                : Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => GamePage(rand)));
+          });
         } else {
           setState(() => seedController.text = 'Cojion');
         }
