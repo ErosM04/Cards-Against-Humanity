@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:cards_against_humanity/data_reader.dart';
+import 'package:cards_against_humanity/game/easteregg.dart';
 import 'package:cards_against_humanity/game/game_page.dart';
 import 'package:cards_against_humanity/game/master_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
@@ -124,23 +125,29 @@ class _StartPageState extends State<StartPage> {
             questionList = list;
             return widget.csvReader.getAnswers();
           }).then((answerList) {
-            CasualityManager rand = CasualityManager(
-              seed: seed,
-              playerNumber: playerNumber,
-              randomAnswerCard: Random(seed),
-              randomQuestionCard: Random(seed + 1),
-              questionList: questionList,
-              answerList: answerList,
-            );
+            //Easter egg
+            if (seed == 104) {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EasterEgg(Random().nextInt(10))));
+            } else {
+              CasualityManager rand = CasualityManager(
+                seed: seed,
+                playerNumber: playerNumber,
+                randomAnswerCard: Random(seed),
+                randomQuestionCard: Random(seed + 1),
+                questionList: questionList,
+                answerList: answerList,
+              );
 
-            // If this is the 1st player starts as a master
-            return (playerNumber == 1)
-                ? Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MasterGamePage(rand)))
-                : Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => GamePage(rand)));
+              // If this is the 1st player starts as a master
+              return (playerNumber == 1)
+                  ? Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MasterGamePage(rand)))
+                  : Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => GamePage(rand)));
+            }
           });
         } else {
           setState(() => seedController.text = 'Cojion');

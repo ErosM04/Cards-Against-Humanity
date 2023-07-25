@@ -4,7 +4,7 @@ import 'package:csv/csv.dart';
 class CsvReader {
   const CsvReader();
 
-  Future<List<List>> getQuestions() async => await _loadCSV('question');
+  Future<List<List>> getQuestions() async => await _loadCSV('questions');
 
   Future<List<String>> getAnswers() async {
     final list = await _loadCSV('answers');
