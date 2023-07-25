@@ -14,6 +14,7 @@ class CasualityManager {
   static int answerNeeded = 0;
   int _score = 0;
   int _round = 0;
+  int _skippedRounds = 0;
 
   CasualityManager({
     required this.seed,
@@ -29,6 +30,8 @@ class CasualityManager {
 
   int get round => _round;
 
+  int get skippedRounds => _skippedRounds;
+
   List<String> get hand => _hand;
 
   String get question => _actualQuestion;
@@ -42,7 +45,7 @@ class CasualityManager {
         _drawAnswerCard();
       }
     } else if (_hand.isNotEmpty && _hand.length < 10) {
-      for (var i = _hand.length; i <= 10; i++) {
+      for (var i = _hand.length; i < 10; i++) {
         _drawAnswerCard();
       }
     }
@@ -70,6 +73,8 @@ class CasualityManager {
     _actualQuestion = questionList[position][0];
     answerNeeded = questionList[position][1];
   }
+
+  void addUncountableRound() => _skippedRounds++;
 
   void won() => {_score++, _cleanSelectedCard()};
 

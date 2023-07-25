@@ -102,19 +102,12 @@ class _MasterGamePageState extends State<MasterGamePage> {
                         CasualityManager.selectedCards.clear();
                         widget.random.fillHand();
                         widget.random.drawQuestionCard();
-                        // True if the next round is the round of the actual player
-                        return ((widget.random.round % 4) ==
-                                (widget.random.playerNumber - 1))
-                            ? Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        MasterGamePage(widget.random)))
-                            : Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        GamePage(widget.random)));
+                        // As this round couldn't be played by the actual player, is not counted
+                        widget.random.addUncountableRound();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GamePage(widget.random)));
                       })
                   : Container(),
             ]),

@@ -24,7 +24,7 @@ class _GamePageState extends State<GamePage> {
           actions: [
             IconButton(
               icon: Text(
-                '${widget.random.score}/${widget.random.round}',
+                '${widget.random.score}/${widget.random.round - widget.random.skippedRounds}',
                 style: TextStyle(
                     fontSize: 17,
                     color: Theme.of(context).colorScheme.secondary),
