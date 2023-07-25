@@ -1,4 +1,4 @@
-package com.example.cards_against_humanity
+package ErosM04.cards_against_humanity
 
 import io.flutter.embedding.android.FlutterActivity
 
