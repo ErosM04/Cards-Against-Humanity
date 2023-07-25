@@ -22,6 +22,7 @@ class CardAH extends StatefulWidget {
 class _CardAHState extends State<CardAH>
     with AutomaticKeepAliveClientMixin<CardAH> {
   bool isClicked = false;
+
   @override
   bool get wantKeepAlive => true;
 

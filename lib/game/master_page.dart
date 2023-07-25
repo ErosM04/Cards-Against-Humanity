@@ -36,49 +36,61 @@ class _MasterGamePageState extends State<MasterGamePage> {
                 isClickable: false,
               ),
               const SizedBox(height: 50),
-              buildSubTitle('Inserisci i numeri delle carte:', fontSize: 22),
-              buildSubTitle('es: 11,22,104', fontSize: 18, verticalPadding: 2),
-              CustomTextField(controller: textController),
-              buildButton(
-                  text: 'Mostra carte',
-                  function: () {
-                    String str = textController.text
-                        .replaceAll(' ', '')
-                        .replaceAll('.', '')
-                        .replaceAll('-', '');
+              (answerCardList.isEmpty)
+                  ? buildSubTitle('Inserisci i numeri delle carte:',
+                      fontSize: 22)
+                  : Container(),
+              (answerCardList.isEmpty)
+                  ? buildSubTitle('es: 11,22,104',
+                      fontSize: 18, verticalPadding: 2)
+                  : Container(),
+              (answerCardList.isEmpty)
+                  ? CustomTextField(controller: textController)
+                  : Container(),
+              (answerCardList.isEmpty)
+                  ? buildButton(
+                      text: 'Mostra carte',
+                      function: () {
+                        String str = textController.text
+                            .replaceAll(' ', '')
+                            .replaceAll('.', '')
+                            .replaceAll('-', '');
 
-                    if (str.contains(',') &&
-                        (str.split(',').length ==
-                                (CasualityManager.answerNeeded * 3) ||
-                            str.split(',').length == 6)) {
-                      final splitArr = str.split(',');
-                      final List<String> answerList = widget.random
-                          .revealAnswerCards(List<int>.generate(splitArr.length,
-                              (index) => int.parse(splitArr[index])));
-                      if (answerList.length ==
-                          (CasualityManager.answerNeeded * 3)) {
-                        if (answerList.length == 3) {
-                          answerList.shuffle();
-                          setState(() => answerCardList = answerList);
-                        } else {
-                          List<List<String>> bigList = [];
-                          for (var i = 0; i < answerList.length; i += 2) {
-                            bigList.add([answerList[i], answerList[i + 1]]);
-                          }
+                        if (str.contains(',') &&
+                            (str.split(',').length ==
+                                    (CasualityManager.answerNeeded * 3) ||
+                                str.split(',').length == 6)) {
+                          final splitArr = str.split(',');
+                          final List<String> answerList = widget.random
+                              .revealAnswerCards(List<int>.generate(
+                                  splitArr.length,
+                                  (index) => int.parse(splitArr[index])));
+                          if (answerList.length ==
+                              (CasualityManager.answerNeeded * 3)) {
+                            if (answerList.length == 3) {
+                              answerList.shuffle();
+                              setState(() => answerCardList = answerList);
+                            } else {
+                              List<List<String>> bigList = [];
+                              for (var i = 0; i < answerList.length; i += 2) {
+                                bigList.add([answerList[i], answerList[i + 1]]);
+                              }
 
-                          bigList.shuffle();
+                              bigList.shuffle();
 
-                          List<String> resultList = [];
-                          for (List<String> list in bigList) {
-                            for (var i = 0; i < list.length; i += 2) {
-                              resultList.add('${list[i]}\n\n${list[i + 1]}');
+                              List<String> resultList = [];
+                              for (List<String> list in bigList) {
+                                for (var i = 0; i < list.length; i += 2) {
+                                  resultList
+                                      .add('${list[i]}\n\n${list[i + 1]}');
+                                }
+                              }
+                              setState(() => answerCardList = resultList);
                             }
                           }
-                          setState(() => answerCardList = resultList);
                         }
-                      }
-                    }
-                  }),
+                      })
+                  : Container(),
               (answerCardList.isNotEmpty)
                   ? buildCardCarousel(answerCardList)
                   : Container(),
@@ -86,6 +98,8 @@ class _MasterGamePageState extends State<MasterGamePage> {
                   ? buildButton(
                       text: 'Prossimo round',
                       function: () {
+                        // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
+                        CasualityManager.selectedCards.clear();
                         widget.random.fillHand();
                         widget.random.drawQuestionCard();
                         // True if the next round is the round of the actual player
@@ -136,8 +150,10 @@ class _MasterGamePageState extends State<MasterGamePage> {
             shrinkWrap: true,
             controller: ScrollController(),
             scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) =>
-                CardAH(onClicked: () => null, text: list[index])),
+            itemBuilder: (context, index) => CardAH(
+                  text: list[index],
+                  onClicked: () {},
+                )),
       );
 
   Padding buildSubTitle(String text,

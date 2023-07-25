@@ -21,6 +21,17 @@ class _GamePageState extends State<GamePage> {
             'Cards Against Humanity',
             style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
+          actions: [
+            IconButton(
+              icon: Text(
+                '${widget.random.score}/${widget.random.round}',
+                style: TextStyle(
+                    fontSize: 17,
+                    color: Theme.of(context).colorScheme.secondary),
+              ),
+              onPressed: () {},
+            )
+          ],
         ),
         body: SingleChildScrollView(
           child: Center(

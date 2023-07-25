@@ -19,6 +19,6 @@ class CsvReader {
 
   Future<List<List>> _loadCSV(String filename) async =>
       const CsvToListConverter().convert(
-          await rootBundle.loadString("assets/$filename.csv"),
+          await rootBundle.loadString("assets/csv/$filename.csv"),
           fieldDelimiter: ';');
 }

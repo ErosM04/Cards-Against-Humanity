@@ -12,6 +12,7 @@ class CasualityManager {
   static final List<String> selectedCards = [];
   String _actualQuestion = '';
   static int answerNeeded = 0;
+  int _score = 0;
   int _round = 0;
 
   CasualityManager({
@@ -31,6 +32,8 @@ class CasualityManager {
   List<String> get hand => _hand;
 
   String get question => _actualQuestion;
+
+  int get score => _score;
 
   void fillHand() {
     if (_hand.isEmpty) {
@@ -67,4 +70,10 @@ class CasualityManager {
     _actualQuestion = questionList[position][0];
     answerNeeded = questionList[position][1];
   }
+
+  void won() => {_score++, _cleanSelectedCard()};
+
+  void lost() => _cleanSelectedCard();
+
+  void _cleanSelectedCard() => CasualityManager.selectedCards.clear();
 }
