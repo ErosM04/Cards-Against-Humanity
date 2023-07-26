@@ -88,7 +88,7 @@ class _CardPageState extends State<CardPage> {
     widget.random.fillHand();
     widget.random.drawQuestionCard();
 
-    (((widget.random.round % 4) == 0 && (widget.random.playerNumber == 4)) || (widget.random.round % 4) == widget.random.playerNumber)
+    (((widget.random.round % 4) == 0 && (widget.random.playerNumber == CasualityManager.totalPlayer)) || (widget.random.round % 4) == widget.random.playerNumber)
         ? Navigator.pushReplacement(
             context,
             MaterialPageRoute(
