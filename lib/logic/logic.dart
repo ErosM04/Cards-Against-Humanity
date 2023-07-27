@@ -71,7 +71,7 @@ class CasualityManager {
     _round++;
     int position = randomQuestionCard.nextInt(questionList.length);
     _actualQuestion = questionList[position][0];
-    answerNeeded = questionList[position][1];
+    answerNeeded = questionList.removeAt(position)[1];
   }
 
   void addUncountableRound() => _skippedRounds++;
