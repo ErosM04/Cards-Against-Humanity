@@ -3,7 +3,7 @@ import 'dart:math';
 class CasualityManager {
   final int seed;
   final int playerNumber;
-  static const int totalPlayers = 4;
+  final int totalPlayers;
   final Random randomQuestionCard;
   final Random randomAnswerCard;
   final List<List> questionList;
@@ -19,6 +19,7 @@ class CasualityManager {
   CasualityManager({
     required this.seed,
     required this.playerNumber,
+    this.totalPlayers = 4,
     required this.randomQuestionCard,
     required this.randomAnswerCard,
     required this.questionList,
@@ -72,6 +73,7 @@ class CasualityManager {
     int position = randomQuestionCard.nextInt(questionList.length);
     _actualQuestion = questionList[position][0];
     answerNeeded = questionList.removeAt(position)[1];
+    // the last time the question card is accessed it's also removed to avoid reusing the same card over and over
   }
 
   void addUncountableRound() => _skippedRounds++;
