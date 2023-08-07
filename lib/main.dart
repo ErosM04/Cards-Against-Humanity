@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(const CardsAgainstHumanity());
 
+/// Not so politically correct
 class CardsAgainstHumanity extends StatelessWidget {
   const CardsAgainstHumanity({super.key});
 

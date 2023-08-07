@@ -1,6 +1,8 @@
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:flutter/material.dart';
 
+/// Widget used to create the card widget, for answers, questions and both together.
+/// To preserve state even when cards are out of the screen the State class comes with [AutomaticKeepAliveClientMixin].
 class CardAH extends StatefulWidget {
   final String text;
   final bool isClickable;
@@ -75,6 +77,8 @@ class _CardAHState extends State<CardAH>
               children: buildTextList()),
         );
 
+  /// Build a List of TextSpan where the question in white and the answers use a color of the theme and are substituted to the '_____'
+  /// contained in the question.
   List<TextSpan> buildTextList() {
     List<TextSpan> textList = [];
     if (widget.text.contains('________')) {
@@ -137,6 +141,8 @@ class _CardAHState extends State<CardAH>
       text: text.split(' - ')[1],
       style: TextStyle(color: Theme.of(context).colorScheme.secondary));
 
+  /// If it's activated ([isClicked] is true) the aspect is changed, the card is added to the list in [CasualityManager]
+  /// and the parameter method is called.
   void _isClicked() {
     if (isClicked) {
       // Removes the card from the selected card list

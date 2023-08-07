@@ -57,6 +57,7 @@ class _GamePageState extends State<GamePage> {
         ),
       );
 
+  /// Calculates the amount of rounds played by the user, excluding the rounds played as master.
   int calculateScore() =>
       (widget.random.round - 1) -
       ((widget.random.round / widget.random.totalPlayers).floor() +
@@ -88,6 +89,8 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  /// Takes a list of answers and build a horizontal list of card using the [CardAH] widget.
+  /// Every time a card widget is clicked the method [selectCard] is called.
   Widget buildCardCarousel(List<String> list) => SizedBox(
         height: 220,
         child: ListView.builder(
@@ -99,6 +102,9 @@ class _GamePageState extends State<GamePage> {
                 onClicked: () => selectCard(list[index]), text: list[index])),
       );
 
+  /// Takes the text of the clicked card and if all the cards needed were selected proceeds to redirect the user to the rigth page.
+  /// #### Parameters
+  /// - ``String [text]`` : the text of the card that has been clicked.
   void selectCard(String text) {
     if (CasualityManager.selectedCards.length ==
         CasualityManager.answerNeeded) {

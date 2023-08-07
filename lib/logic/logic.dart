@@ -53,6 +53,8 @@ class CasualityManager {
   }
 
   /// This method has to be used every time an answer card is used to complete the question card. Simply removes it from the ``[hand]``.
+  /// #### Parameters
+  /// - ``String [cardText]`` : the text of the card to remove from the [hand].
   void useCard(String cardText) => _hand.remove(cardText);
 
   /// Extract n-``[totalPlayers]`` random answer card from the ``[answerList]`` and adds to the ``[hand]`` only the i-``[playerNumber]`` card.
@@ -68,7 +70,15 @@ class CasualityManager {
     _hand.add('$position - ${answerList[position]}');
   }
 
-  /// Returns a list of answer cards, but without the id. E.g. "104 - Dio" --> "Dio".
+  /// Returns a list of answer cards, but without the id.
+  ///
+  /// E.g. 104 --> "104 - Dio" --> "Dio".
+  ///
+  /// #### Parameters
+  /// - ``List<int> [numbers]`` : the list of id of the answer cards to draw.
+  ///
+  /// #### Returns
+  /// - ``List<String>`` : the list of answers.
   List<String> revealAnswerCards(List<int> numbers) =>
       List.generate(numbers.length, (index) => answerList[numbers[index]]);
 
@@ -83,11 +93,11 @@ class CasualityManager {
   }
 
   /// Used when a round is won. Increase the ``[score]`` and clears ``[selectedCards]``.
-  void won() => {_score++, _cleanSelectedCard()};
+  void won() => {_score++, _clearSelectedCard()};
 
   /// Used when a round is lost. Clears ``[selectedCards]``.
-  void lost() => _cleanSelectedCard();
+  void lost() => _clearSelectedCard();
 
   /// Clears ``[selectedCards]``.
-  void _cleanSelectedCard() => CasualityManager.selectedCards.clear();
+  void _clearSelectedCard() => CasualityManager.selectedCards.clear();
 }

@@ -36,6 +36,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
                 isClickable: false,
               ),
               const SizedBox(height: 50),
+              // Those ifs are to hide element on setState()
               (answerCardList.isEmpty)
                   ? buildSubTitle('Inserisci i numeri delle carte:',
                       fontSize: 22)
@@ -49,80 +50,79 @@ class _MasterGamePageState extends State<MasterGamePage> {
                   : Container(),
               (answerCardList.isEmpty)
                   ? buildButton(
-                      text: 'Mostra carte',
-                      function: () {
-                        String str = textController.text
-                            .replaceAll(' ', '')
-                            .replaceAll(',', '')
-                            .replaceAll('-', '');
-
-                        if (str.contains('.') &&
-                            (str.split('.').length ==
-                                (CasualityManager.answerNeeded *
-                                    (widget.random.totalPlayers - 1)))) {
-                          final splitArr = str.split('.');
-
-                          // If data inserted aren't numbers the function stops
-                          for (var element in splitArr) {
-                            if (int.tryParse(element) == null) return;
-                          }
-
-                          // Converts the array of number into an array with the corresponding answer
-                          final List<String> answerList = widget.random
-                              .revealAnswerCards(List<int>.generate(
-                                  splitArr.length,
-                                  (index) => int.parse(splitArr[index])));
-
-                          if (answerList.length ==
-                              (CasualityManager.answerNeeded *
-                                  (widget.random.totalPlayers - 1))) {
-                            // True if only 1 answer per player is requested
-                            if (answerList.length ==
-                                (widget.random.totalPlayers - 1)) {
-                              answerList.shuffle();
-                              setState(() => answerCardList = answerList);
-                            } else {
-                              List<List<String>> bigList = [];
-                              for (var i = 0; i < answerList.length; i += 2) {
-                                bigList.add([answerList[i], answerList[i + 1]]);
-                              }
-
-                              bigList.shuffle();
-
-                              List<String> resultList = [];
-                              for (List<String> list in bigList) {
-                                for (var i = 0; i < list.length; i += 2) {
-                                  resultList
-                                      .add('${list[i]}\n\n${list[i + 1]}');
-                                }
-                              }
-                              setState(() => answerCardList = resultList);
-                            }
-                          }
-                        }
-                      })
+                      text: 'Mostra carte', function: () => getAnswerCards())
                   : Container(),
               (answerCardList.isNotEmpty)
                   ? buildCardCarousel(answerCardList)
                   : Container(),
               (answerCardList.isNotEmpty)
                   ? buildButton(
-                      text: 'Prossimo round',
-                      function: () {
-                        // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
-                        CasualityManager.selectedCards.clear();
-                        widget.random.fillHand();
-                        widget.random.drawQuestionCard();
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => GamePage(widget.random)));
-                      })
+                      text: 'Prossimo round', function: () => goToNewRound())
                   : Container(),
             ]),
           ),
         ),
       );
+
+  /// Read the data from the textfield, converts it into a list of numbers and then use these ids to get the answers and returns a list
+  /// of answers that is save in [answerCardList].
+  void getAnswerCards() {
+    String str = textController.text
+        .replaceAll(' ', '')
+        .replaceAll(',', '')
+        .replaceAll('-', '');
+
+    if (str.contains('.') &&
+        (str.split('.').length ==
+            (CasualityManager.answerNeeded *
+                (widget.random.totalPlayers - 1)))) {
+      final splitArr = str.split('.');
+
+      // If data inserted aren't numbers the function stops
+      for (var element in splitArr) {
+        if (int.tryParse(element) == null) return;
+      }
+
+      // Converts the array of number into an array with the corresponding answer
+      final List<String> answerList = widget.random.revealAnswerCards(
+          List<int>.generate(
+              splitArr.length, (index) => int.parse(splitArr[index])));
+
+      if (answerList.length ==
+          (CasualityManager.answerNeeded * (widget.random.totalPlayers - 1))) {
+        // True if only 1 answer per player is requested
+        if (answerList.length == (widget.random.totalPlayers - 1)) {
+          answerList.shuffle();
+          setState(() => answerCardList = answerList);
+        } else {
+          List<List<String>> bigList = [];
+          for (var i = 0; i < answerList.length; i += 2) {
+            bigList.add([answerList[i], answerList[i + 1]]);
+          }
+
+          bigList.shuffle();
+
+          List<String> resultList = [];
+          for (List<String> list in bigList) {
+            for (var i = 0; i < list.length; i += 2) {
+              resultList.add('${list[i]}\n\n${list[i + 1]}');
+            }
+          }
+          setState(() => answerCardList = resultList);
+        }
+      }
+    }
+  }
+
+  /// Goes to a MasterGamePage.
+  void goToNewRound() {
+    // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
+    CasualityManager.selectedCards.clear();
+    widget.random.fillHand();
+    widget.random.drawQuestionCard();
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => GamePage(widget.random)));
+  }
 
   Padding buildButton({required String text, required Function function}) =>
       Padding(
@@ -145,6 +145,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
         ),
       );
 
+  /// Takes a list of answers and build a horizontal list of card using the [CardAH] widget.
   Widget buildCardCarousel(List<String> list) => SizedBox(
         height: 220,
         child: ListView.builder(

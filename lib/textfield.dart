@@ -16,6 +16,7 @@ class CustomTextField extends StatelessWidget {
         child: TextFormField(
           controller: controller,
           obscureText: obscureText,
+          // Used to priviledge numbers over letters and still accessing the '.' character.
           keyboardType: TextInputType.phone,
         ),
       );

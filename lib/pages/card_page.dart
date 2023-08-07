@@ -55,6 +55,7 @@ class _CardPageState extends State<CardPage> {
         ),
       ));
 
+  /// Used to build a the ``Ho perso`` and ``Ho vinto`` buttons.
   ElevatedButton buildEndButton(
           {required String text,
           required Function function,
@@ -76,6 +77,8 @@ class _CardPageState extends State<CardPage> {
             ),
           ));
 
+  /// Used to build the complete card with the question and all the answer.
+  /// Answers are in a different color.
   Widget buildCompleteCard() => Column(
         children: [
           CardAH(
@@ -89,7 +92,7 @@ class _CardPageState extends State<CardPage> {
         ],
       );
 
-  /// Extract the ids of the card saved in ``CasualityManager.selectedCards``. E.g.: "121, 557"
+  /// Extracts the ids of the card saved in ``CasualityManager.selectedCards``. E.g.: "121, 557"
   String extractCardsId() => List<String>.generate(
           CasualityManager.selectedCards.length,
           (index) => CasualityManager.selectedCards[index].split('-')[0].trim())
@@ -97,7 +100,7 @@ class _CardPageState extends State<CardPage> {
       .replaceAll('[', '')
       .replaceAll(']', '');
 
-  /// Go to MasterGamePage if the next round is the round of the actual player
+  /// Goes to a MasterGamePage if the next round is the round of the actual player, otherwise goes to a GamePage.
   void goToNewRound() {
     widget.random.fillHand();
     widget.random.drawQuestionCard();
