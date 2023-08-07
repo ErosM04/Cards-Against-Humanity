@@ -80,7 +80,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   Widget buildCardCarousel(List<String> list) => SizedBox(
-        height: 200,
+        height: 220,
         child: ListView.builder(
             itemCount: list.length,
             shrinkWrap: true,
