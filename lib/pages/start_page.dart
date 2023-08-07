@@ -6,6 +6,7 @@ import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
 import 'package:cards_against_humanity/textfield.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StartPage extends StatefulWidget {
   final CsvReader csvReader = const CsvReader();
@@ -79,7 +80,19 @@ class _StartPageState extends State<StartPage> {
                   ),
                 ),
                 CustomTextField(controller: playerNumberController),
-                const SizedBox(height: 100),
+                const SizedBox(height: 50),
+                GestureDetector(
+                  onTap: () => launchUrl(Uri.parse(
+                      'https://github.com/ErosM04/Cards-Against-Humanity')),
+                  child: const Text(
+                    'Clicca qui per la guida!',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: ElevatedButton(
