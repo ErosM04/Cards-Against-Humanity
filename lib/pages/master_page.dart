@@ -113,8 +113,6 @@ class _MasterGamePageState extends State<MasterGamePage> {
                         CasualityManager.selectedCards.clear();
                         widget.random.fillHand();
                         widget.random.drawQuestionCard();
-                        // As this round couldn't be played by the actual player, is not counted
-                        widget.random.addUncountableRound();
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

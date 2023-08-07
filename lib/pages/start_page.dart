@@ -132,7 +132,9 @@ class _StartPageState extends State<StartPage> {
     if (seed == null ||
         playerAmount == null ||
         playerNumber == null ||
+        playerNumber <= 0 ||
         playerNumber > playerAmount ||
+        playerAmount < 2 ||
         playerAmount > 20) {
       cojion();
       return;

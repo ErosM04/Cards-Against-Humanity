@@ -28,7 +28,7 @@ class _GamePageState extends State<GamePage> {
                 padding: const EdgeInsets.all(0),
                 icon: Expanded(
                   child: Text(
-                    '${widget.random.score}/${widget.random.round - widget.random.skippedRounds}',
+                    '${widget.random.score}/${calculateScore()}',
                     style: TextStyle(
                         fontSize: 17,
                         color: Theme.of(context).colorScheme.secondary),
@@ -56,6 +56,15 @@ class _GamePageState extends State<GamePage> {
           ),
         ),
       );
+
+  int calculateScore() =>
+      (widget.random.round - 1) -
+      ((widget.random.round / widget.random.totalPlayers).floor() +
+          ((widget.random.round % widget.random.totalPlayers) /
+                      widget.random.playerNumber >=
+                  1
+              ? 1
+              : 0));
 
   Padding buildSubTitle(String text,
       {double fontSize = 24,
