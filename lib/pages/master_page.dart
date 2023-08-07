@@ -58,22 +58,27 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
                         if (str.contains('.') &&
                             (str.split('.').length ==
-                                    (CasualityManager.answerNeeded * 3) ||
-                                str.split('.').length == 6)) {
-                          final splitArr = str.split(',');
+                                (CasualityManager.answerNeeded *
+                                    (widget.random.totalPlayers - 1)))) {
+                          final splitArr = str.split('.');
 
                           // If data inserted aren't numbers the function stops
                           for (var element in splitArr) {
                             if (int.tryParse(element) == null) return;
                           }
 
+                          // Converts the array of number into an array with the corresponding answer
                           final List<String> answerList = widget.random
                               .revealAnswerCards(List<int>.generate(
                                   splitArr.length,
                                   (index) => int.parse(splitArr[index])));
+
                           if (answerList.length ==
-                              (CasualityManager.answerNeeded * 3)) {
-                            if (answerList.length == 3) {
+                              (CasualityManager.answerNeeded *
+                                  (widget.random.totalPlayers - 1))) {
+                            // True if only 1 answer per player is requested
+                            if (answerList.length ==
+                                (widget.random.totalPlayers - 1)) {
                               answerList.shuffle();
                               setState(() => answerCardList = answerList);
                             } else {
