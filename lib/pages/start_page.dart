@@ -106,18 +106,15 @@ class _StartPageState extends State<StartPage> {
       );
 
   void startGame() {
-    // Cheks if the data in the textfields are in the wrong format
-    if (!(seedController.text.replaceAll(' ', '').isNotEmpty &&
-        (playerAmountController.text.replaceAll(' ', '').isNotEmpty &&
-            int.tryParse(playerAmountController.text.replaceAll(' ', '')) !=
-                null) &&
-        (playerNumberController.text.replaceAll(' ', '') == '1' ||
-            playerNumberController.text.replaceAll(' ', '') == '2' ||
-            playerNumberController.text.replaceAll(' ', '') == '3' ||
-            playerNumberController.text.replaceAll(' ', '') == '4'))) {
+    // Cheks if the data in the textfields are empty
+    if (seedController.text.isEmpty ||
+        playerAmountController.text.isEmpty ||
+        playerNumberController.text.isEmpty) {
       cojion();
       return;
     }
+
+    // tries converting to int
     int? seed = int.tryParse(seedController.text
         .replaceAll(' ', '')
         .replaceAll('.', '')
@@ -131,10 +128,12 @@ class _StartPageState extends State<StartPage> {
         .replaceAll('.', '')
         .replaceAll('-', ''));
 
+    // Checks if the data are in the correct format
     if (seed == null ||
         playerAmount == null ||
         playerNumber == null ||
-        playerNumber > playerAmount) {
+        playerNumber > playerAmount ||
+        playerAmount > 20) {
       cojion();
       return;
     }
@@ -144,11 +143,12 @@ class _StartPageState extends State<StartPage> {
       questionList = list;
       return widget.csvReader.getAnswers();
     }).then((answerList) {
-      //Easter egg
       if (seed == 104) {
+        //Easter egg
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => EasterEgg(Random().nextInt(10))));
       } else {
+        // Normal execution
         CasualityManager rand = CasualityManager(
           seed: seed,
           playerNumber: playerNumber,
