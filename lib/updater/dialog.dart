@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// Used to create the content for the update dialog
 class DialogContent extends StatelessWidget {
   final String latestVersion;
   final String? changes;
@@ -13,6 +14,12 @@ class DialogContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Reads the changes and extracts different types of data:
+    // - Funzionalità
+    // - Cambiamenti
+    // - Bug fixes
+    // Each element has it's own list of information. Apart from these, it also creates a title and a link to the release.
+
     String? title1;
     String? title2;
     String? title3;
@@ -67,6 +74,25 @@ class DialogContent extends StatelessWidget {
     );
   }
 
+  /// Takes a list of strings where each string is a description of a change and returns the complete list version.
+  /// If the single row is too long (over 54), is clamped at the end and '...' are added.
+  /// E.g.:
+  /// ```
+  /// rows = ['### Funzionalità', 'Aggiunto un bottone', 'Ora puoi ascoltare gli audio, bla bla bla bla']
+  /// ```
+  /// Result:
+  /// ```
+  /// """
+  /// - Aggiunto un bottone
+  /// - Ora puoi ascoltare gli audio, bla bla...
+  /// """
+  /// ```
+  ///
+  /// #### Parameters
+  /// - ``List<String> [rows]`` : the list of rows where each rows is a element of the list. Apart from the first element which is the title.
+  ///
+  /// #### Returns
+  /// ``String`` : The complete text with every row starting with a '-'.
   String _composeRows(List<String> rows) {
     String str = '';
 
@@ -80,79 +106,92 @@ class DialogContent extends StatelessWidget {
     return str;
   }
 
+  /// Graphically build the content using a Column and adding all the elemnts that are not null.
+  /// To check if an element is null and not empty ``[_safeBuild]`` method is used.
+  /// #### Parameters
+  /// - ``String [mainText]`` : the text on the top ``'Vuoi scaricale la versione vx.x.x'``
+  /// - ``String? [subTitle1]`` : the first subtitle
+  /// - ``String? [subTitle2]`` : the second subtitle
+  /// - ``String? [subTitle3]`` : the third subtitle
+  /// - ``String? [text1]`` : the first text (under the 1st subtitle)
+  /// - ``String? [text2]`` : the second text (under the 2nd subtitle)
+  /// - ``String? [text3]`` : the third text (under the 3th subtitle)
+  /// - ``String? [linkText]`` : the text befor the link
+  /// - ``String? [link]`` : the link text
+  ///
+  /// #### Returns
+  /// ``[Column]`` : the column with all the children.
   Widget buildDialog(
-          {required String mainText,
-          String? subTitle1,
-          String? subTitle2,
-          String? subTitle3,
-          String? text1,
-          String? text2,
-          String? text3,
-          String? linkText,
-          String? link}) =>
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Version title
-          _buildText(mainText),
-          const SizedBox(height: 20),
-          // Functionalities
-          (subTitle1 != null && subTitle1.isNotEmpty)
-              ? _buildText(subTitle1, isBold: true)
-              : Container(),
-          (subTitle1 != null && subTitle1.isNotEmpty)
-              ? const SizedBox(height: 4)
-              : Container(),
-          (text1 != null && text1.isNotEmpty) ? _buildText(text1) : Container(),
-          (text1 != null && text1.isNotEmpty)
-              ? const SizedBox(height: 8)
-              : Container(),
-          // Changes
-          (subTitle2 != null && subTitle2.isNotEmpty)
-              ? _buildText(subTitle2, isBold: true)
-              : Container(),
-          (subTitle2 != null && subTitle2.isNotEmpty)
-              ? const SizedBox(height: 4)
-              : Container(),
-          (text2 != null && text2.isNotEmpty) ? _buildText(text2) : Container(),
-          (text2 != null && text2.isNotEmpty)
-              ? const SizedBox(height: 8)
-              : Container(),
-          // Bug fixies
-          (subTitle3 != null && subTitle3.isNotEmpty)
-              ? _buildText(subTitle3, isBold: true)
-              : Container(),
-          (subTitle3 != null && subTitle3.isNotEmpty)
-              ? const SizedBox(height: 4)
-              : Container(),
-          (text3 != null && text3.isNotEmpty) ? _buildText(text3) : Container(),
-          const SizedBox(height: 20),
-          // Link
-          (linkText != null &&
-                  linkText.isNotEmpty &&
-                  link != null &&
-                  link.isNotEmpty)
-              ? _buildText(linkText)
-              : Container(),
-          (link != null && link.isNotEmpty) ? _buildLink(link) : Container(),
-        ],
-      );
+      {required String mainText,
+      String? subTitle1,
+      String? subTitle2,
+      String? subTitle3,
+      String? text1,
+      String? text2,
+      String? text3,
+      String? linkText,
+      String? link}) {
+    Column column = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [],
+    );
 
-  Text _buildText(String text, {bool isLink = false, bool isBold = false}) =>
+    // Version title
+    column.children.add(_buildText(mainText));
+    column.children.add(const SizedBox(height: 20));
+
+    // Functionalities
+    column.children
+        .add(_safeBuild(subTitle1, _buildText(subTitle1, isBold: true)));
+    column.children.add(_safeBuild(subTitle1, const SizedBox(height: 4)));
+    column.children.add(_safeBuild(text1, _buildText(text1)));
+    column.children.add(_safeBuild(text1, const SizedBox(height: 8)));
+
+    // Changes
+    column.children
+        .add(_safeBuild(subTitle2, _buildText(subTitle2, isBold: true)));
+    column.children.add(_safeBuild(subTitle2, const SizedBox(height: 4)));
+    column.children.add(_safeBuild(text2, _buildText(text2)));
+    column.children.add(_safeBuild(text2, const SizedBox(height: 8)));
+
+    // Bug fixies
+    column.children
+        .add(_safeBuild(subTitle3, _buildText(subTitle3, isBold: true)));
+    column.children.add(_safeBuild(subTitle3, const SizedBox(height: 4)));
+    column.children.add(_safeBuild(text3, _buildText(text3)));
+    column.children.add(_safeBuild(text3, const SizedBox(height: 8)));
+    column.children.add(const SizedBox(height: 15));
+
+    // Link
+    column.children.add(_safeBuild(linkText, _buildText(linkText)));
+    column.children.add(_safeBuild(link, _buildLink(link)));
+
+    return column;
+  }
+
+  /// Allows to securely build [widget] only if the [str] is not null and not empty.
+  Widget _safeBuild(String? str, Widget widget) =>
+      (str != null && str.isNotEmpty) ? widget : Container();
+
+  /// Returns a [Text] widget. If ``[text]`` is null, then is converted to an empty String ('').
+  /// If ``[isLink]`` is true, then the text is blue and underlined. If ``[isBold]`` is true then the text is bold.
+  /// ``[isBold]`` doesn't affect the link version of the text.
+  Text _buildText(String? text, {bool isLink = false, bool isBold = false}) =>
       (isLink)
-          ? Text(text.trim(),
+          ? Text((text == null) ? '' : text.trim(),
               style: const TextStyle(
                 color: Colors.blue,
                 decoration: TextDecoration.underline,
                 decorationColor: Colors.blue,
               ))
           : Text(
-              text.trim(),
+              (text == null) ? '' : text.trim(),
               style: TextStyle(fontWeight: (isBold) ? FontWeight.bold : null),
             );
 
-  Widget _buildLink(String text) => GestureDetector(
+  /// Returns the clickable link to the latest GitHub release. To build the text uses ``[_buildText]``.
+  Widget _buildLink(String? text) => GestureDetector(
         onTap: () => launchUrl(Uri.parse(
             'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest')),
         child: _buildText(text, isLink: true),

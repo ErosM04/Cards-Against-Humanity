@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'dart:convert';
 
+/// Allows to check for a new version and download the latest version (if exists) into the ``Downloads`` folder
+/// with the single method ``[updateToNewVersion]``.
 class Updater {
   final String actualVersion = '0.1.0';
   final String _latestReleaseLink =
@@ -15,8 +17,9 @@ class Updater {
 
   const Updater(this.context);
 
-  /// If the latest version is different from the actual then asks for update consent.
-  /// if the version is ahead then returns ``true``, otherwise display an error ``SnackBar`` and returns ``false``.
+  /// Uses ``[_getLatestVersionJson]`` to get the latest version and if it is different from the actual version, asks for update consent
+  /// to the user. When asking for consent uses ``[_getLatestVersionJson]`` again to get info about the latest changes and insert them
+  /// into the dialog using [DialogContent].
   void updateToNewVersion() async {
     String latestVersion =
         (await _getLatestVersionJson('tag_name')).replaceAll('v', '');
@@ -31,8 +34,13 @@ class Updater {
     }
   }
 
-  /// Performs a request to the Github API to obtain a json about the latest release.
-  /// ``key`` is the key used to get the corressponding value from the json.
+  /// Performs a request to the Github API to obtain a json about the latest release data.
+  /// If anything goes wrong an [Exception] is thrown and an error message [SnackBar] is called.
+  /// #### Parameters
+  /// - ``String [key]`` : is the key used to get the corressponding value from the json ``{['key'] => value}``.
+  ///
+  /// #### Returns
+  /// ``Future<String>`` : the value corresponding to ``[key]`` in the json.
   Future<String> _getLatestVersionJson(String key) async {
     int statusCode = -1;
 
@@ -55,6 +63,10 @@ class Updater {
     return '';
   }
 
+  /// Uses ``[showDialog]`` to show an [AlertDialog] over the screen.
+  /// #### Parameters
+  /// - ``String [latestVersion]`` : the latest version available of the app.
+  /// - ``DialogContent [context]`` : the content to insert under the title in the [AlertDialog].
   void _invokeDialog({
     required String latestVersion,
     required DialogContent content,
@@ -86,12 +98,10 @@ class Updater {
                 ],
               ));
 
-  /// After 2 seconds shows a ``SnackBar`` to inform the user that the new version has been detected.
-  /// Two seconds later downloads the latest version of the app (link4launches.apk) and save it in the Downloads folder.
-  ///
-  /// Every single time the download progress is updated a new ``SnackBar``containing the progress percentage is called.
-  /// At the end of the download another ``SnackBar`` is called to inform the user about the path.
-  /// A ``SnackBar`` is also used in case of error.
+  /// Uses the ``[FileDownloader]`` object to downlaod the apk.
+  /// A [SnackBar] is shown at the end of the download to inform the user that the app has been downloaded and saved
+  /// in the ``Downloads`` folder. In case of error an error message [SnackBar] is shown. To show the snackbar
+  /// ``[_callSnackBar]`` method is used.
   Future<void> _downloadUpdate(String latestVersion) async =>
       FileDownloader.downloadFile(
         url: _latestAPKLink.trim(),
@@ -104,7 +114,7 @@ class Updater {
             durationInSec: 3),
       );
 
-  /// Function used to simplify the invocation and the creation of a ``SnackBar``.
+  /// Function used to simplify the invocation and the creation of a ``[SnackBar]``.
   void _callSnackBar(
           {required String message,
           int durationInSec = 2,
