@@ -5,6 +5,8 @@ import 'package:cards_against_humanity/pages/easteregg.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
 import 'package:cards_against_humanity/textfield.dart';
+import 'package:cards_against_humanity/updater/snackbar.dart';
+import 'package:cards_against_humanity/updater/updater.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,6 +23,14 @@ class _StartPageState extends State<StartPage> {
   final seedController = TextEditingController();
   final playerAmountController = TextEditingController();
   final playerNumberController = TextEditingController();
+  late Updater updater;
+
+  @override
+  void initState() {
+    super.initState();
+    updater = Updater(context);
+    updater.updateToNewVersion();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(

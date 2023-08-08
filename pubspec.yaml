@@ -16,6 +16,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   change_app_package_name: ^1.1.0
   url_launcher: ^6.1.12
+  flutter_file_downloader: ^1.1.2
+  http: ^1.1.0
 
 
 dev_dependencies:
