@@ -173,7 +173,7 @@ class _StartPageState extends State<StartPage> {
       if (seed == 104) {
         //Easter egg
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => EasterEgg(Random().nextInt(10))));
+            builder: (context) => EasterEgg(Random().nextInt(12))));
       } else {
         // Normal execution
         CasualityManager rand = CasualityManager(
