@@ -28,13 +28,11 @@ class _GamePageState extends State<GamePage> {
               width: 65,
               child: IconButton(
                 padding: const EdgeInsets.all(0),
-                icon: Expanded(
-                  child: Text(
-                    '${widget.random.score}/${calculateScore()}',
-                    style: TextStyle(
-                        fontSize: 17,
-                        color: Theme.of(context).colorScheme.secondary),
-                  ),
+                icon: Text(
+                  '${widget.random.score}/${calculateScore()}',
+                  style: TextStyle(
+                      fontSize: 17,
+                      color: Theme.of(context).colorScheme.secondary),
                 ),
                 onPressed: () {},
               ),
