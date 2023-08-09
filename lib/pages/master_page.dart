@@ -2,6 +2,7 @@ import 'package:cards_against_humanity/card.dart';
 import 'package:cards_against_humanity/pages/appbar.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
+import 'package:cards_against_humanity/pages/start_page.dart';
 import 'package:cards_against_humanity/textfield.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +21,13 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: const CustomAppBar(),
+        appBar: CustomAppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_sharp),
+            onPressed: () => Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const StartPage())),
+          ),
+        ),
         body: SingleChildScrollView(
           child: Center(
             child: Column(children: [
