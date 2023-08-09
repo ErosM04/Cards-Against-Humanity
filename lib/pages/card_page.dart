@@ -1,4 +1,5 @@
 import 'package:cards_against_humanity/card.dart';
+import 'package:cards_against_humanity/pages/appbar.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
@@ -16,13 +17,7 @@ class CardPage extends StatefulWidget {
 class _CardPageState extends State<CardPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          'Cards Against Humanity',
-          style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-        ),
-      ),
+      appBar: const CustomAppBar(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 30),

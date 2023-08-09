@@ -1,3 +1,4 @@
+import 'package:cards_against_humanity/pages/appbar.dart';
 import 'package:flutter/material.dart';
 
 class EasterEgg extends StatelessWidget {
@@ -9,14 +10,7 @@ class EasterEgg extends StatelessWidget {
   Widget build(BuildContext context) => WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            title: Text(
-              'Cards Against Humanity',
-              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
+          appBar: const CustomAppBar(),
           body: GestureDetector(
             onTap: () => Navigator.of(context).pop(),
             child: Center(

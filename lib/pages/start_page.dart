@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/model/data_reader.dart';
+import 'package:cards_against_humanity/pages/appbar.dart';
 import 'package:cards_against_humanity/pages/easteregg.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
@@ -39,13 +40,7 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            'Cards Against Humanity',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-          ),
-        ),
+        appBar: const CustomAppBar(),
         body: Center(
           child: SingleChildScrollView(
             child: Column(
@@ -164,7 +159,7 @@ class _StartPageState extends State<StartPage> {
         playerNumber == null ||
         playerNumber <= 0 ||
         playerNumber > playerAmount ||
-        playerAmount < 2 ||
+        playerAmount < 3 ||
         playerAmount > 20) {
       cojion();
       return;

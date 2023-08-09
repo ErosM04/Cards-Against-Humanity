@@ -1,4 +1,5 @@
 import 'package:cards_against_humanity/card.dart';
+import 'package:cards_against_humanity/pages/appbar.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/textfield.dart';
@@ -19,13 +20,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            'Cards Against Humanity',
-            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-          ),
-        ),
+        appBar: const CustomAppBar(),
         body: SingleChildScrollView(
           child: Center(
             child: Column(children: [
