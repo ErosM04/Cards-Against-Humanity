@@ -12,5 +12,5 @@ Appena avviato il gioco ci troveremo davanti ad una schermata in cui vanno inser
 - il totale dei giocatori, da 3 a 20.
 - il numero del giocatore, da 1 fino al totale di giocatori.
 <div align="center">
-<img src="readme_images/start_page.jpeg">
+<img src="readme_images/start_page.jpg">
 </div>
