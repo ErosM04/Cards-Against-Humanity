@@ -99,6 +99,7 @@ Una volta eletta la carta più divertente non ci resta che premere il pulsante *
 </div>
 
 ## Download e Installazione
-...
+L'apk da scaricare lo puoi trovare nella cartella ``release_apk`` o eventualmente nell'ultimo **release**.
+Per installarlo basta cliccarlo e il sistema operativo Android chiederà automaticamente di installarlo. Se vi dovesse avvisare che è un'app pericolosa, sbattetevene è solo perché non la state installando dal Play Store, e poi io sono una brava persona :wink: 
 
 **Buon divertimento!** :smiley:
