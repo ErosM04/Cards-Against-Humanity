@@ -12,7 +12,7 @@ class Updater {
   final String _latestReleaseLink =
       'https://api.github.com/repos/ErosM04/Cards-Against-Humanity/releases/latest';
   final String _latestAPKLink =
-      'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest/download/Cards Against Humanity.apk';
+      'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest/download/Cards_Against_Humanity.apk';
   final BuildContext context;
 
   const Updater(this.context);
