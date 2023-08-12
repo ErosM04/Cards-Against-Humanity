@@ -26,6 +26,7 @@ In aggiunta vi sarà anche un [link](https://github.com/ErosM04/Cards-Against-Hu
 </div>
 
 Di seguito un esempio di come inserire i dati per una partita. In questo caso ``56466`` è il seed che tutti dovrano inserire uguale. Poi il numero totale di giocatori, in questo caso ``4``. Ed infine il numero del giocatore, che in questo caso può andare da 1 a 4, l'importante è che ogn'uno abbia un numero diverso.
+
 <div align="center">
     <img src="readme_images/start_page2.jpg" width=200>
 </div>
@@ -34,7 +35,7 @@ Di seguito un esempio di come inserire i dati per una partita. In questo caso ``
 Nel caso in cui **non** avessimo iniziato come giocatore **1** ci troveremmo davanti ad una schermata simile a questa, giocheremmo quindi un turno normale da giocatore.
 
 Nella schermata potremmo vedere al centro la carta domanda con uno spazio vuoto da completare indicato da ``_____``. Per colmare quel buco con qualche cazzata ci basterà cliccare una delle carte dal carosello sottostante che rappresenta la nostra mano di **10** carte.
-Inoltre nella barra in alto vi è a sinistra un icon per terminare la partita e a destra il nostro attuale punteggio, attualmente 0/0 poiché non abbiamo ancora giocato niente.
+Inoltre nella barra in alto vi è a sinistra un icona per terminare la partita e a destra il nostro attuale punteggio, attualmente 0/0 poiché non abbiamo ancora giocato niente.
 
 <div align="center">
     <img src="readme_images/game_page.jpg" width=200>
@@ -54,25 +55,29 @@ Una volta premuti i tasti della schermata precedente, a meno che non sia il nost
     <img src="readme_images/game_page2.jpg" width=200>
 </div>
 
-<div align="center">
-    <img src="readme_images/game_page_2answers.jpg" width=200>
-</div>
+Di seguito un esempio di domanda in cui sono richieste 2 risposte; in questo caso la prima carta cliccata si evidenzierà e finché non avremo premuto la seconda non andremo avanti. Fino a che non abbbiamo premuto la seconda carta possiamo anche decidere di deselezionare la prima ricliccandovi sopra. **Importante!** selezionare le carte in ordine o la frase verrà sminchiata.
 
 <div align="center">
+    <img src="readme_images/game_page_2answers.jpg" width=200>
     <img src="readme_images/card_page_2answers.jpg" width=200>
 </div>
 
 ### Master turn
-In questo caso, avendo iniziato come giocatore **1**, inizieremo come master
+Il Master turn è un turno che a rotazione, dal giocatore 1 al n, viene giocato dal **giudice** che non dovrà completare la domanda con una risposta, bensì eleggere il completamento più divertente scelto dagli altri giocatori.
+
+Ci troveremmo quindi davanti ad una schermata che al centro avrà la carta domanda e sotto ad essa vi sarà una casella di testo per inserire i numeri delle carte scelte dagli altri giocatori (che si trovano sotto alla carta completa) in ordine e semparate dal punto "**.**".
+Inoltre nella barra in alto vi è a sinistra un icona per terminare la partita.
 
 <div align="center">
     <img src="readme_images/master_page.jpg" width=200>
 </div>
 
-<div align="center">
-    <img src="readme_images/master_page2.jpg" width=200>
-</div>
+Nell'immagine sottostante possiamo vedere un esempio di come compilare il campo. In questo caso stanno giocando 4 giocatori in totale, quindi escludendo quello che attualmente deve inserire i numeri abbiamo un totale di 3 carte completamento scelte, di conseguenza inseriremo i numeri nel seguente modo: ``364.774.26``.
+Nel caso la carta domanda necessiti di 2 carte completamento ecco che i numeri andranno diposti nel modo seguente: ``55.24.7.255.743.112``. L'importante è che le 2 carte scelte dallo stesso giocatore vengano scritte una di seguito all'altra.
 
 <div align="center">
+    <img src="readme_images/master_page2.jpg" width=200>
     <img src="readme_images/master_page3.jpg" width=200>
 </div>
+
+**Buon divertimento!** :smiley:
