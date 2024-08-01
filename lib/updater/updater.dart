@@ -1,4 +1,5 @@
 import 'package:cards_against_humanity/updater/dialog.dart';
+import 'package:cards_against_humanity/updater/installer.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -105,10 +106,18 @@ class Updater {
   Future<void> _downloadUpdate(String latestVersion) async =>
       FileDownloader.downloadFile(
         url: _latestAPKLink.trim(),
-        onDownloadCompleted: (path) => _callSnackBar(
-            message:
-                'Versione $latestVersion scaricata in ${path.split('/')[4]}/${path.split('/').last}',
-            durationInSec: 5),
+        onDownloadCompleted: (path) {
+          _callSnackBar(
+              message:
+                  'Versione $latestVersion scaricata in ${path.split('/')[4]}/${path.split('/').last}',
+              durationInSec: 5);
+          Future.delayed(
+            const Duration(seconds: 5),
+            () => Installer(context)
+              ..installUpdate(
+                  (path.startsWith('/')) ? path.substring(1) : path),
+          );
+        },
         onDownloadError: (errorMessage) => _callSnackBar(
             message: 'Errore durante il download $latestVersion: $errorMessage',
             durationInSec: 3),
