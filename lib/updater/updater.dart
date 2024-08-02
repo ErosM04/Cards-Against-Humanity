@@ -9,7 +9,7 @@ import 'dart:convert';
 /// Allows to check for a new version and download the latest version (if exists) into the ``Downloads`` folder
 /// with the single method ``[updateToNewVersion]``.
 class Updater {
-  final String actualVersion = '0.1.0';
+  final String actualVersion = '0.9.0';
   final String _latestReleaseLink =
       'https://api.github.com/repos/ErosM04/Cards-Against-Humanity/releases/latest';
   final String _latestAPKLink =
