@@ -54,3 +54,5 @@ flutter:
     - assets/eastereggs/104_9.jpeg
     - assets/eastereggs/104_10.jpeg
     - assets/eastereggs/104_11.jpeg
+    - assets/dialog/upgrade.png
+    - assets/dialog/error.png

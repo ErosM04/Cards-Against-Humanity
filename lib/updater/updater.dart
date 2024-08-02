@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'dart:convert';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Allows to check for a new version and download the latest version (if exists) into the ``Downloads`` folder
 /// with the single method ``[updateToNewVersion]``.
@@ -107,12 +108,23 @@ class Updater {
       FileDownloader.downloadFile(
         url: _latestAPKLink.trim(),
         onDownloadCompleted: (path) {
+          // Prima SnackBar che avverte della fine del download
           _callSnackBar(
               message:
                   'Versione $latestVersion scaricata in ${path.split('/')[4]}/${path.split('/').last}',
-              durationInSec: 5);
+              durationInSec: 4);
+          // Viene verificato che ci siano i permessi per installare il download, se non ci sono una seconda SnackBar appare
+          // e informa che verrà chiesto il permesso all'utente
+          Permission.requestInstallPackages.isGranted.then((res) => (res)
+              ? null
+              : _callSnackBar(
+                  message:
+                      "Ti verrà ora chiesto di dare il permesso per l'installazione dell'aggiornamento",
+                  durationInSec: 4,
+                ));
+          // Finite entrambe le operazioni parte l'installazione
           Future.delayed(
-            const Duration(seconds: 5),
+            const Duration(seconds: 8),
             () => Installer(context)
               ..installUpdate(
                   (path.startsWith('/')) ? path.substring(1) : path),

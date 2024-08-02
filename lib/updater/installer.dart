@@ -35,27 +35,10 @@ class Installer {
                 },
               ),
           onDenied: () => _callSnackBar(
-              message:
-                  "Ma come no? Cattivo! Vatti a installare l'update nella cartella Download"));
-  // {
-  //   print('path: $path');
-  //   OpenFile.open(path).then(
-  //     (result) {
-  //       print('type: ${result.type}');
-  //       if (result.type != ResultType.done) {
-  //         return ErrorDialogBuilder(
-  //                 context: context,
-  //                 content: ErrorDialogContent(
-  //                     errorType: result.message, path: _getShortPath(path)),
-  //                 denyButtonAction: () => _callSnackBar(message: ':('),
-  //                 confirmButtonAction: () => _manuallySelectAndInstallUpdate())
-  //             .invokeDialog();
-  //       } else {
-  //         return null;
-  //       }
-  //     },
-  //   );
-  // }
+                message:
+                    "Ma come no? Cattivo! Vatti a installare l'update nella cartella Download",
+                durationInSec: 5,
+              ));
 
   void _requestInstallPackagesPermission(
       {required Function onGranted, required Function onDenied}) async {
