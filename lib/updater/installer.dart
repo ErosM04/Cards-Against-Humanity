@@ -1,17 +1,17 @@
 import 'dart:io';
 import 'package:cards_against_humanity/updater/snackbar.dart';
-import 'package:cards_against_humanity/updater/view/dialog_builders/error_dialog_builder.dart';
-import 'package:cards_against_humanity/updater/view/dialog_contents/error_dialog_content.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_builders/error_dialog_builder.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_contents/error_dialog_content.dart';
 import 'package:flutter/material.dart';
 import 'package:cards_against_humanity/updater/updater.dart';
-// import 'package:open_filex/open_filex.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
 
 /// This class is used by the ``[Updater]`` object in order to install the downloaded apk file.
 class Installer {
-  /// Context used to call both the ``[CustomSnackBar]`` and the ``[CustomDialog]``.
+  /// Context used to call both the ``[SnackBarMessage]`` and the ``[CustomDialog]``.
   final BuildContext context;
 
   const Installer(this.context);
@@ -19,20 +19,16 @@ class Installer {
   Future<void> installUpdate(String path) async =>
       _requestInstallPackagesPermission(
           onGranted: () => OpenFile.open(path).then(
-                (result) {
-                  print('type: ${result.type}');
-                  if (result.type != ResultType.done) {
-                    return ErrorDialogBuilder(
+                (result) => (result.type != ResultType.done)
+                    ? ErrorDialogBuilder(
                         context: context,
                         content: ErrorDialogContent(
                             errorType: result.message,
                             path: _getShortPath(path)),
                         denyButtonAction: () => _callSnackBar(message: ':('),
                         confirmButtonAction: () =>
-                            _manuallySelectAndInstallUpdate()).invokeDialog();
-                  }
-                  return null;
-                },
+                            _manuallySelectAndInstallUpdate()).invokeDialog()
+                    : null,
               ),
           onDenied: () => _callSnackBar(
                 message:
@@ -73,7 +69,8 @@ class Installer {
       }
     } catch (e) {
       _callSnackBar(
-          message: 'An error occurred while manually installing the update :(');
+          message:
+              "Si è verificato un errore durante l'installazione manuale dell'aggiornamento :(");
     }
   }
 

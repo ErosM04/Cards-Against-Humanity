@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cards_against_humanity/updater/view/dialog_contents/dialog_content.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_contents/dialog_content.dart';
 
 /// Overrides [DialogContent] to create a content to display inside an ``[ErrorDialogContent]``.
 ///
@@ -27,21 +27,21 @@ class ErrorDialogContent extends DialogContent {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Do you want to manually install the update apk file?',
+            "Vuoi installare manualmente l'aggiornamento?",
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 10),
           const Divider(),
           const SizedBox(height: 5),
           const Text(
-              'While trying to install the update you just downloaded an error occurred:'),
+              "Durante l'installazione dell'aggiornamento si è verificato un errore:"),
           const SizedBox(height: 3),
           (isSafe(errorType))
               ? buildCustomText(errorType, color: Colors.red)
               : Container(),
           const SizedBox(height: 10),
           const Text(
-              'Now you will be redirected to the file manager in order to select the update file, located at:'),
+              'Verrai ora rediretto al file manager per eseguire il file di aggiornamento che si trova in:'),
           const SizedBox(height: 5),
           (isSafe(path))
               ? buildCustomText(path, color: Colors.blue)

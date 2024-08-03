@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cards_against_humanity/updater/view/custom_dialog.dart';
-import 'package:cards_against_humanity/updater/view/dialog_builders/dialog_builder.dart';
-import 'package:cards_against_humanity/updater/view/dialog_contents/update_dialog_content.dart';
+import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_builders/dialog_builder.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_contents/update_dialog_content.dart';
 
 /// Extends ``[DialogBuilder]`` in order to create a [CustomDialog] suitable to infrom the user that an app ``update``
 /// is available.
@@ -21,11 +21,11 @@ class UpdateDialogBuilder extends DialogBuilder {
   @override
   CustomDialog buildDialog() => CustomDialog(
         image: Image.asset(
-          'assets/dialog/upgrade.png',
+          'assets/dialog/update.png',
           scale: 9,
-          color: const Color.fromARGB(255, 1, 202, 98),
+          color: Theme.of(context).colorScheme.tertiary,
         ),
-        title: 'New version available',
+        title: 'Nuova versione scaricabile',
         denyButtonAction: denyButtonAction,
         confirmButtonAction: confirmButtonAction,
         child: content,

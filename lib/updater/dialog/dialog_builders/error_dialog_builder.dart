@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cards_against_humanity/updater/view/custom_dialog.dart';
-import 'package:cards_against_humanity/updater/view/dialog_builders/dialog_builder.dart';
-import 'package:cards_against_humanity/updater/view/dialog_contents/error_dialog_content.dart';
+import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_builders/dialog_builder.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_contents/error_dialog_content.dart';
 
 /// Extends ``[DialogBuilder]`` in order to create a [CustomDialog] suitable to infrom the user that something went
 /// wrong while trying to install the downloaded updated ``.apk`` file.
@@ -24,9 +24,9 @@ class ErrorDialogBuilder extends DialogBuilder {
         image: Image.asset(
           'assets/dialog/error.png',
           scale: 9,
-          color: Colors.red,
+          color: Theme.of(context).colorScheme.tertiary,
         ),
-        title: 'Error while installing the update',
+        title: "Errore durante l'installazione dell'aggiornamento",
         denyButtonAction: denyButtonAction,
         confirmButtonAction: confirmButtonAction,
         child: content,

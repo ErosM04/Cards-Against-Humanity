@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:cards_against_humanity/updater/view/custom_dialog.dart';
-import 'package:cards_against_humanity/updater/view/dialog_builders/update_dialog_builder.dart';
-import 'package:cards_against_humanity/updater/view/dialog_contents/dialog_content.dart';
+import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_builders/update_dialog_builder.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_contents/dialog_content.dart';
 
 /// Overrides [DialogContent] to create a content to display inside an ``[UpdateDialogBuilder]``.
 ///
@@ -77,8 +77,8 @@ class UpdateDialogContent extends DialogContent {
       formattedChanges = _extractLinks(formattedChanges);
 
       if (formattedChanges.contains('###') &&
-          (formattedChanges.contains('Features') ||
-              formattedChanges.contains('Changes') ||
+          (formattedChanges.contains('Funzionalità') ||
+              formattedChanges.contains('Modifiche') ||
               formattedChanges.contains('Bug fixes'))) {
         List<String> arr = formattedChanges.split('###');
         title1 = '';
@@ -87,35 +87,36 @@ class UpdateDialogContent extends DialogContent {
 
         // Every if inside the for-loop is executed only one time (in order)
         for (var element in arr) {
-          if (element.contains('Features') && element.contains('-')) {
-            title1 = 'Features';
+          if (element.contains('Funzionalità') && element.contains('-')) {
+            title1 = 'Funzionalità';
             // Uses sublist() to remove the first element which is the title ('Features')
             // To split '- ' is used, beacuse '-' would also split on words like 'drop-down' or 'ahead-of-time'.
             list1 = element.split('- ').sublist(1);
-          } else if (element.contains('Changes')) {
-            title2 = 'Changes';
+          } else if (element.contains('Modifiche')) {
+            title2 = 'Modifiche';
             list2 = element.split('- ').sublist(1);
           } else if (element.contains('Bug fixes')) {
             title3 = 'Bug fixes';
-            list3 = ['Various bug fixes'];
+            list3 = ['Alcuni bug fixes'];
           }
         }
-        linkText = 'More info at:';
-        link = 'link4launches';
+        linkText = 'Più informazioni:';
+        link = 'Cards Against Humanity';
       }
-    }
 
-    return buildContent(
-      mainText: 'Download version $latestVersion?',
-      subTitle1: title1,
-      subTitle2: title2,
-      subTitle3: title3,
-      list1: list1,
-      list2: list2,
-      list3: list3,
-      linkText: linkText,
-      link: link,
-    );
+      return buildContent(
+        mainText: 'Scaricare la versione $latestVersion?',
+        subTitle1: title1,
+        subTitle2: title2,
+        subTitle3: title3,
+        list1: list1,
+        list2: list2,
+        list3: list3,
+        linkText: linkText,
+        link: link,
+      );
+    }
+    return Container();
   }
 
   /// Removes GitHub links (``[Name](link)``) parentesis and name, leaving only the link.
@@ -201,14 +202,18 @@ class UpdateDialogContent extends DialogContent {
 
     // Link
     if (isSafe(link)) {
-      children.add(Row(children: [
-        buildCustomText(linkText),
-        isSafe(linkText) ? const SizedBox(width: 5) : Container(),
-        buildLink(
-          text: link,
-          url: 'https://github.com/ErosM04/link4launches/releases/latest',
-        ),
-      ]));
+      children.add(Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          buildCustomText(linkText),
+          isSafe(linkText) ? const SizedBox(width: 5) : Container(),
+          buildLink(
+            text: link,
+            url:
+                'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest',
+          ),
+        ],
+      ));
     }
 
     children.add(const SizedBox(height: 10));

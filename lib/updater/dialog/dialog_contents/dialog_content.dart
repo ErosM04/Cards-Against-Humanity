@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cards_against_humanity/updater/view/custom_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Creates a [Column] containing differents widgets. Those widgets will be the content displayed inside the ``[CustomDialog]``.

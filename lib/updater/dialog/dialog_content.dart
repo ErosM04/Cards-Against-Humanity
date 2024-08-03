@@ -19,7 +19,6 @@ class DialogContent extends StatelessWidget {
     // - Cambiamenti
     // - Bug fixes
     // Each element has it's own list of information. Apart from these, it also creates a title and a link to the release.
-
     String? title1;
     String? title2;
     String? title3;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:cards_against_humanity/updater/view/custom_dialog.dart';
-import 'package:cards_against_humanity/updater/view/dialog_contents/dialog_content.dart';
+import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/dialog_contents/dialog_content.dart';
 
 /// Builds a basic ``[CustomDialog]`` using the given parameters and allows to invoke it (display it) using the ``[invokeDialog]`` method.
 /// It also offers the possibility to animate the widget with a bottom-to-center [SlideTransition] and a [FadeTransition].
@@ -36,7 +36,7 @@ class DialogBuilder {
   /// This is a basic implementation of a plain [CustomDialog] as it's meant to be ``overrided``.
   CustomDialog buildDialog() => CustomDialog(
         image: Image.asset('assets/dialog/upgrade.png'),
-        title: 'Title',
+        title: 'Titolo',
         denyButtonAction: denyButtonAction,
         confirmButtonAction: confirmButtonAction,
         child: Container(),

@@ -35,7 +35,7 @@ class CustomDialog extends StatelessWidget {
     required this.title,
     required this.child,
     this.denyButtonText = 'No',
-    this.confirmButtonText = 'Yes',
+    this.confirmButtonText = 'Sì',
     required this.denyButtonAction,
     required this.confirmButtonAction,
     this.popAtActionEnd = true,
@@ -48,9 +48,9 @@ class CustomDialog extends StatelessWidget {
           children: [
             // Animated image
             Container(
-              decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 81, 92, 110),
-                  borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20))),
               child: Padding(
@@ -99,22 +99,46 @@ class CustomDialog extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        denyButtonAction();
-                        Navigator.pop(context);
-                      },
-                      child: Text(denyButtonText)),
-                  ElevatedButton(
-                      onPressed: () {
-                        confirmButtonAction();
-                        Navigator.pop(context);
-                      },
-                      child: Text(confirmButtonText)),
+                  // No
+                  _buildButton(
+                    onPressed: denyButtonAction,
+                    text: denyButtonText,
+                    context: context,
+                  ),
+                  // Sì
+                  _buildButton(
+                    onPressed: confirmButtonAction,
+                    text: confirmButtonText,
+                    context: context,
+                  ),
                 ],
               ),
             )
           ],
+        ),
+      );
+
+  ElevatedButton _buildButton({
+    required Function onPressed,
+    required String text,
+    required BuildContext context,
+    bool popAfterOnPressed = true,
+  }) =>
+      ElevatedButton(
+        onPressed: () {
+          onPressed();
+          if (popAfterOnPressed) Navigator.pop(context);
+        },
+        style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all<Color>(
+                Theme.of(context).colorScheme.primary)),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       );
 }
