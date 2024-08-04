@@ -38,7 +38,7 @@ class UpdateDialogContent extends DialogContent {
   /// "Download version x.x.x?"
   /// ------------------------------------------------
   /// "Features
-  /// - Changed package name (app id) to ErosM04.link4launches
+  /// - Changed package name (app id) to ErosM04.Cards_Against_Humanity
   /// - Lunch page images are now zoomable
   /// - Divided readme info in 2 files, README.md and MORE_INFO.md
   /// - ...
@@ -52,7 +52,8 @@ class UpdateDialogContent extends DialogContent {
   /// Bug fixes
   /// - Various bug fixes
   ///
-  /// More info at: link4launches"
+  /// More info at:
+  /// Cards against Humanity"
   /// ------------------------------------------------
   /// ```
   ///(the "-" and the "- ..." are added in later methods)

@@ -1,5 +1,4 @@
 import 'package:cards_against_humanity/updater/dialog/dialog_builders/update_dialog_builder.dart';
-import 'package:cards_against_humanity/updater/dialog/dialog_content.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_contents/update_dialog_content.dart';
 import 'package:cards_against_humanity/updater/installer.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
@@ -12,19 +11,26 @@ import 'package:permission_handler/permission_handler.dart';
 /// Allows to check for a new version and download the latest version (if exists) into the ``Downloads`` folder
 /// with the single method ``[updateToNewVersion]``.
 class Updater {
+  /// Current version of the app, needs to be updated every time a new release is built.
   final String actualVersion = '0.2.0';
+
+  /// The link to get a json containg the latest GitHub release information (for the app).
   final String _latestReleaseLink =
       'https://api.github.com/repos/ErosM04/Cards-Against-Humanity/releases/latest';
+
+  /// The link to get the update apk file.
   final String _latestAPKLink =
       'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest/download/Cards_Against_Humanity.apk';
+
+  /// App context used for various widgets.
   final BuildContext context;
 
   const Updater(this.context);
 
-  /// Uses ``[_getLatestVersionJson]`` to get the latest version and if it is different from the actual version, asks for update consent
-  /// to the user. When asking for consent uses ``[_getLatestVersionJson]`` again to get info about the latest changes and insert them
-  /// into the dialog using [DialogContent].
-  Future updateToNewVersion() async {
+  /// Uses ``[_getLatestVersionData]`` to get the latest release info (such as version, description...). If the GitHub
+  /// release isn't a draft and the version is different from the actual version, invoke an ``[UpdateDialogBuilder]`` that
+  /// will ask the user if he wants to download the update ``[_downloadUpdate]``.
+  void updateToNewVersion() async {
     var data = await _getLatestVersionData();
 
     if (data.isNotEmpty &&
@@ -39,61 +45,11 @@ class Updater {
         ),
       ).invokeDialog();
     }
-
-    // if (latestVersion != actualVersion && latestVersion.isNotEmpty) {
-    //   UpdateDialogBuilder(
-    //           context: context,
-    //           confirmButtonAction: () => _downloadUpdate(latestVersion),
-    //           denyButtonAction: () => _callSnackBar(message: ':('),
-    //           content: UpdateDialogContent(latestVersion: latestVersion, changes: ,))
-    //       .invokeDialog();
-    //   // _invokeDialog(
-    //   //   latestVersion: latestVersion,
-    //   //   content: DialogContent(
-    //   //       latestVersion: latestVersion,
-    //   //       changes: await _getLatestVersionJson('body')),
-    //   // );
-    // }
   }
-
-  /// Uses ``[showDialog]`` to show an [AlertDialog] over the screen.
-  /// #### Parameters
-  /// - ``String [latestVersion]`` : the latest version available of the app.
-  /// - ``DialogContent [context]`` : the content to insert under the title in the [AlertDialog].
-  void _invokeDialog({
-    required String latestVersion,
-    required DialogContent content,
-  }) =>
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-                title: const Text('Nuova versione disponibile'),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                actionsAlignment: MainAxisAlignment.spaceAround,
-                actions: [
-                  ElevatedButton(
-                    onPressed: () {
-                      _callSnackBar(message: ':(');
-                      Navigator.pop(context);
-                    },
-                    child: const Text('No'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _downloadUpdate(latestVersion);
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Sì'),
-                  )
-                ],
-                content: content,
-              ));
 
   /// Performs a request to the Github API to obtain a json within info about the latest release data, the link used is
   /// ``[_latestReleaseLink]``.
-  /// If anything goes wrong an [Exception] is thrown and an error message [CustomSnackBar] is showed.
+  /// If anything goes wrong an [Exception] is thrown and an error message [SnackBarMessage] is showed.
   ///
   /// #### Returns
   /// ``Future<Map<String, String>>`` : a map containing info about the latest GitHub release of the app's repository.
@@ -143,7 +99,7 @@ class Updater {
           // First SnackBar that informs the user that the download completed successfully and gives the path
           _callSnackBar(
               message:
-                  'Versione $latestVersion scaricata in ${path.split('/')[path.split('/').length - 2]}/${path.split('/').last}',
+                  'Versione $latestVersion scaricata in ${_getShortPath(path)}',
               durationInSec: 4);
           // Verifies if the installation package permission is granted
           Permission.requestInstallPackages.isGranted.then((res) {
@@ -178,7 +134,7 @@ class Updater {
             durationInSec: 3),
       );
 
-  /// Function used to simplify the invocation and the creation of a ``[SnackBar]``.
+  /// Function used to simplify the invocation and the creation of a ``[SnackBar]``. Uses ``[SnackBarMessage]``
   void _callSnackBar(
           {required String message,
           int durationInSec = 2,
@@ -188,4 +144,15 @@ class Updater {
               durationInSec: durationInSec,
               durationInMil: durationInMil)
           .build(context));
+
+  /// Thakes a ``[path]`` and split that based on ``[splitCharacter]``, then returns a path containg only the last 2 elements.
+  ///
+  /// #### Parameters
+  /// - ``String path`` : a generic path.
+  /// - ``String splitCharacter`` : the character used for the ``split()``.
+  ///
+  /// #### Returns
+  /// ``String`` : the path containg only the 2 last elements, separated by the ``[splitCharacter]``.
+  String _getShortPath(String path, {String splitCharacter = '/'}) =>
+      '${path.split(splitCharacter)[path.split(splitCharacter).length - 2]}$splitCharacter${path.split(splitCharacter).last}';
 }

@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 
+/// Pre-fabricated ``[SnackBar]``.
 class SnackBarMessage {
+  /// The text message to display in the center of the SnackBar.
   final String message;
+
+  /// The duration in seconds.
   final int durationInSec;
+
+  /// The duration in milliseconds, if a values is assegned, this duration is used in place of ``[durationInSec]``.
   final int? durationInMil;
+
+  /// The font size of the ``[message]``.
   final double fontSize;
 
   const SnackBarMessage({
@@ -27,11 +35,12 @@ class SnackBarMessage {
             borderRadius: BorderRadius.circular(18),
             color: Colors.black,
           ),
-          child: _buildSnackBarContent(context),
+          child: _buildSnackBarContent(),
         ),
       );
 
-  Widget _buildSnackBarContent(BuildContext context) => Padding(
+  /// Builds the text contained in the [SnackBar].
+  Widget _buildSnackBarContent() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 7),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

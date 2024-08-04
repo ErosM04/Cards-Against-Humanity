@@ -118,10 +118,17 @@ class CustomDialog extends StatelessWidget {
         ),
       );
 
+  /// Builds an [ElevatedButton] that matches the style of the app.
+  ///
+  /// #### Parameters
+  /// - ``BuildContext context`` : the context.
+  /// - ``Function onPressed`` : the function to execute when the button is pressed.
+  /// - ``String text`` : the text to show inside the button.
+  /// - ``bool popAfterOnPressed`` : if it's true, after ``[onPressed]`` is executed, the ``[context]`` is usesd to perform a pop.
   ElevatedButton _buildButton({
+    required BuildContext context,
     required Function onPressed,
     required String text,
-    required BuildContext context,
     bool popAfterOnPressed = true,
   }) =>
       ElevatedButton(

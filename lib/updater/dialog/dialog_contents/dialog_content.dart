@@ -12,7 +12,7 @@ class DialogContent extends StatelessWidget {
 
   /// Checks on the ``[str]`` to verify that it isn't neither null nor false.
   /// #### Returns
-  /// ``bool`` : true if the string isn't null and empty, false otherwise.
+  /// ``bool`` : true if the String isn't null and empty, false otherwise.
   bool isSafe(String? str) => (str != null && str.isNotEmpty);
 
   /// Allows to create a customizable ``[Text]`` widget.

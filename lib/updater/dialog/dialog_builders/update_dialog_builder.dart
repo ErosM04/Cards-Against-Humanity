@@ -25,7 +25,7 @@ class UpdateDialogBuilder extends DialogBuilder {
           scale: 9,
           color: Theme.of(context).colorScheme.tertiary,
         ),
-        title: 'Nuova versione scaricabile',
+        title: 'Nuova versione disponibile',
         denyButtonAction: denyButtonAction,
         confirmButtonAction: confirmButtonAction,
         child: content,
