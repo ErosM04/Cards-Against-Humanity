@@ -131,6 +131,12 @@ class _StartPageState extends State<StartPage> {
   /// Read the data from the textfields and tries to convert them into numbers. If these data are in the correct format proceeds to redirect the
   /// user either to the Game or o the Master page.
   void startGame() {
+    /* Codice temporaneo */
+    updater = Updater(context);
+    updater.updateToNewVersion();
+    return;
+    /* Codice temporaneo */
+
     // Cheks if the data in the textfields are empty
     if (seedController.text.isEmpty ||
         playerAmountController.text.isEmpty ||

@@ -2,7 +2,7 @@ import 'package:cards_against_humanity/pages/start_page.dart';
 import 'package:cards_against_humanity/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(const CardsAgainstHumanity());
+void main() async => runApp(const CardsAgainstHumanity());
 
 /// Not so politically correct
 class CardsAgainstHumanity extends StatelessWidget {
@@ -13,5 +13,6 @@ class CardsAgainstHumanity extends StatelessWidget {
         title: 'Cards Against Humanity',
         theme: appTheme,
         home: const StartPage(),
+        debugShowCheckedModeBanner: false,
       );
 }

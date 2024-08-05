@@ -1,12 +1,12 @@
 import 'package:cards_against_humanity/updater/dialog/dialog_builders/update_dialog_builder.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_contents/update_dialog_content.dart';
+import 'package:cards_against_humanity/updater/downloader.dart';
 import 'package:cards_against_humanity/updater/installer.dart';
+import 'package:cards_against_humanity/updater/permission.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'dart:convert';
-import 'package:permission_handler/permission_handler.dart';
 
 /// Allows to check for a new version and download the latest version (if exists) into the ``Downloads`` folder
 /// with the single method ``[updateToNewVersion]``.
@@ -88,51 +88,33 @@ class Updater {
     }
   }
 
-  /// Uses the ``[FileDownloader]`` object to downlaod the apk.
+  /// Uses the ``[DownloadManager]`` object to downlaod the apk.
   /// A [SnackBar] is shown at the end of the download to inform the user that the app has been downloaded and saved
   /// in the ``Downloads`` folder. In case of error an error message [SnackBar] is shown. To show the snackbar
   /// ``[_callSnackBar]`` method is used.
-  Future<void> _downloadUpdate(String latestVersion) async =>
-      FileDownloader.downloadFile(
-        url: _latestAPKLink.trim(),
-        onDownloadCompleted: (path) {
-          // First SnackBar that informs the user that the download completed successfully and gives the path
-          _callSnackBar(
-              message:
-                  'Versione $latestVersion scaricata in ${_getShortPath(path)}',
-              durationInSec: 4);
-          // Verifies if the installation package permission is granted
-          Permission.requestInstallPackages.isGranted.then((res) {
-            if (res) {
-              // If the permission is granted, after 4 seconds (the SnackBar duration), the installation process starts
-              Future.delayed(
-                const Duration(seconds: 4),
-                () => Installer(context)
-                  ..installUpdate(
-                      (path.startsWith('/')) ? path.substring(1) : path),
-              );
-            } else {
-              // Otherwise a SnackBar informs the user that he/she will be asked to give the permisson to the app in order
-              // to install an the update (the permission request will be managed by the Installer class).
-              // After 8 seconds (the combined duration of both SnackBars), the request is performed.
-              _callSnackBar(
-                message:
-                    "Ti verrà ora chiesto di dare il permesso per l'installazione dell'aggiornamento",
-                durationInSec: 4,
-              );
-              Future.delayed(
-                const Duration(seconds: 8),
-                () => Installer(context)
-                  ..installUpdate(
-                      (path.startsWith('/')) ? path.substring(1) : path),
-              );
-            }
-          });
-        },
-        onDownloadError: (errorMessage) => _callSnackBar(
-            message: 'Errore durante il download $latestVersion: $errorMessage',
-            durationInSec: 3),
-      );
+  void _downloadUpdate(String latestVersion) async {
+    PermissionChecker.requestExternalStorage(
+      onGranted: () => DownloadManager(latestVersion: latestVersion)
+        ..download(
+          fileLink: _latestAPKLink,
+          fileName: 'Cards_Against_Humanity',
+          fileExtension: '.apk',
+          downloadPath: '/storage/emulated/0/Download',
+          onPathError: () =>
+              _callSnackBar(message: "Impossibile scaricare l'aggiornamento"),
+          onDownloadComplete: (path) {
+            _callSnackBar(
+              message: 'Versione $latestVersion scaricata in $path',
+              durationInSec: 4,
+            );
+
+            Future.delayed(const Duration(seconds: 4),
+                () => Installer(context)..installUpdate(path));
+          },
+        ),
+      onDenied: () => {_callSnackBar(message: 'Fottiti')},
+    );
+  }
 
   /// Function used to simplify the invocation and the creation of a ``[SnackBar]``. Uses ``[SnackBarMessage]``
   void _callSnackBar(
@@ -144,15 +126,4 @@ class Updater {
               durationInSec: durationInSec,
               durationInMil: durationInMil)
           .build(context));
-
-  /// Thakes a ``[path]`` and split that based on ``[splitCharacter]``, then returns a path containg only the last 2 elements.
-  ///
-  /// #### Parameters
-  /// - ``String path`` : a generic path.
-  /// - ``String splitCharacter`` : the character used for the ``split()``.
-  ///
-  /// #### Returns
-  /// ``String`` : the path containg only the 2 last elements, separated by the ``[splitCharacter]``.
-  String _getShortPath(String path, {String splitCharacter = '/'}) =>
-      '${path.split(splitCharacter)[path.split(splitCharacter).length - 2]}$splitCharacter${path.split(splitCharacter).last}';
 }

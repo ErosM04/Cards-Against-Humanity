@@ -16,12 +16,13 @@ dependencies:
   flutter_launcher_icons: 
   change_app_package_name: 
   url_launcher: 
-  flutter_file_downloader: 
   http: 
   file_picker: 
   flutter_animate: 
   open_file_plus: 
-  permission_handler: 
+  permission_handler:
+  path_provider: ^2.1.4
+  dio: ^5.5.0+1 
 
 
 dev_dependencies:
