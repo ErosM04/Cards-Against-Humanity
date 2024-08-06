@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/updater/dialog/download/downloader.dart';
+import 'package:cards_against_humanity/updater/downloader.dart';
 import 'package:flutter/material.dart';
 
 class DownloadDialog extends StatefulWidget {

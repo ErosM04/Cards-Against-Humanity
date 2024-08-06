@@ -1,7 +1,7 @@
 import 'package:cards_against_humanity/updater/dialog/dialog_builders/update_dialog_builder.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_contents/update_dialog_content.dart';
-import 'package:cards_against_humanity/updater/dialog/download/download_dialog.dart';
-import 'package:cards_against_humanity/updater/dialog/download/downloader.dart';
+import 'package:cards_against_humanity/updater/dialog/download_dialog.dart';
+import 'package:cards_against_humanity/updater/downloader.dart';
 import 'package:cards_against_humanity/updater/installer.dart';
 import 'package:cards_against_humanity/updater/permission.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
