@@ -6,6 +6,8 @@ import 'package:cards_against_humanity/pages/easteregg.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
 import 'package:cards_against_humanity/textfield.dart';
+import 'package:cards_against_humanity/updater/dialog/download/download_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/download/downloader.dart';
 import 'package:cards_against_humanity/updater/updater.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -131,12 +133,6 @@ class _StartPageState extends State<StartPage> {
   /// Read the data from the textfields and tries to convert them into numbers. If these data are in the correct format proceeds to redirect the
   /// user either to the Game or o the Master page.
   void startGame() {
-    /* Codice temporaneo */
-    updater = Updater(context);
-    updater.updateToNewVersion();
-    return;
-    /* Codice temporaneo */
-
     // Cheks if the data in the textfields are empty
     if (seedController.text.isEmpty ||
         playerAmountController.text.isEmpty ||

@@ -1,6 +1,7 @@
 import 'package:cards_against_humanity/updater/dialog/dialog_builders/update_dialog_builder.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_contents/update_dialog_content.dart';
-import 'package:cards_against_humanity/updater/downloader.dart';
+import 'package:cards_against_humanity/updater/dialog/download/download_dialog.dart';
+import 'package:cards_against_humanity/updater/dialog/download/downloader.dart';
 import 'package:cards_against_humanity/updater/installer.dart';
 import 'package:cards_against_humanity/updater/permission.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
@@ -94,8 +95,38 @@ class Updater {
   /// ``[_callSnackBar]`` method is used.
   void _downloadUpdate(String latestVersion) async {
     PermissionChecker.requestExternalStorage(
-      onGranted: () => DownloadManager(latestVersion: latestVersion)
-        ..download(
+      onGranted: () => invokeDownloadDialog(latestVersion),
+      // onGranted: () => DownloadManager(latestVersion: latestVersion)
+      //   ..download(
+      //     fileLink: _latestAPKLink,
+      //     fileName: 'Cards_Against_Humanity',
+      //     fileExtension: '.apk',
+      //     downloadPath: '/storage/emulated/0/Download',
+      //     onPathError: () =>
+      //         _callSnackBar(message: "Impossibile scaricare l'aggiornamento"),
+      //     onDownloadComplete: (path) {
+      //       _callSnackBar(
+      //         message:
+      //             'Versione $latestVersion scaricata in ${_getShortPath(path)}',
+      //         durationInSec: 4,
+      //       );
+
+      //       Future.delayed(const Duration(seconds: 4),
+      //           () => Installer(context)..installUpdate(path));
+      //     },
+      //   ),
+      onDenied: () => {_callSnackBar(message: 'Fottiti')},
+    );
+  }
+
+  void invokeDownloadDialog(String latestVersion) => showGeneralDialog(
+        context: context,
+        pageBuilder: (context, animation, secondaryAnimation) => Container(),
+        transitionDuration: const Duration(milliseconds: 180),
+        transitionBuilder: (context, animation, secondaryAnimation, child) =>
+            DownloadDialog(
+          downloader: DownloadManager(latestVersion: latestVersion),
+          title: 'Download in corso',
           fileLink: _latestAPKLink,
           fileName: 'Cards_Against_Humanity',
           fileExtension: '.apk',
@@ -104,17 +135,15 @@ class Updater {
               _callSnackBar(message: "Impossibile scaricare l'aggiornamento"),
           onDownloadComplete: (path) {
             _callSnackBar(
-              message: 'Versione $latestVersion scaricata in $path',
+              message:
+                  'Versione $latestVersion scaricata in ${_getShortPath(path)}',
               durationInSec: 4,
             );
-
             Future.delayed(const Duration(seconds: 4),
                 () => Installer(context)..installUpdate(path));
           },
         ),
-      onDenied: () => {_callSnackBar(message: 'Fottiti')},
-    );
-  }
+      );
 
   /// Function used to simplify the invocation and the creation of a ``[SnackBar]``. Uses ``[SnackBarMessage]``
   void _callSnackBar(
@@ -126,4 +155,15 @@ class Updater {
               durationInSec: durationInSec,
               durationInMil: durationInMil)
           .build(context));
+
+  /// Thakes a ``[path]`` and split that based on ``[splitCharacter]``, then returns a path containg only the last 2 elements.
+  ///
+  /// #### Parameters
+  /// - ``String path`` : a generic path.
+  /// - ``String splitCharacter`` : the character used for the ``split()``.
+  ///
+  /// #### Returns
+  /// ``String`` : the path containg only the 2 last elements, separated by the ``[splitCharacter]``.
+  String _getShortPath(String path, {String splitCharacter = '/'}) =>
+      '${path.split(splitCharacter)[path.split(splitCharacter).length - 2]}$splitCharacter${path.split(splitCharacter).last}';
 }

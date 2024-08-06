@@ -12,7 +12,8 @@ class DownloadManager {
     required String fileLink,
     required String fileName,
     required String fileExtension,
-    required void Function(String path) onDownloadComplete,
+    void Function(String path)? onDownloadComplete,
+    void Function(int progress, int total)? onDownloadProgress,
     Function? onPathError,
     String? downloadPath,
   }) async {
@@ -27,13 +28,15 @@ class DownloadManager {
       fileExtension: fileExtension,
     )}';
 
-    print('Final path: $finalCompletePath');
-
     await Dio().download(
       fileLink,
       finalCompletePath,
       onReceiveProgress: (count, total) {
-        if (count == total) onDownloadComplete(finalCompletePath);
+        if (onDownloadProgress != null) onDownloadProgress(count, total);
+
+        if (count == total && onDownloadComplete != null) {
+          onDownloadComplete(finalCompletePath);
+        }
       },
     );
   }

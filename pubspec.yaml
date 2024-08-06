@@ -20,9 +20,9 @@ dependencies:
   file_picker: 
   flutter_animate: 
   open_file_plus: 
-  permission_handler:
-  path_provider: ^2.1.4
-  dio: ^5.5.0+1 
+  permission_handler: 
+  path_provider: 
+  dio: 
 
 
 dev_dependencies:
