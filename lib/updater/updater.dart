@@ -96,25 +96,6 @@ class Updater {
   void _downloadUpdate(String latestVersion) async {
     PermissionChecker.requestExternalStorage(
       onGranted: () => invokeDownloadDialog(latestVersion),
-      // onGranted: () => DownloadManager(latestVersion: latestVersion)
-      //   ..download(
-      //     fileLink: _latestAPKLink,
-      //     fileName: 'Cards_Against_Humanity',
-      //     fileExtension: '.apk',
-      //     downloadPath: '/storage/emulated/0/Download',
-      //     onPathError: () =>
-      //         _callSnackBar(message: "Impossibile scaricare l'aggiornamento"),
-      //     onDownloadComplete: (path) {
-      //       _callSnackBar(
-      //         message:
-      //             'Versione $latestVersion scaricata in ${_getShortPath(path)}',
-      //         durationInSec: 4,
-      //       );
-
-      //       Future.delayed(const Duration(seconds: 4),
-      //           () => Installer(context)..installUpdate(path));
-      //     },
-      //   ),
       onDenied: () => {_callSnackBar(message: 'Fottiti')},
     );
   }
