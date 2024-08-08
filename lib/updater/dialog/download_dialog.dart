@@ -62,8 +62,10 @@ class _DownloadDialogState extends State<DownloadDialog> {
       fileExtension: widget.fileExtension,
       downloadPath: widget.downloadPath,
       onDownloadComplete: (path) {
-        if (widget.onDownloadComplete != null) widget.onDownloadComplete!(path);
         Navigator.pop(context);
+        if (widget.onDownloadComplete != null) {
+          widget.onDownloadComplete!(path);
+        }
       },
       onDownloadProgress: (progress, total) {
         if (widget.onDownloadProgress != null) {

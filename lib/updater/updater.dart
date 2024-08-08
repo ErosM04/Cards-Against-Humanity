@@ -133,8 +133,9 @@ class Updater {
             );
             Future.delayed(
               const Duration(seconds: 4),
-              () => (context.mounted)
-                  ? Installer(context).installUpdate(path)
+              // Uses this.context, in order not to confuse with the transitionbuilder context
+              () => (this.context.mounted)
+                  ? Installer(this.context).installUpdate(path)
                   : null,
             );
           },
