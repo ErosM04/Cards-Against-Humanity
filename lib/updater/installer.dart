@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cards_against_humanity/updater/permission.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_builders/error_dialog_builder.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_contents/error_dialog_content.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:cards_against_humanity/updater/updater.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:cards_against_humanity/updater/dialog/custom_dialog.dart';
 
 /// This class is used by the ``[Updater]`` object in order to install the downloaded apk file.
@@ -16,61 +16,69 @@ class Installer {
 
   const Installer(this.context);
 
-  /// Uses ``[_requestInstallPackagesPermission]`` to check if the **"Package Installation"** permission has already been granted,
+  /// Uses ``[_askForInstallationPermission]``  to check if the **"Package Installation"** permission has already been granted,
   /// otherwise asks for it.
-  /// If the permission is granted takes the ``[path]`` of the update apk file and uese ``[OpenFile]`` to execute it (the system will
-  /// then manage the update).
   ///
-  /// If something goes wrong invokes an ``[ErrorDialogBuilder]``, which asks the user if he/she wants to manually select the apk
+  /// If the permission is granted takes the ``[path]`` of the update apk file and uses ``[OpenFile]`` to execute it (the system will
+  /// then manage the update).
+  /// And if something goes wrong invokes an ``[ErrorDialogBuilder]``, which asks the user if he/she wants to manually select the apk
   /// update in order to execute it; done by using ``[_manuallySelectAndInstallUpdate]``.
+  ///
+  /// If the permission is not granted, a [SnackBar] is used to offend the user.
   ///
   /// #### Parameters
   /// - ``String path`` : the path to the apk file in the device storage.
-  void installUpdate(String path) async => _requestInstallPackagesPermission(
-      onGranted: () => OpenFile.open(path).then(
-            (result) => (result.type != ResultType.done)
-                // The package wasn't able to execute the file (probably wrong path)
-                ? ErrorDialogBuilder(
-                    context: context,
-                    content: ErrorDialogContent(
-                        errorType: result.message, path: _getShortPath(path)),
-                    denyButtonAction: () => _callSnackBar(message: ':('),
-                    confirmButtonAction: () =>
-                        _manuallySelectAndInstallUpdate()).invokeDialog()
-                // The update executed
-                : null,
-          ),
-      onDenied: () => _callSnackBar(
-            message:
-                "Ma come no? Cattivo! Vatti a installare l'update nella cartella Download",
-            durationInSec: 5,
-          ));
+  void installUpdate(String path) async => _askForInstallationPermission(
+        onGranted: () => OpenFile.open(path).then(
+          (result) => (result.type != ResultType.done && context.mounted)
+              // The package wasn't able to execute the file (probably wrong path)
+              ? ErrorDialogBuilder(
+                  context: context,
+                  content: ErrorDialogContent(
+                      errorType: result.message, path: _getShortPath(path)),
+                  denyButtonAction: () => _callSnackBar(message: ':('),
+                  confirmButtonAction: () =>
+                      _manuallySelectAndInstallUpdate()).invokeDialog()
+              // The update executed
+              : null,
+        ),
+        onDenied: () => _callSnackBar(
+          message:
+              "Ma come no? Cattivo! Vatti a installare l'update nella cartella Download",
+          durationInSec: 5,
+        ),
+      );
 
-  /// Uses ``[Permission]`` object from permission package to check if the **"Package Installation"** permission has already been granted,
+  /// Uses the ``[PermissionManager]`` object to check if the **"Package Installation"** permission has already been granted,
   /// otherwise asks for it.
   ///
-  ///  #### Parameters
-  /// - ``Function onGranted`` : the function to execute if the permission has already been granted or is granted at the moment.
+  /// If the permission has already been granted executes ``[onGranted]``. Otherwise informs the user that he needs the permission
+  /// and then asks for it. If it's granted  executes ``[onGranted]``, otherwise  executes ``[onDenied]``.
+  ///
+  /// #### Parameters
+  /// - ``Function onGranted`` : the function to execute if the permission is granted.
   /// - ``Function onDenied`` : the function to execute if the permission isn't granted.
-  void _requestInstallPackagesPermission(
-      {required Function onGranted, required Function onDenied}) async {
-    var status = await Permission.requestInstallPackages.status;
-    if (status.isGranted) {
-      // Permission has already been granted
+  void _askForInstallationPermission({
+    required Function onGranted,
+    required Function onDenied,
+  }) async {
+    if (await PermissionManager.checkInstallPackages()) {
       onGranted();
     } else {
-      // Asks for permission
-      if (await Permission.requestInstallPackages.request().isGranted) {
-        // Permission is granted
-        onGranted();
-      } else {
-        // Permission is denied
-        onDenied();
-      }
+      _callSnackBar(
+        message:
+            " Ti verrà ora chiesto di dare il permesso per installare il pacchetto di aggiornamento",
+        durationInSec: 5,
+      );
+      Future.delayed(
+        const Duration(seconds: 5),
+        () => PermissionManager.requestInstallPackages(
+            onGranted: onGranted, onDenied: onDenied),
+      );
     }
   }
 
-  /// Uses ``[FilePicker]`` to open a file manager. The file picked by the user will than be executed.
+  /// Uses ``[FilePicker]`` to open a **File Manager**. The file picked by the user will than be executed.
   /// The file type is restricted to **apk**.
   void _manuallySelectAndInstallUpdate() async {
     try {
@@ -93,7 +101,7 @@ class Installer {
     }
   }
 
-  /// Thakes a ``[path]`` and split that based on ``[splitCharacter]``, then returns a path containg only the last 2 elements.
+  /// Takes a ``[path]`` and splits that based on ``[splitCharacter]``, then returns a path containg only the last 2 elements.
   ///
   /// #### Parameters
   /// - ``String path`` : a generic path.
