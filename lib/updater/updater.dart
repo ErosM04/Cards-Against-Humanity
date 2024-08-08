@@ -1,7 +1,6 @@
 import 'package:cards_against_humanity/updater/dialog/dialog_builders/update_dialog_builder.dart';
 import 'package:cards_against_humanity/updater/dialog/dialog_contents/update_dialog_content.dart';
 import 'package:cards_against_humanity/updater/dialog/download_dialog.dart';
-import 'package:cards_against_humanity/updater/downloader.dart';
 import 'package:cards_against_humanity/updater/installer.dart';
 import 'package:cards_against_humanity/updater/permission.dart';
 import 'package:cards_against_humanity/updater/snackbar.dart';
@@ -9,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-/// Allows to check for a new version and download the latest version (if exists) into the ``Downloads`` folder
+/// Allows to check for a new version of the app and download the latest one (if exists) into the ``Downloads`` folder
 /// with the single method ``[updateToNewVersion]``.
 class Updater {
   /// Current version of the app, needs to be updated every time a new release is built.
@@ -30,7 +29,9 @@ class Updater {
 
   /// Uses ``[_getLatestVersionData]`` to get the latest release info (such as version, description...). If the GitHub
   /// release isn't a draft and the version is different from the actual version, invoke an ``[UpdateDialogBuilder]`` that
-  /// will ask the user if he wants to download the update ``[_downloadUpdate]``.
+  /// will ask the user if he wants to download the update.
+  ///
+  /// To download the file the method ``[_downloadUpdate]`` is used.
   void updateToNewVersion() async {
     var data = await _getLatestVersionData();
 
@@ -89,24 +90,31 @@ class Updater {
     }
   }
 
-  /// Uses the ``[DownloadManager]`` object to downlaod the apk.
-  /// A [SnackBar] is shown at the end of the download to inform the user that the app has been downloaded and saved
-  /// in the ``Downloads`` folder. In case of error an error message [SnackBar] is shown. To show the snackbar
-  /// ``[_callSnackBar]`` method is used.
-  void _downloadUpdate(String latestVersion) async {
-    PermissionChecker.requestExternalStorage(
-      onGranted: () => invokeDownloadDialog(latestVersion),
-      onDenied: () => {_callSnackBar(message: 'Fottiti')},
-    );
-  }
+  /// Uses the ``[PermissionChecker]`` object to ask permission to access to **to the external storage**.
+  /// If the permission is granted, ``[_invokeDownloadDialog]`` is called, and then provides to invoke the ``[DownloadDialog]``.
+  ///
+  /// If the permission is not granted, [SnackBar] is shown to insult the user.
+  ///
+  /// #### Parameter
+  /// - ``String latestVersion`` : the latest version of the app, e.g. "1.4.67".
+  void _downloadUpdate(String latestVersion) async =>
+      PermissionChecker.requestExternalStorage(
+        onGranted: () => _invokeDownloadDialog(latestVersion),
+        onDenied: () => _callSnackBar(message: 'Fottiti'),
+      );
 
-  void invokeDownloadDialog(String latestVersion) => showGeneralDialog(
+  /// Use the ``[showGeneralDialog]`` method to show a ``[DownloadDialog]`` that performs the download and keeps the user
+  /// updated on the progress with a [CircularProgressIndicator].
+  ///
+  /// #### Parameter
+  /// - ``String latestVersion`` : the latest version of the app, e.g. "1.4.67".
+  void _invokeDownloadDialog(String latestVersion) => showGeneralDialog(
         context: context,
         pageBuilder: (context, animation, secondaryAnimation) => Container(),
         transitionDuration: const Duration(milliseconds: 180),
         transitionBuilder: (context, animation, secondaryAnimation, child) =>
             DownloadDialog(
-          downloader: DownloadManager(latestVersion: latestVersion),
+          latestVersion: latestVersion,
           title: 'Download in corso',
           fileLink: _latestAPKLink,
           fileName: 'Cards_Against_Humanity',

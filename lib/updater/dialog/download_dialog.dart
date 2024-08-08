@@ -1,24 +1,45 @@
 import 'package:cards_against_humanity/updater/downloader.dart';
 import 'package:flutter/material.dart';
 
+/// A [Dialog] that uses **[DownloadManager]** to show [CircularProgressIndicator] (with the percentage) start and keep
+/// progress of a download.
 class DownloadDialog extends StatefulWidget {
-  final DownloadManager downloader;
+  /// The latest version of the app e.g. "1.1.34".
+  final String latestVersion;
+
+  /// The title to display in the dialog.
   final String title;
+
+  /// The url to download the file.
   final String fileLink;
+
+  /// The name of the file, without the extension.
   final String fileName;
+
+  /// The extension of the file, e.g. ".apk".
   final String fileExtension;
-  final String downloadPath;
+
+  /// The path used to download the file, if it's null then the path provided by the ``path_provider`` package is used.
+  final String? downloadPath;
+
+  /// The function to execute when the download is completed, the path is the complete ``path`` (file name included) where
+  /// the file is downloaded.
   final void Function(String path)? onDownloadComplete;
+
+  /// The function to execute every time a new data package is downlaoded (every time the download makes a progress),
+  /// the ``progress`` is the number of data downloaded so far, while the ``total`` is the total amount of data to downlaod.
   final void Function(int progress, int total)? onDownloadProgress;
+
+  /// The function to execute when an error related to path or file system occurs.
   final Function? onPathError;
 
   const DownloadDialog({
-    required this.downloader,
+    required this.latestVersion,
     required this.title,
     required this.fileLink,
     required this.fileName,
     required this.fileExtension,
-    required this.downloadPath,
+    this.downloadPath,
     this.onDownloadComplete,
     this.onDownloadProgress,
     this.onPathError,
@@ -35,7 +56,7 @@ class _DownloadDialogState extends State<DownloadDialog> {
   @override
   void initState() {
     super.initState();
-    widget.downloader.download(
+    DownloadManager(latestVersion: widget.latestVersion).download(
       fileLink: widget.fileLink,
       fileName: widget.fileName,
       fileExtension: widget.fileExtension,
