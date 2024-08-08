@@ -36,7 +36,8 @@ class Updater {
     var data = await _getLatestVersionData();
 
     if (data.isNotEmpty &&
-        (data['version'].toString() != actualVersion && !data['draft'])) {
+        (data['version'].toString() != actualVersion && !data['draft']) &&
+        context.mounted) {
       UpdateDialogBuilder(
         context: context,
         denyButtonAction: () => _callSnackBar(message: ':('),
@@ -90,7 +91,7 @@ class Updater {
     }
   }
 
-  /// Uses the ``[PermissionChecker]`` object to ask permission to access to **to the external storage**.
+  /// Uses the ``[PermissionManager]`` object to ask permission to access to **to the external storage**.
   /// If the permission is granted, ``[_invokeDownloadDialog]`` is called, and then provides to invoke the ``[DownloadDialog]``.
   ///
   /// If the permission is not granted, [SnackBar] is shown to insult the user.
@@ -98,13 +99,15 @@ class Updater {
   /// #### Parameter
   /// - ``String latestVersion`` : the latest version of the app, e.g. "1.4.67".
   void _downloadUpdate(String latestVersion) async =>
-      PermissionChecker.requestExternalStorage(
+      PermissionManager.requestExternalStorage(
         onGranted: () => _invokeDownloadDialog(latestVersion),
         onDenied: () => _callSnackBar(message: 'Fottiti'),
       );
 
   /// Use the ``[showGeneralDialog]`` method to show a ``[DownloadDialog]`` that performs the download and keeps the user
   /// updated on the progress with a [CircularProgressIndicator].
+  ///
+  /// If the downlaod process works successfully, the ``[Installer]`` object permforms the installation.
   ///
   /// #### Parameter
   /// - ``String latestVersion`` : the latest version of the app, e.g. "1.4.67".
@@ -128,8 +131,12 @@ class Updater {
                   'Versione $latestVersion scaricata in ${_getShortPath(path)}',
               durationInSec: 4,
             );
-            Future.delayed(const Duration(seconds: 4),
-                () => Installer(context)..installUpdate(path));
+            Future.delayed(
+              const Duration(seconds: 4),
+              () => (context.mounted)
+                  ? Installer(context).installUpdate(path)
+                  : null,
+            );
           },
         ),
       );

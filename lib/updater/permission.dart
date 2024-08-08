@@ -1,8 +1,8 @@
 import 'package:permission_handler/permission_handler.dart';
 
 /// Simplifies the action of controlling and requesting for permissions.
-class PermissionChecker {
-  const PermissionChecker();
+class PermissionManager {
+  const PermissionManager();
 
   // CHECKS
 
