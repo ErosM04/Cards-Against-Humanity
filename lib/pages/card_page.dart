@@ -1,5 +1,6 @@
 import 'package:cards_against_humanity/card.dart';
-import 'package:cards_against_humanity/pages/appbar.dart';
+import 'package:cards_against_humanity/pages/components/appbar.dart';
+import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
@@ -27,22 +28,18 @@ class _CardPageState extends State<CardPage> {
               buildCompleteCard(),
               const SizedBox(height: 100),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  buildEndButton(
-                      text: 'Ho perso',
-                      color: Colors.red,
-                      function: () {
-                        widget.random.lost();
-                        goToNewRound();
-                      }),
-                  buildEndButton(
-                      text: 'Ho vinto',
-                      color: Colors.green,
-                      function: () {
-                        widget.random.won();
-                        goToNewRound();
-                      }),
+                  _buildEndButton(
+                    text: 'Ho perso',
+                    onPressed: () => widget.random.lost(),
+                    color: Colors.red,
+                  ),
+                  _buildEndButton(
+                    text: 'Ho vinto',
+                    onPressed: () => widget.random.won(),
+                    color: Colors.green,
+                  ),
                 ],
               ),
             ],
@@ -51,26 +48,20 @@ class _CardPageState extends State<CardPage> {
       ));
 
   /// Used to build a the ``Ho perso`` and ``Ho vinto`` buttons.
-  ElevatedButton buildEndButton(
+  Widget _buildEndButton(
           {required String text,
-          required Function function,
+          required Function onPressed,
           required Color color}) =>
-      ElevatedButton(
-          onPressed: () => function(),
-          style: ElevatedButton.styleFrom(
-              backgroundColor: color,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20))),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-            child: Text(
-              text,
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-          ));
+      CustomButton(
+          text: text,
+          textColor: Colors.white,
+          fontSize: 20,
+          verticalInternalPadding: 12,
+          color: color,
+          onPressed: () {
+            onPressed();
+            goToNewRound();
+          });
 
   /// Used to build the complete card with the question and all the answer.
   /// Answers are in a different color.

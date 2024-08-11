@@ -1,5 +1,6 @@
 import 'package:cards_against_humanity/card.dart';
-import 'package:cards_against_humanity/pages/appbar.dart';
+import 'package:cards_against_humanity/pages/components/appbar.dart';
+import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/pages/start_page.dart';
@@ -52,14 +53,14 @@ class _MasterGamePageState extends State<MasterGamePage> {
                   : Container(),
               (answerCardList.isEmpty)
                   ? buildButton(
-                      text: 'Mostra carte', function: () => getAnswerCards())
+                      text: 'Mostra carte', onPressed: () => getAnswerCards())
                   : Container(),
               (answerCardList.isNotEmpty)
                   ? buildCardCarousel(answerCardList)
                   : Container(),
               (answerCardList.isNotEmpty)
                   ? buildButton(
-                      text: 'Prossimo round', function: () => goToNewRound())
+                      text: 'Prossimo round', onPressed: () => goToNewRound())
                   : Container(),
             ]),
           ),
@@ -126,26 +127,14 @@ class _MasterGamePageState extends State<MasterGamePage> {
         MaterialPageRoute(builder: (context) => GamePage(widget.random)));
   }
 
-  Padding buildButton({required String text, required Function function}) =>
+  Widget buildButton(
+          {required String text, required void Function() onPressed}) =>
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 50),
-        child: ElevatedButton(
-          onPressed: () => function(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  text,
-                  style: const TextStyle(
-                      fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+          padding: const EdgeInsets.symmetric(vertical: 50),
+          child: CustomButton(
+            text: text,
+            onPressed: onPressed,
+          ));
 
   /// Takes a list of answers and build a horizontal list of card using the [CardAH] widget.
   Widget buildCardCarousel(List<String> list) => SizedBox(

@@ -1,7 +1,8 @@
 import 'dart:math';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/model/data_reader.dart';
-import 'package:cards_against_humanity/pages/appbar.dart';
+import 'package:cards_against_humanity/pages/components/appbar.dart';
+import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:cards_against_humanity/pages/easteregg.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
@@ -105,21 +106,10 @@ class _StartPageState extends State<StartPage> {
                 const SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: ElevatedButton(
+                  child: CustomButton(
+                    text: 'Play',
                     onPressed: () => startGame(),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Play',
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
+                    horizontalInternalPadding: 80,
                   ),
                 ),
               ],

@@ -26,7 +26,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
         titleSpacing: 0,
         title: Text(
           'Cards Against Humanity',
-          style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.secondary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: widget.actions,
       );

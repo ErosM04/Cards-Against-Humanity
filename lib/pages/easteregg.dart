@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/pages/appbar.dart';
+import 'package:cards_against_humanity/pages/components/appbar.dart';
 import 'package:flutter/material.dart';
 
 class EasterEgg extends StatelessWidget {
