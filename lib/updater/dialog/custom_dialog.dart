@@ -1,3 +1,4 @@
+import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -101,13 +102,13 @@ class CustomDialog extends StatelessWidget {
                 children: [
                   // No
                   _buildButton(
-                    onPressed: denyButtonAction,
+                    onPressed: () => denyButtonAction,
                     text: denyButtonText,
                     context: context,
                   ),
                   // Sì
                   _buildButton(
-                    onPressed: confirmButtonAction,
+                    onPressed: () => confirmButtonAction,
                     text: confirmButtonText,
                     context: context,
                   ),
@@ -118,34 +119,25 @@ class CustomDialog extends StatelessWidget {
         ),
       );
 
-  /// Builds an [ElevatedButton] that matches the style of the app.
+  /// Builds an [CustomButton] that matches the style of the app.
   ///
   /// #### Parameters
   /// - ``BuildContext context`` : the context.
-  /// - ``Function onPressed`` : the function to execute when the button is pressed.
+  /// - ``void Function() onPressed`` : the function to execute when the button is pressed.
   /// - ``String text`` : the text to show inside the button.
   /// - ``bool popAfterOnPressed`` : if it's true, after ``[onPressed]`` is executed, the ``[context]`` is usesd to perform a pop.
-  ElevatedButton _buildButton({
+  Widget _buildButton({
     required BuildContext context,
-    required Function onPressed,
+    required void Function() onPressed,
     required String text,
     bool popAfterOnPressed = true,
   }) =>
-      ElevatedButton(
-        onPressed: () {
-          onPressed();
-          if (popAfterOnPressed) Navigator.pop(context);
-        },
-        style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color>(
-                Theme.of(context).colorScheme.primary)),
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
+      CustomButton(
+          text: text,
+          fontSize: 16,
+          horizontalInternalPadding: 5,
+          onPressed: () {
+            onPressed();
+            if (popAfterOnPressed) Navigator.pop(context);
+          });
 }

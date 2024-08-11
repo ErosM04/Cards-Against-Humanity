@@ -110,6 +110,7 @@ class _StartPageState extends State<StartPage> {
                     text: 'Play',
                     onPressed: () => startGame(),
                     horizontalInternalPadding: 80,
+                    verticalInternalPadding: 15,
                   ),
                 ),
               ],

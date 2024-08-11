@@ -17,8 +17,6 @@ ThemeData appTheme = ThemeData(
             const WidgetStatePropertyAll(Color.fromARGB(255, 242, 135, 5)),
         shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
-        padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(vertical: 10, horizontal: 15)),
         textStyle: const WidgetStatePropertyAll(TextStyle(
             fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black)),
       ),
