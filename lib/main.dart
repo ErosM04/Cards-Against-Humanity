@@ -1,3 +1,4 @@
+import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/pages/start_page.dart';
 import 'package:cards_against_humanity/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ class CardsAgainstHumanity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Cards Against Humanity',
+        title: appName,
         theme: appTheme,
         home: const StartPage(),
         debugShowCheckedModeBanner: false,

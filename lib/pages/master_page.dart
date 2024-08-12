@@ -24,7 +24,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
   Widget build(BuildContext context) => Scaffold(
         appBar: CustomAppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_sharp),
+            icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () => Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const StartPage())),
           ),
@@ -127,8 +127,10 @@ class _MasterGamePageState extends State<MasterGamePage> {
         MaterialPageRoute(builder: (context) => GamePage(widget.random)));
   }
 
-  Widget buildButton(
-          {required String text, required void Function() onPressed}) =>
+  Widget buildButton({
+    required String text,
+    required void Function() onPressed,
+  }) =>
       Padding(
           padding: const EdgeInsets.symmetric(vertical: 50),
           child: CustomButton(

@@ -19,7 +19,7 @@ class _GamePageState extends State<GamePage> {
   Widget build(BuildContext context) => Scaffold(
         appBar: CustomAppBar(
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_sharp),
+            icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () => Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const StartPage())),
           ),

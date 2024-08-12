@@ -32,7 +32,11 @@ class _EasterEggState extends State<EasterEgg> {
   Widget build(BuildContext context) => PopScope(
         canPop: true,
         child: Scaffold(
-          appBar: const CustomAppBar(),
+          appBar: CustomAppBar(
+              leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () => Navigator.pop(context),
+          )),
           body: GestureDetector(
             onTap: () => _updateImgWidget(),
             child: Center(child: _pic),

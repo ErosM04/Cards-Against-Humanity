@@ -1,3 +1,4 @@
+import 'package:cards_against_humanity/constants.dart';
 import 'package:flutter/material.dart';
 
 /// Customized [AppBar] for Cards Against Humanity
@@ -15,7 +16,7 @@ class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Size preferredSize;
 
   @override
-  _CustomAppBarState createState() => _CustomAppBarState();
+  State<StatefulWidget> createState() => _CustomAppBarState();
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
@@ -25,7 +26,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
         leading: widget.leading,
         titleSpacing: 0,
         title: Text(
-          'Cards Against Humanity',
+          appName,
           style: TextStyle(
             color: Theme.of(context).colorScheme.secondary,
             fontWeight: FontWeight.bold,
