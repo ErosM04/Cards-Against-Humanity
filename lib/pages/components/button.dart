@@ -6,7 +6,7 @@ class CustomButton extends StatelessWidget {
   final String text;
 
   /// The function to call after the button is pressed.
-  final void Function() onPressed;
+  final Function onPressed;
 
   /// The color of the button, if no value is provided the color chosen is the first of the theme.
   final Color? color;

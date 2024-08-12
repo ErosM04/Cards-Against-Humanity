@@ -102,13 +102,13 @@ class CustomDialog extends StatelessWidget {
                 children: [
                   // No
                   _buildButton(
-                    onPressed: () => denyButtonAction,
+                    onPressed: denyButtonAction,
                     text: denyButtonText,
                     context: context,
                   ),
                   // Sì
                   _buildButton(
-                    onPressed: () => confirmButtonAction,
+                    onPressed: confirmButtonAction,
                     text: confirmButtonText,
                     context: context,
                   ),
@@ -128,7 +128,7 @@ class CustomDialog extends StatelessWidget {
   /// - ``bool popAfterOnPressed`` : if it's true, after ``[onPressed]`` is executed, the ``[context]`` is usesd to perform a pop.
   Widget _buildButton({
     required BuildContext context,
-    required void Function() onPressed,
+    required Function onPressed,
     required String text,
     bool popAfterOnPressed = true,
   }) =>
