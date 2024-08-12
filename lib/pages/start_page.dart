@@ -24,19 +24,24 @@ class _StartPageState extends State<StartPage> {
   final seedController = TextEditingController();
   final playerAmountController = TextEditingController();
   final playerNumberController = TextEditingController();
-  late Updater updater;
+  late List<List<dynamic>> questionList;
+  late List<String> answerList;
 
   @override
   void initState() {
-    super.initState();
+    // Loads data from csv
+    widget.csvReader.getQuestions().then((list) => questionList = list);
+    widget.csvReader.getAnswers().then((list) => answerList = list);
 
     // Checks if a new version exists and ask for download consent.
     // The 2 seconds delay is to avoid errors (trust me).
-    updater = Updater(context);
+    var updater = Updater(context);
     Future.delayed(
       const Duration(seconds: 2),
       () => updater.updateToNewVersion(),
     );
+
+    super.initState();
   }
 
   @override
@@ -48,50 +53,18 @@ class _StartPageState extends State<StartPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Seed
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Codice partita:',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildSubTitle('Codice partita'),
                 CustomTextField(controller: seedController),
                 const SizedBox(height: 100),
                 // Total players
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Totale giocatori:',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildSubTitle('Totale giocatori'),
                 CustomTextField(controller: playerAmountController),
                 const SizedBox(height: 100),
                 // Player number
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Numero giocatore:',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildSubTitle('Numero giocatore'),
                 CustomTextField(controller: playerNumberController),
                 const SizedBox(height: 50),
+                // Link guide
                 GestureDetector(
                   onTap: () => launchUrl(Uri.parse(
                       'https://github.com/ErosM04/Cards-Against-Humanity')),
@@ -104,11 +77,12 @@ class _StartPageState extends State<StartPage> {
                   ),
                 ),
                 const SizedBox(height: 50),
+                // Play button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: CustomButton(
                     text: 'Play',
-                    onPressed: () => startGame(),
+                    onPressed: () => _startGame(),
                     horizontalInternalPadding: 80,
                     verticalInternalPadding: 15,
                   ),
@@ -119,30 +93,34 @@ class _StartPageState extends State<StartPage> {
         ),
       );
 
-  /// Read the data from the textfields and tries to convert them into numbers. If these data are in the correct format proceeds to redirect the
-  /// user either to the Game or o the Master page.
-  void startGame() {
+  Padding _buildSubTitle(String text) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          children: [
+            Text(
+              '$text:',
+              textAlign: TextAlign.start,
+              style: const TextStyle(fontSize: 20),
+            ),
+          ],
+        ),
+      );
+
+  /// Read the data from the [TextField] and tries to convert them into numbers. If these data are in the correct format
+  /// proceeds to redirect the user either to the **Game** or o the **Master** page.
+  void _startGame() {
     // Cheks if the data in the textfields are empty
     if (seedController.text.isEmpty ||
         playerAmountController.text.isEmpty ||
         playerNumberController.text.isEmpty) {
-      cojion();
+      _cojion();
       return;
     }
 
     // tries converting to int
-    int? seed = int.tryParse(seedController.text
-        .replaceAll(' ', '')
-        .replaceAll('.', '')
-        .replaceAll('-', ''));
-    int? playerAmount = int.tryParse(playerAmountController.text
-        .replaceAll(' ', '')
-        .replaceAll('.', '')
-        .replaceAll('-', ''));
-    int? playerNumber = int.tryParse(playerNumberController.text
-        .replaceAll(' ', '')
-        .replaceAll('.', '')
-        .replaceAll('-', ''));
+    int? seed = _tryParseInput(seedController);
+    int? playerAmount = _tryParseInput(playerAmountController);
+    int? playerNumber = _tryParseInput(playerNumberController);
 
     // Checks if the data are in the correct format
     if (seed == null ||
@@ -152,43 +130,47 @@ class _StartPageState extends State<StartPage> {
         playerNumber > playerAmount ||
         playerAmount < 3 ||
         playerAmount > 20) {
-      cojion();
+      _cojion();
       return;
     }
 
-    List<List<dynamic>> questionList = [];
-    widget.csvReader.getQuestions().then((list) {
-      questionList = list;
-      return widget.csvReader.getAnswers();
-    }).then((answerList) {
-      if (seed == 104 && mounted) {
-        //Easter egg
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const EasterEgg()));
-      } else {
-        // Normal execution
-        CasualityManager rand = CasualityManager(
-          seed: seed,
-          playerNumber: playerNumber,
-          totalPlayers: playerAmount,
-          randomAnswerCard: Random(seed),
-          randomQuestionCard: Random(seed + 1),
-          questionList: questionList,
-          answerList: answerList,
-        );
+    if (seed == 104 && mounted) {
+      // Easter egg
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const EasterEgg()));
+    } else {
+      // Normal execution
+      CasualityManager rand = CasualityManager(
+        seed: seed,
+        playerNumber: playerNumber,
+        totalPlayers: playerAmount,
+        randomAnswerCard: Random(seed),
+        randomQuestionCard: Random(seed + 1),
+        questionList: questionList,
+        answerList: answerList,
+      );
 
-        // If this is the 1st player starts as a master
-        return (playerNumber == 1)
-            ? Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => MasterGamePage(rand)))
-            : Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => GamePage(rand)));
+      // If this is the 1st player starts as a master, otherwise start as normal player
+      if (playerNumber == 1) {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => MasterGamePage(rand)));
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => GamePage(rand)));
       }
-    });
+    }
   }
 
-  /// Set all text fields of the page as "Cojion", to infor the user he inserted the data in a wrong format
-  void cojion() {
+  /// Tryes parsing the string inside the ``[TextField]`` associated with the given ``[controller]`` into an [int].
+  /// If something goes wrong a null is returned.
+  int? _tryParseInput(TextEditingController controller) =>
+      int.tryParse(controller.text
+          .replaceAll(' ', '')
+          .replaceAll('.', '')
+          .replaceAll('-', ''));
+
+  /// Set all text fields of the page as "Cojion", to infor the user he inserted the data in a wrong format.
+  void _cojion() {
     seedController.text = 'Cojion';
     playerAmountController.text = 'Cojion';
     playerNumberController.text = 'Cojion';
