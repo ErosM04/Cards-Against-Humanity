@@ -2,18 +2,18 @@ import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:flutter/material.dart';
 
 /// Widget used to create the card widget, for answers, questions and both together.
-/// To preserve state even when cards are out of the screen the State class comes with [AutomaticKeepAliveClientMixin].
+/// To preserve state even when cards are out of the screen the State class comes with ``[AutomaticKeepAliveClientMixin]``.
 class CardAH extends StatefulWidget {
   final String text;
   final bool isClickable;
-  final Function onClicked;
+  final Function? onClicked;
   final List<String> answersList;
 
   const CardAH({
     super.key,
     required this.text,
     this.isClickable = true,
-    required this.onClicked,
+    this.onClicked,
     this.answersList = const [],
   });
 
@@ -53,14 +53,17 @@ class _CardAHState extends State<CardAH>
           child: Padding(
             padding: EdgeInsets.symmetric(
                 vertical: (widget.isClickable) ? 30 : 40, horizontal: 20),
-            child: buildCustomText(context),
+            child: _buildCustomText(),
           ),
         ),
       ),
     );
   }
 
-  Widget buildCustomText(BuildContext context) => (widget.answersList.isEmpty)
+  /// If a list of answers is passed as a parameter (so it isn't empty) returns a ``[RichText]`` containg the question
+  /// with the answers.
+  /// Otherwise returns a ``[Text]`` using the text parameter.
+  Widget _buildCustomText() => (widget.answersList.isEmpty)
       ? Text(
           widget.text,
           textAlign: TextAlign.start,
@@ -74,19 +77,19 @@ class _CardAHState extends State<CardAH>
           textAlign: TextAlign.start,
           text: TextSpan(
               style: const TextStyle(fontSize: 20, color: Colors.white),
-              children: buildTextList()),
+              children: _buildTextList()),
         );
 
-  /// Build a List of TextSpan where the question in white and the answers use a color of the theme and are substituted to the '_____'
-  /// contained in the question.
-  List<TextSpan> buildTextList() {
+  /// Builds a list of ``[TextSpan]`` where the question (text parameter) is white and the answers (taken by the list
+  /// of answers) use a color of the theme and are substituted to the '_____' contained in the question string.
+  List<TextSpan> _buildTextList() {
     List<TextSpan> textList = [];
     if (widget.text.contains('________')) {
       if (widget.answersList.length == 1) {
         if (widget.text.startsWith('________')) {
           // 1 answer and is at the start of the sentence
           textList = [
-            buildCustomAnswerText(
+            _buildCustomAnswerText(
                 '${widget.answersList[0][0].toUpperCase()}${widget.answersList[0].substring(1)}'),
             TextSpan(text: widget.text.replaceAll('________', '')),
           ];
@@ -95,7 +98,7 @@ class _CardAHState extends State<CardAH>
           List<String> tempList = widget.text.split('________');
           textList = [
             TextSpan(text: tempList[0]),
-            buildCustomAnswerText(widget.answersList[0]),
+            _buildCustomAnswerText(widget.answersList[0]),
             (tempList.length > 1)
                 ? TextSpan(text: tempList[1])
                 : const TextSpan(),
@@ -108,10 +111,10 @@ class _CardAHState extends State<CardAH>
           tempList.removeWhere((element) => element == '');
 
           textList = [
-            buildCustomAnswerText(
+            _buildCustomAnswerText(
                 '${widget.answersList[0][0].toUpperCase()}${widget.answersList[0].substring(1)}'),
             TextSpan(text: tempList[0]),
-            buildCustomAnswerText(widget.answersList[1]),
+            _buildCustomAnswerText(widget.answersList[1]),
             TextSpan(text: tempList[1]),
           ];
         } else {
@@ -121,9 +124,9 @@ class _CardAHState extends State<CardAH>
 
           textList = [
             TextSpan(text: tempList[0]),
-            buildCustomAnswerText(widget.answersList[0]),
+            _buildCustomAnswerText(widget.answersList[0]),
             TextSpan(text: tempList[1]),
-            buildCustomAnswerText(widget.answersList[1]),
+            _buildCustomAnswerText(widget.answersList[1]),
             TextSpan(text: tempList[2]),
           ];
         }
@@ -131,17 +134,18 @@ class _CardAHState extends State<CardAH>
     } else {
       textList = [
         TextSpan(text: widget.text),
-        buildCustomAnswerText(widget.answersList[0]),
+        _buildCustomAnswerText(widget.answersList[0]),
       ];
     }
     return textList;
   }
 
-  TextSpan buildCustomAnswerText(String text) => TextSpan(
+  /// Builds a custom ``[TextSpan]`` which uses the color of the scheme (used for answers).
+  TextSpan _buildCustomAnswerText(String text) => TextSpan(
       text: text.split(' - ')[1],
       style: TextStyle(color: Theme.of(context).colorScheme.secondary));
 
-  /// If it's activated ([isClicked] is true) the aspect is changed, the card is added to the list in [CasualityManager]
+  /// If it's activated (``[isClicked]`` is true) the aspect is changed, the card is added to the list in [CasualityManager]
   /// and the parameter method is called.
   void _isClicked() {
     if (isClicked) {
@@ -153,7 +157,8 @@ class _CardAHState extends State<CardAH>
       // Adds the card to the selected card list (if there is space for it)
       setState(() => isClicked = !isClicked);
       CasualityManager.selectedCards.add(widget.text);
-      widget.onClicked();
+
+      if (widget.onClicked != null) widget.onClicked!();
     }
   }
 }
