@@ -7,8 +7,8 @@ class EasterEgg extends StatelessWidget {
   const EasterEgg(this.randomNumber, {super.key});
 
   @override
-  Widget build(BuildContext context) => WillPopScope(
-        onWillPop: () async => false,
+  Widget build(BuildContext context) => PopScope(
+        canPop: true,
         child: Scaffold(
           appBar: const CustomAppBar(),
           body: GestureDetector(
