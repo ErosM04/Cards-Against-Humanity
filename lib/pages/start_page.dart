@@ -161,10 +161,10 @@ class _StartPageState extends State<StartPage> {
       questionList = list;
       return widget.csvReader.getAnswers();
     }).then((answerList) {
-      if (seed == 104) {
+      if (seed == 104 && mounted) {
         //Easter egg
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => EasterEgg(Random().nextInt(12))));
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const EasterEgg()));
       } else {
         // Normal execution
         CasualityManager rand = CasualityManager(

@@ -42,17 +42,5 @@ flutter:
   assets:
     - assets/csv/questions.csv
     - assets/csv/answers.csv
-    - assets/eastereggs/104_0.jpeg
-    - assets/eastereggs/104_1.jpeg
-    - assets/eastereggs/104_2.jpeg
-    - assets/eastereggs/104_3.jpeg
-    - assets/eastereggs/104_4.jpeg
-    - assets/eastereggs/104_5.jpeg
-    - assets/eastereggs/104_6.jpeg
-    - assets/eastereggs/104_7.jpeg
-    - assets/eastereggs/104_8.jpeg
-    - assets/eastereggs/104_9.jpeg
-    - assets/eastereggs/104_10.jpeg
-    - assets/eastereggs/104_11.jpeg
     - assets/dialog/error.png
     - assets/dialog/update.png

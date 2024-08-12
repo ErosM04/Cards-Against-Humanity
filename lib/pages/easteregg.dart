@@ -1,10 +1,32 @@
 import 'package:cards_against_humanity/pages/components/appbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class EasterEgg extends StatelessWidget {
-  final int randomNumber;
+class EasterEgg extends StatefulWidget {
+  const EasterEgg({super.key});
 
-  const EasterEgg(this.randomNumber, {super.key});
+  @override
+  State<EasterEgg> createState() => _EasterEggState();
+}
+
+class _EasterEggState extends State<EasterEgg> {
+  String url = 'https://cataas.com/cat';
+  late Widget _pic;
+
+  @override
+  void initState() {
+    _pic = Image.network(url);
+    _updateImgWidget();
+    super.initState();
+  }
+
+  _updateImgWidget() async {
+    setState(() => _pic = const CircularProgressIndicator());
+    Uint8List bytes = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+        .buffer
+        .asUint8List();
+    setState(() => _pic = Image.memory(bytes));
+  }
 
   @override
   Widget build(BuildContext context) => PopScope(
@@ -12,10 +34,8 @@ class EasterEgg extends StatelessWidget {
         child: Scaffold(
           appBar: const CustomAppBar(),
           body: GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Center(
-              child: Image.asset('assets/eastereggs/104_$randomNumber.jpeg'),
-            ),
+            onTap: () => _updateImgWidget(),
+            child: Center(child: _pic),
           ),
         ),
       );
