@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+/// Pre-fabricated ``[TextField]`` with phone keyboard.
 class CustomTextField extends StatelessWidget {
+  /// The controller of the ``[TextField]``.
   final TextEditingController controller;
+
+  /// Whether to hide the text being edited (e.g., for passwords).
   final bool obscureText;
 
   const CustomTextField({

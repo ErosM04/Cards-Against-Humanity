@@ -3,8 +3,16 @@ import 'package:flutter/material.dart';
 
 /// Customized [AppBar] for Cards Against Humanity
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
+  /// The leading icon, if null uses the defult arrow back.
   final Widget? leading;
+
+  /// The score of the player, if this value is > -1 and ``[maxPoints]`` is >= to this value, the score is showed
+  /// in the format: score/playedRounds.
   final int score;
+
+  /// The maximum points the player could have obtained, which is also the amount of raound played, excluding those played
+  /// as the master. If ``[maxPoints]`` is > -1 and this value is >= to that value, the score is showed in the format:
+  /// score/playedRounds.
   final int maxPoints;
 
   const CustomAppBar({

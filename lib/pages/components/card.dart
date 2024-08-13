@@ -4,9 +4,17 @@ import 'package:flutter/material.dart';
 /// Widget used to create the card widget, for answers, questions and both together.
 /// To preserve state even when cards are out of the screen the State class comes with ``[AutomaticKeepAliveClientMixin]``.
 class CardAH extends StatefulWidget {
+  /// The text to display inside the card.
   final String text;
+
+  /// Indicated if the card can be clicked to invoke certain actions and execute ``[onClicked]``.
   final bool isClickable;
+
+  /// The function to call if [isClickable] is true and the card is clicked.
   final Function? onClicked;
+
+  /// The list of answers to dislay in the empty spots of the question card.
+  /// If empty only shows the text of the question.
   final List<String> answersList;
 
   const CardAH({
@@ -37,7 +45,7 @@ class _CardAHState extends State<CardAH>
       child: Container(
         width: (widget.isClickable) ? 200 : double.infinity,
         decoration: BoxDecoration(
-          color: (isClicked)
+          color: (widget.isClickable && isClicked)
               ? Theme.of(context).colorScheme.primary
               : Colors.transparent,
           border: Border.all(

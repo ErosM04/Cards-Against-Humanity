@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Custom button with app style
+/// Custom button with app style.
 class CustomButton extends StatelessWidget {
   /// The text to display inside the button.
   final String text;
@@ -14,13 +14,13 @@ class CustomButton extends StatelessWidget {
   /// The color of the [text], default is black.
   final Color? textColor;
 
-  /// The interal vertical padding of the text
+  /// The interal vertical padding of the text.
   final double verticalInternalPadding;
 
-  /// The interal horizontal padding of the text
+  /// The interal horizontal padding of the text.
   final double horizontalInternalPadding;
 
-  /// The size of [text]
+  /// The size of [text].
   final double fontSize;
 
   const CustomButton({
