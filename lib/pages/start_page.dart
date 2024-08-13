@@ -1,7 +1,9 @@
+import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/model/data_reader.dart';
 import 'package:cards_against_humanity/pages/components/appbar.dart';
 import 'package:cards_against_humanity/pages/components/button.dart';
+import 'package:cards_against_humanity/pages/components/info.dart';
 import 'package:cards_against_humanity/pages/easteregg.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
@@ -62,15 +64,17 @@ class _StartPageState extends State<StartPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Seed
-                _buildSubTitle('Codice partita'),
+                _buildSubTitle(subTitle: 'Codice partita', infoText: seedInfo),
                 CustomTextField(controller: seedController),
                 const SizedBox(height: 100),
                 // Total players
-                _buildSubTitle('Totale giocatori'),
+                _buildSubTitle(
+                    subTitle: 'Totale giocatori', infoText: totalPlayersInfo),
                 CustomTextField(controller: playerAmountController),
                 const SizedBox(height: 100),
                 // Player number
-                _buildSubTitle('Numero giocatore'),
+                _buildSubTitle(
+                    subTitle: 'Numero giocatore', infoText: playerNumberInfo),
                 CustomTextField(controller: playerNumberController),
                 const SizedBox(height: 50),
                 // Link guide
@@ -82,6 +86,7 @@ class _StartPageState extends State<StartPage> {
                     style: TextStyle(
                       color: Colors.blue,
                       decoration: TextDecoration.underline,
+                      decorationColor: Colors.blue,
                     ),
                   ),
                 ),
@@ -102,16 +107,23 @@ class _StartPageState extends State<StartPage> {
         ),
       );
 
-  /// Creates a subtitle, adding ":" at the end of the text.
-  Padding _buildSubTitle(String text) => Padding(
+  /// Creates a row with a subtitle on the left and an ``[GameInfo]`` on the right.
+  ///
+  /// #### Parameters
+  /// - ``String subTitle`` : the text of the subtitle, at the and ":" will be added.
+  /// - ``String infoText`` : the text to display on the popup box when the ``[GameInfo]`` is clicked.
+  Widget _buildSubTitle({required String subTitle, required String infoText}) =>
+      Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '$text:',
+              '$subTitle:',
               textAlign: TextAlign.start,
               style: const TextStyle(fontSize: 20),
             ),
+            GameInfo(infoText: infoText),
           ],
         ),
       );

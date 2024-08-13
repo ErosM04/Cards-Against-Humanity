@@ -23,6 +23,7 @@ dependencies:
   permission_handler: 
   path_provider: 
   dio: 
+  info_popup: 
 
 
 dev_dependencies:
