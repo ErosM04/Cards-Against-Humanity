@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/card.dart';
+import 'package:cards_against_humanity/pages/components/card.dart';
 import 'package:cards_against_humanity/pages/components/appbar.dart';
 import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';

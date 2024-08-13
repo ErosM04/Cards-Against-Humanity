@@ -5,7 +5,7 @@ import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:cards_against_humanity/pages/easteregg.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/pages/master_page.dart';
-import 'package:cards_against_humanity/textfield.dart';
+import 'package:cards_against_humanity/pages/components/textfield.dart';
 import 'package:cards_against_humanity/updater/updater.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
