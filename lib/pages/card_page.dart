@@ -25,7 +25,7 @@ class _CardPageState extends State<CardPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              buildCompleteCard(),
+              _buildCompleteCard(),
               const SizedBox(height: 100),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -60,12 +60,12 @@ class _CardPageState extends State<CardPage> {
           color: color,
           onPressed: () {
             onPressed();
-            goToNewRound();
+            _goToNewRound();
           });
 
   /// Used to build the complete card with the question and all the answer.
   /// Answers are in a different color.
-  Widget buildCompleteCard() => Column(
+  Widget _buildCompleteCard() => Column(
         children: [
           CardAH(
             onClicked: () => null,
@@ -74,12 +74,12 @@ class _CardPageState extends State<CardPage> {
             answersList: CasualityManager.selectedCards,
           ),
           const SizedBox(height: 10),
-          Text('ID carta/e: ${extractCardsId()}'),
+          Text('ID carta/e: ${_extractCardsId()}'),
         ],
       );
 
   /// Extracts the ids of the card saved in ``CasualityManager.selectedCards``. E.g.: "121, 557"
-  String extractCardsId() => List<String>.generate(
+  String _extractCardsId() => List<String>.generate(
           CasualityManager.selectedCards.length,
           (index) => CasualityManager.selectedCards[index].split('-')[0].trim())
       .toString()
@@ -87,7 +87,7 @@ class _CardPageState extends State<CardPage> {
       .replaceAll(']', '');
 
   /// Goes to a MasterGamePage if the next round is the round of the actual player, otherwise goes to a GamePage.
-  void goToNewRound() {
+  void _goToNewRound() {
     widget.random.fillHand();
     widget.random.drawQuestionCard();
 

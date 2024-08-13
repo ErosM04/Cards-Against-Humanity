@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/model/data_reader.dart';
 import 'package:cards_against_humanity/pages/components/appbar.dart';
@@ -12,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class StartPage extends StatefulWidget {
+  /// The object used to load data from the csv files in the assets.
   final CsvReader csvReader = const CsvReader();
 
   const StartPage({super.key});
@@ -21,10 +21,19 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
+  /// The controller of the [TextField] of the seed.
   final seedController = TextEditingController();
+
+  /// The controller of the [TextField] of the amount of players.
   final playerAmountController = TextEditingController();
+
+  /// The controller of the [TextField] of the specific number of the player.
   final playerNumberController = TextEditingController();
+
+  /// List of the questions loaded from the csv.
   late List<List<dynamic>> questionList;
+
+  /// List of the answers wloaded from the csv.
   late List<String> answerList;
 
   @override
@@ -93,6 +102,7 @@ class _StartPageState extends State<StartPage> {
         ),
       );
 
+  /// Creates a subtitle, adding ":" at the end of the text.
   Padding _buildSubTitle(String text) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Row(
@@ -144,8 +154,6 @@ class _StartPageState extends State<StartPage> {
         seed: seed,
         playerNumber: playerNumber,
         totalPlayers: playerAmount,
-        randomAnswerCard: Random(seed),
-        randomQuestionCard: Random(seed + 1),
         questionList: questionList,
         answerList: answerList,
       );

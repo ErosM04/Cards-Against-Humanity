@@ -5,7 +5,10 @@ import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/pages/start_page.dart';
 import 'package:flutter/material.dart';
 
+/// The normal game page, where the player has to choose the funniest answer/s card/s to complete the
+/// question card.
 class GamePage extends StatefulWidget {
+  /// The object that manages the logic of the game.
   final CasualityManager random;
 
   const GamePage(this.random, {super.key});
@@ -23,21 +26,8 @@ class _GamePageState extends State<GamePage> {
             onPressed: () => Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const StartPage())),
           ),
-          actions: [
-            SizedBox(
-              width: 65,
-              child: IconButton(
-                padding: const EdgeInsets.all(0),
-                icon: Text(
-                  '${widget.random.score}/${calculateScore()}',
-                  style: TextStyle(
-                      fontSize: 17,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-                onPressed: () {},
-              ),
-            )
-          ],
+          score: widget.random.score,
+          maxPoints: widget.random.playedRounds,
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -49,16 +39,16 @@ class _GamePageState extends State<GamePage> {
                 isClickable: false,
               ),
               const SizedBox(height: 100),
-              buildSubTitle('La tua mano:'),
+              _buildSubTitle('La tua mano:'),
               const SizedBox(height: 20),
-              buildCardCarousel(widget.random.hand),
+              _buildCardCarousel(widget.random.hand),
             ]),
           ),
         ),
       );
 
   /// Calculates the amount of rounds played by the user, excluding the rounds played as master.
-  int calculateScore() =>
+  int _calculateScore() =>
       (widget.random.round - 1) -
       ((widget.random.round / widget.random.totalPlayers).floor() +
           ((widget.random.round % widget.random.totalPlayers) /
@@ -67,7 +57,7 @@ class _GamePageState extends State<GamePage> {
               ? 1
               : 0));
 
-  Padding buildSubTitle(String text,
+  Widget _buildSubTitle(String text,
       {double fontSize = 24,
       double horizontalPadding = 20,
       double verticalPadding = 0}) {
@@ -90,8 +80,8 @@ class _GamePageState extends State<GamePage> {
   }
 
   /// Takes a list of answers and build a horizontal list of card using the [CardAH] widget.
-  /// Every time a card widget is clicked the method [selectCard] is called.
-  Widget buildCardCarousel(List<String> list) => SizedBox(
+  /// Every time a card widget is clicked the method [_selectCard] is called.
+  Widget _buildCardCarousel(List<String> list) => SizedBox(
         height: 220,
         child: ListView.builder(
             itemCount: list.length,
@@ -99,15 +89,15 @@ class _GamePageState extends State<GamePage> {
             controller: ScrollController(),
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) => CardAH(
-                onClicked: () => selectCard(list[index]), text: list[index])),
+                onClicked: () => _selectCard(list[index]), text: list[index])),
       );
 
   /// Takes the text of the clicked card and if all the cards needed were selected proceeds to redirect the user to the rigth page.
   /// #### Parameters
   /// - ``String [text]`` : the text of the card that has been clicked.
-  void selectCard(String text) {
+  void _selectCard(String text) {
     if (CasualityManager.selectedCards.length ==
-        CasualityManager.answerNeeded) {
+        CasualityManager.answersNeeded) {
       for (var cardText in CasualityManager.selectedCards) {
         widget.random.useCard(cardText);
       }

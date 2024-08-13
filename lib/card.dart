@@ -153,7 +153,7 @@ class _CardAHState extends State<CardAH>
       CasualityManager.selectedCards.remove(widget.text);
       setState(() => isClicked = !isClicked);
     } else if (CasualityManager.selectedCards.length <
-        CasualityManager.answerNeeded) {
+        CasualityManager.answersNeeded) {
       // Adds the card to the selected card list (if there is space for it)
       setState(() => isClicked = !isClicked);
       CasualityManager.selectedCards.add(widget.text);

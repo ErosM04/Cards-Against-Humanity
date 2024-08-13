@@ -7,7 +7,9 @@ import 'package:cards_against_humanity/pages/start_page.dart';
 import 'package:cards_against_humanity/textfield.dart';
 import 'package:flutter/material.dart';
 
+/// Page of the player which has to insert the ids of the cards selected by the other players.
 class MasterGamePage extends StatefulWidget {
+  /// The object that manages the logic of the game.
   final CasualityManager random;
 
   const MasterGamePage(this.random, {super.key});
@@ -17,7 +19,10 @@ class MasterGamePage extends StatefulWidget {
 }
 
 class _MasterGamePageState extends State<MasterGamePage> {
+  /// The list of answer cards that will be inserted by the player.
   List<String> answerCardList = [];
+
+  /// The controller of the [TextField] where the players inserts the ids of the answer cards.
   final textController = TextEditingController();
 
   @override
@@ -28,6 +33,8 @@ class _MasterGamePageState extends State<MasterGamePage> {
             onPressed: () => Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const StartPage())),
           ),
+          score: widget.random.score,
+          maxPoints: widget.random.playedRounds,
         ),
         body: SingleChildScrollView(
           child: Center(
@@ -40,27 +47,29 @@ class _MasterGamePageState extends State<MasterGamePage> {
               ),
               const SizedBox(height: 50),
               // Those ifs are to hide element on setState()
+              // This is an abort in the form of lines of code that hides the textfield when the button is pressed
+              // and then shows the list of cards containing the answers.
               (answerCardList.isEmpty)
-                  ? buildSubTitle('Inserisci i numeri delle carte:',
+                  ? _buildSubTitle('Inserisci i numeri delle carte:',
                       fontSize: 22)
                   : Container(),
               (answerCardList.isEmpty)
-                  ? buildSubTitle('es: 11.22.104',
+                  ? _buildSubTitle('es: 11.22.104',
                       fontSize: 18, verticalPadding: 2)
                   : Container(),
               (answerCardList.isEmpty)
                   ? CustomTextField(controller: textController)
                   : Container(),
               (answerCardList.isEmpty)
-                  ? buildButton(
-                      text: 'Mostra carte', onPressed: () => getAnswerCards())
+                  ? _buildButton(
+                      text: 'Mostra carte', onPressed: () => _getAnswerCards())
                   : Container(),
               (answerCardList.isNotEmpty)
-                  ? buildCardCarousel(answerCardList)
+                  ? _buildCardCarousel(answerCardList)
                   : Container(),
               (answerCardList.isNotEmpty)
-                  ? buildButton(
-                      text: 'Prossimo round', onPressed: () => goToNewRound())
+                  ? _buildButton(
+                      text: 'Prossimo round', onPressed: () => _goToNewRound())
                   : Container(),
             ]),
           ),
@@ -69,7 +78,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
   /// Read the data from the textfield, converts it into a list of numbers and then use these ids to get the answers and returns a list
   /// of answers that is save in [answerCardList].
-  void getAnswerCards() {
+  void _getAnswerCards() {
     String str = textController.text
         .replaceAll(' ', '')
         .replaceAll(',', '')
@@ -77,7 +86,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
     if (str.contains('.') &&
         (str.split('.').length ==
-            (CasualityManager.answerNeeded *
+            (CasualityManager.answersNeeded *
                 (widget.random.totalPlayers - 1)))) {
       final splitArr = str.split('.');
 
@@ -92,7 +101,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
               splitArr.length, (index) => int.parse(splitArr[index])));
 
       if (answerList.length ==
-          (CasualityManager.answerNeeded * (widget.random.totalPlayers - 1))) {
+          (CasualityManager.answersNeeded * (widget.random.totalPlayers - 1))) {
         // True if only 1 answer per player is requested
         if (answerList.length == (widget.random.totalPlayers - 1)) {
           answerList.shuffle();
@@ -117,8 +126,8 @@ class _MasterGamePageState extends State<MasterGamePage> {
     }
   }
 
-  /// Goes to a MasterGamePage.
-  void goToNewRound() {
+  /// Goes to the normal game page.
+  void _goToNewRound() {
     // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
     CasualityManager.selectedCards.clear();
     widget.random.fillHand();
@@ -127,7 +136,8 @@ class _MasterGamePageState extends State<MasterGamePage> {
         MaterialPageRoute(builder: (context) => GamePage(widget.random)));
   }
 
-  Widget buildButton({
+  /// Builds a [CustomButton] to reveal the answer cards or to move to the next page.
+  Widget _buildButton({
     required String text,
     required void Function() onPressed,
   }) =>
@@ -138,8 +148,9 @@ class _MasterGamePageState extends State<MasterGamePage> {
             onPressed: onPressed,
           ));
 
-  /// Takes a list of answers and build a horizontal list of card using the [CardAH] widget.
-  Widget buildCardCarousel(List<String> list) => SizedBox(
+  /// Takes a list of answers and build a horizontal list of [CardAH] containg the different answers of the different
+  /// players (shuffled).
+  Widget _buildCardCarousel(List<String> list) => SizedBox(
         height: 220,
         child: ListView.builder(
             itemCount: list.length,
@@ -152,25 +163,27 @@ class _MasterGamePageState extends State<MasterGamePage> {
                 )),
       );
 
-  Padding buildSubTitle(String text,
-      {double fontSize = 24,
-      double horizontalPadding = 20,
-      double verticalPadding = 0}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: horizontalPadding, vertical: verticalPadding),
-      child: Row(
-        children: [
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.secondary,
+  /// Builds a customizable subtitle
+  Widget _buildSubTitle(
+    String text, {
+    double fontSize = 24,
+    double horizontalPadding = 20,
+    double verticalPadding = 0,
+  }) =>
+      Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding, vertical: verticalPadding),
+        child: Row(
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
 }
