@@ -5,7 +5,7 @@ import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/pages/start_page.dart';
 import 'package:flutter/material.dart';
 
-/// The normal game page, where the player has to choose the funniest answer/s card/s to complete the
+/// The normal Game page, where the player has to choose the funniest answer/s card/s to complete the
 /// question card.
 class GamePage extends StatefulWidget {
   /// The object that manages the logic of the game.
@@ -47,20 +47,13 @@ class _GamePageState extends State<GamePage> {
         ),
       );
 
-  /// Calculates the amount of rounds played by the user, excluding the rounds played as master.
-  int _calculateScore() =>
-      (widget.random.round - 1) -
-      ((widget.random.round / widget.random.totalPlayers).floor() +
-          ((widget.random.round % widget.random.totalPlayers) /
-                      widget.random.playerNumber >=
-                  1
-              ? 1
-              : 0));
-
-  Widget _buildSubTitle(String text,
-      {double fontSize = 24,
-      double horizontalPadding = 20,
-      double verticalPadding = 0}) {
+  /// Builds the subtitles
+  Widget _buildSubTitle(
+    String text, {
+    double fontSize = 24,
+    double horizontalPadding = 20,
+    double verticalPadding = 0,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: horizontalPadding, vertical: verticalPadding),
