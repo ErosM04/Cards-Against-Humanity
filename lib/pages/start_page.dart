@@ -60,48 +60,60 @@ class _StartPageState extends State<StartPage> {
         appBar: const CustomAppBar(),
         body: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Seed
-                _buildSubTitle(subTitle: 'Codice partita', infoText: seedInfo),
-                CustomTextField(controller: seedController),
-                const SizedBox(height: 100),
-                // Total players
-                _buildSubTitle(
-                    subTitle: 'Totale giocatori', infoText: totalPlayersInfo),
-                CustomTextField(controller: playerAmountController),
-                const SizedBox(height: 100),
-                // Player number
-                _buildSubTitle(
-                    subTitle: 'Numero giocatore', infoText: playerNumberInfo),
-                CustomTextField(controller: playerNumberController),
-                const SizedBox(height: 50),
-                // Link guide
-                GestureDetector(
-                  onTap: () => launchUrl(Uri.parse(
-                      'https://github.com/ErosM04/Cards-Against-Humanity')),
-                  child: const Text(
-                    'Clicca qui per la guida!',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Colors.blue,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Seed
+                  _buildSubTitle(
+                      subTitle: 'Codice partita', infoText: seedInfo),
+                  Row(
+                    children: [
+                      Text(
+                        'Inserire un numero di almeno 10 cifre',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                  CustomTextField(controller: seedController),
+                  const SizedBox(height: 100),
+                  // Total players
+                  _buildSubTitle(
+                      subTitle: 'Totale giocatori', infoText: totalPlayersInfo),
+                  CustomTextField(controller: playerAmountController),
+                  const SizedBox(height: 100),
+                  // Player number
+                  _buildSubTitle(
+                      subTitle: 'Numero giocatore', infoText: playerNumberInfo),
+                  CustomTextField(controller: playerNumberController),
+                  const SizedBox(height: 50),
+                  // Link guide
+                  GestureDetector(
+                    onTap: () => launchUrl(Uri.parse(
+                        'https://github.com/ErosM04/Cards-Against-Humanity')),
+                    child: const Text(
+                      'Clicca qui per la guida!',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.blue,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                // Play button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: CustomButton(
-                    text: 'Play',
-                    onPressed: () => _startGame(),
-                    horizontalInternalPadding: 80,
-                    verticalInternalPadding: 15,
+                  const SizedBox(height: 50),
+                  // Play button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: CustomButton(
+                      text: 'Play',
+                      onPressed: () => _startGame(),
+                      horizontalInternalPadding: 80,
+                      verticalInternalPadding: 15,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -113,19 +125,16 @@ class _StartPageState extends State<StartPage> {
   /// - ``String subTitle`` : the text of the subtitle, at the and ":" will be added.
   /// - ``String infoText`` : the text to display on the popup box when the ``[GameInfo]`` is clicked.
   Widget _buildSubTitle({required String subTitle, required String infoText}) =>
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '$subTitle:',
-              textAlign: TextAlign.start,
-              style: const TextStyle(fontSize: 20),
-            ),
-            GameInfo(infoText: infoText),
-          ],
-        ),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '$subTitle:',
+            textAlign: TextAlign.start,
+            style: const TextStyle(fontSize: 20),
+          ),
+          GameInfo(infoText: infoText),
+        ],
       );
 
   /// Read the data from the [TextField] and tries to convert them into numbers. If these data are in the correct format

@@ -15,13 +15,10 @@ class CustomTextField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          // Used to priviledge numbers over letters and still accessing the '.' character.
-          keyboardType: TextInputType.phone,
-        ),
+  Widget build(BuildContext context) => TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        // Used to priviledge numbers over letters and still accessing the '.' character.
+        keyboardType: TextInputType.phone,
       );
 }

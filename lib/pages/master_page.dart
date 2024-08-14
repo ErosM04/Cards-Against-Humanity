@@ -129,7 +129,10 @@ class _MasterGamePageState extends State<MasterGamePage> {
             verticalPadding: 2,
             info: cardsIdInput,
           ),
-          CustomTextField(controller: textController),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: CustomTextField(controller: textController),
+          ),
           _buildButton(
             text: 'Mostra carte',
             onPressed: () => _getAnswerCards(),
