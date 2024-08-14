@@ -1,6 +1,8 @@
+import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/pages/components/card.dart';
 import 'package:cards_against_humanity/pages/components/appbar.dart';
 import 'package:cards_against_humanity/pages/components/button.dart';
+import 'package:cards_against_humanity/pages/components/info.dart';
 import 'package:cards_against_humanity/pages/game_page.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
 import 'package:cards_against_humanity/pages/start_page.dart';
@@ -39,38 +41,19 @@ class _MasterGamePageState extends State<MasterGamePage> {
         body: SingleChildScrollView(
           child: Center(
             child: Column(children: [
+              // Card
               const SizedBox(height: 30),
               CardAH(
-                onClicked: () => null,
                 text: widget.random.question,
                 isClickable: false,
               ),
               const SizedBox(height: 50),
-              // Those ifs are to hide element on setState()
-              // This is an abort in the form of lines of code that hides the textfield when the button is pressed
-              // and then shows the list of cards containing the answers.
+              // The if is used to show the input field to insert the cards id (when the answer list is empty).
+              // Then after the button is clicked and the answer list isn't empty anymore the list of cards containg the answers
+              // is showed in place of the input field.
               (answerCardList.isEmpty)
-                  ? _buildSubTitle('Inserisci i numeri delle carte:',
-                      fontSize: 22)
-                  : Container(),
-              (answerCardList.isEmpty)
-                  ? _buildSubTitle('es: 11.22.104',
-                      fontSize: 18, verticalPadding: 2)
-                  : Container(),
-              (answerCardList.isEmpty)
-                  ? CustomTextField(controller: textController)
-                  : Container(),
-              (answerCardList.isEmpty)
-                  ? _buildButton(
-                      text: 'Mostra carte', onPressed: () => _getAnswerCards())
-                  : Container(),
-              (answerCardList.isNotEmpty)
-                  ? _buildCardCarousel(answerCardList)
-                  : Container(),
-              (answerCardList.isNotEmpty)
-                  ? _buildButton(
-                      text: 'Prossimo round', onPressed: () => _goToNewRound())
-                  : Container(),
+                  ? _buildCardInputWidgets()
+                  : _buildCardsListWidgets(),
             ]),
           ),
         ),
@@ -126,7 +109,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
     }
   }
 
-  /// Goes to the normal game page.
+  /// Goes to the normal Game page.
   void _goToNewRound() {
     // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
     CasualityManager.selectedCards.clear();
@@ -135,6 +118,34 @@ class _MasterGamePageState extends State<MasterGamePage> {
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (context) => GamePage(widget.random)));
   }
+
+  /// Builds the set of widgets used to take the cards id as input, to later save them into ``[answerCardList]``.
+  Widget _buildCardInputWidgets() => Column(
+        children: [
+          _buildSubTitle('Inserisci i numeri delle carte:', fontSize: 22),
+          _buildSubTitle(
+            'es: 11.22.104',
+            fontSize: 18,
+            verticalPadding: 2,
+            info: cardsIdInput,
+          ),
+          CustomTextField(controller: textController),
+          _buildButton(
+            text: 'Mostra carte',
+            onPressed: () => _getAnswerCards(),
+          ),
+        ],
+      );
+
+  /// Builds the set of widgets used to show the differents answer cards (one per player), with each card containg
+  /// the answer/s to the question card.
+  Widget _buildCardsListWidgets() => Column(
+        children: [
+          _buildCardCarousel(answerCardList),
+          _buildButton(
+              text: 'Prossimo round', onPressed: () => _goToNewRound()),
+        ],
+      );
 
   /// Builds a [CustomButton] to reveal the answer cards or to move to the next page.
   Widget _buildButton({
@@ -159,7 +170,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) => CardAH(
                   text: list[index],
-                  onClicked: () {},
+                  isClickable: true,
                 )),
       );
 
@@ -169,11 +180,15 @@ class _MasterGamePageState extends State<MasterGamePage> {
     double fontSize = 24,
     double horizontalPadding = 20,
     double verticalPadding = 0,
+    String? info,
   }) =>
       Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding, vertical: verticalPadding),
+          horizontal: horizontalPadding,
+          vertical: verticalPadding,
+        ),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               text,
@@ -183,6 +198,9 @@ class _MasterGamePageState extends State<MasterGamePage> {
                 color: Theme.of(context).colorScheme.secondary,
               ),
             ),
+            (info != null && info.isNotEmpty)
+                ? GameInfo(infoText: info)
+                : Container(),
           ],
         ),
       );
