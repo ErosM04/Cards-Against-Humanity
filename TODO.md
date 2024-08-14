@@ -8,4 +8,4 @@
 - [X] Add info icon at the opposite of the subtitle in start page, when clicked shows a box containg info about that textfield
 - [X] Load data from csv as soon as the app starts
 - [X] Aggiungi punteggio anche in master page
-- [ ] Add scroll view in answer card in Master page
+- [X] Add scroll view in card

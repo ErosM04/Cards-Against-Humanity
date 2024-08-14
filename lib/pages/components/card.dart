@@ -82,21 +82,25 @@ class _CardAHState extends State<CardAH>
   /// If a list of answers is passed as a parameter (so it isn't empty) returns a ``[RichText]`` containg the question
   /// with the answers.
   /// Otherwise returns a ``[Text]`` using the text parameter.
-  Widget _buildCustomText() => (widget.answersList.isEmpty)
-      ? Text(widget.text,
-          textAlign: TextAlign.start,
-          style: TextStyle(
-            fontSize: (widget.isMainCard) ? 20 : 17,
-            color: (widget.isClickable && isClicked)
-                ? Theme.of(context).colorScheme.tertiary
-                : Colors.white,
-          ))
-      : RichText(
-          textAlign: TextAlign.start,
-          text: TextSpan(
-              style: const TextStyle(fontSize: 20, color: Colors.white),
-              children: _buildTextList()),
-        );
+  ///
+  /// Both cases the widget is enclosed in a ``[SingleChildScrollView]`` to scroll the text if it's too long.
+  Widget _buildCustomText() => SingleChildScrollView(
+        child: (widget.answersList.isEmpty)
+            ? Text(widget.text,
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  fontSize: (widget.isMainCard) ? 20 : 17,
+                  color: (widget.isClickable && isClicked)
+                      ? Theme.of(context).colorScheme.tertiary
+                      : Colors.white,
+                ))
+            : RichText(
+                textAlign: TextAlign.start,
+                text: TextSpan(
+                    style: const TextStyle(fontSize: 20, color: Colors.white),
+                    children: _buildTextList()),
+              ),
+      );
 
   /// Builds a list of ``[TextSpan]`` where the question (text parameter) is white and the answers (taken by the list
   /// of answers) use a color of the theme and are substituted to the '_____' contained in the question string.
