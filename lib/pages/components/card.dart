@@ -13,6 +13,9 @@ class CardAH extends StatefulWidget {
   /// The function to call if [isClickable] is true and the card is clicked.
   final Function? onClicked;
 
+  /// If this is true, this card has colored border to highlight its importance.
+  final bool isMainCard;
+
   /// The list of answers to dislay in the empty spots of the question card.
   /// If empty only shows the text of the question.
   final List<String> answersList;
@@ -22,6 +25,7 @@ class CardAH extends StatefulWidget {
     required this.text,
     this.isClickable = true,
     this.onClicked,
+    this.isMainCard = false,
     this.answersList = const [],
   });
 
@@ -41,26 +45,33 @@ class _CardAHState extends State<CardAH>
     super.build(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-          vertical: 10, horizontal: (widget.isClickable) ? 10 : 30),
+          vertical: 10, horizontal: (widget.isMainCard) ? 30 : 10),
       child: Container(
-        width: (widget.isClickable) ? 200 : double.infinity,
+        width: (widget.isMainCard) ? double.infinity : 200,
         decoration: BoxDecoration(
           color: (widget.isClickable && isClicked)
               ? Theme.of(context).colorScheme.primary
               : Colors.transparent,
           border: Border.all(
-              color: (widget.isClickable)
-                  ? (isClicked)
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.white
-                  : Theme.of(context).colorScheme.primary),
+            color: (widget.isMainCard)
+                ? (widget.isClickable)
+                    ? (isClicked)
+                        ? Theme.of(context).colorScheme.secondary
+                        : Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.primary
+                : (widget.isClickable)
+                    ? (isClicked)
+                        ? Theme.of(context).colorScheme.secondary
+                        : Colors.white
+                    : Colors.white,
+          ),
           borderRadius: BorderRadius.circular(20),
         ),
         child: GestureDetector(
           onTap: () => (widget.isClickable) ? _isClicked() : null,
           child: Padding(
             padding: EdgeInsets.symmetric(
-                vertical: (widget.isClickable) ? 30 : 40, horizontal: 20),
+                vertical: (widget.isMainCard) ? 40 : 30, horizontal: 20),
             child: _buildCustomText(),
           ),
         ),
@@ -72,15 +83,14 @@ class _CardAHState extends State<CardAH>
   /// with the answers.
   /// Otherwise returns a ``[Text]`` using the text parameter.
   Widget _buildCustomText() => (widget.answersList.isEmpty)
-      ? Text(
-          widget.text,
+      ? Text(widget.text,
           textAlign: TextAlign.start,
           style: TextStyle(
-              fontSize: (widget.isClickable) ? 17 : 20,
-              color: (widget.isClickable && isClicked)
-                  ? Theme.of(context).colorScheme.tertiary
-                  : Colors.white),
-        )
+            fontSize: (widget.isMainCard) ? 20 : 17,
+            color: (widget.isClickable && isClicked)
+                ? Theme.of(context).colorScheme.tertiary
+                : Colors.white,
+          ))
       : RichText(
           textAlign: TextAlign.start,
           text: TextSpan(

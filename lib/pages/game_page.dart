@@ -34,9 +34,9 @@ class _GamePageState extends State<GamePage> {
             child: Column(children: [
               const SizedBox(height: 30),
               CardAH(
-                onClicked: () => null,
                 text: widget.random.question,
                 isClickable: false,
+                isMainCard: true,
               ),
               const SizedBox(height: 100),
               _buildSubTitle('La tua mano:'),

@@ -46,6 +46,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
               CardAH(
                 text: widget.random.question,
                 isClickable: false,
+                isMainCard: true,
               ),
               const SizedBox(height: 50),
               // The if is used to show the input field to insert the cards id (when the answer list is empty).
@@ -173,7 +174,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) => CardAH(
                   text: list[index],
-                  isClickable: true,
+                  isClickable: false,
                 )),
       );
 

@@ -71,9 +71,9 @@ class CardPage extends StatelessWidget {
   Widget _buildCompleteCard() => Column(
         children: [
           CardAH(
-            onClicked: () => null,
             text: random.question,
             isClickable: false,
+            isMainCard: true,
             answersList: CasualityManager.selectedCards,
           ),
           const SizedBox(height: 10),
