@@ -1,5 +1,5 @@
 # Cards-Against-Humanity
-Questa mobile app :iphone: non così politicamente corretta può essere usata per giocare a ``Cards Against Humanity`` fino ad una massimo di 20 giocatori, **senza una connessione ad Internet**.
+Quest'app :iphone: non così politicamente corretta può essere usata per giocare a ``Cards Against Humanity`` fino ad una massimo di 20 giocatori, **senza una connessione ad Internet** (Solo su dispositivi **Android**!).
 
 ![CAH](readme_images/CAH.gif)
 
@@ -23,11 +23,21 @@ Il gioco, basandosi su una semi-randomizzazione che utilizza un **seed** (il cod
 In quest'app c'è anche un easteregg, buona fortuna a trovarlo.
 
 ### Auto-Update
-L'applicazione risulterà sempre aggiornata alla versione corrente in quanto ad ogni avvio controllerà grazie alle API di GitHub qual'è l'ultima versione e in caso essa non corrisponda a quella corrente verrà chiesto all'utente il permesso di installare quella più recente. Come visibile dall'immagine nel banner per il consenso vengono mostrate il numero della nuova versione ed elencate ``Funzionalità``, ``Cambiamenti`` e se vi sono stati dei ``Bug fixies``. In aggiunta vi è anche un [link](https://github.com/ErosM04/Cards-Against-Humanity/releases/latest) all'ultimo release per visualizzare nel dettaglio tutti i cambiamenti.
+L'applicazione risulterà sempre aggiornata alla versione corrente in quanto ad ogni avvio controllerà grazie alle API di GitHub qual'è l'ultima versione e in caso essa non corrisponda a quella corrente verrà chiesto all'utente il permesso di installare quella più recente. Come visibile dall'immagine nel banner per il consenso vengono mostrate il numero della nuova versione ed elencate ``Funzionalità``, ``Modifiche`` e se vi sono stati dei ``Bug fixies``. In aggiunta vi è anche un [link](https://github.com/ErosM04/Cards-Against-Humanity/releases/latest) all'ultimo release per visualizzare nel dettaglio tutti i cambiamenti.
+
+Una volta premuto Sì, un banner terrà aggiornati sullo stato del download.
 
 <div align="center">
-    <img src="readme_images/start_page_update.jpg" width=200>
+    <img src="readme_images/start_page_update.png" width=200>
+    <img src="readme_images/start_page_download.png" width=200>
 </div>
+
+Se si verificherà qualche problema durante l'installazione, apparirà un banner che ci informerà sull'errore e, una volta premuto Sì, aprirà un File Manager per selezionare manualmente l'aggiornamento ed avviarlo.
+
+<div align="center">
+    <img src="readme_images/start_page_installer.png" width=200>
+</div>
+
 
 ## Come giocare
 
@@ -39,13 +49,13 @@ Appena avviato il gioco ci troveremo davanti ad una schermata in cui vanno inser
 In aggiunta vi sarà anche un [link](https://github.com/ErosM04/Cards-Against-Humanity) che indirizza alla repo GitHub del progetto così da avere un facile accesso alle istruzioni.
 
 <div align="center">
-    <img src="readme_images/start_page.jpg" width=200>
+    <img src="readme_images/start_page.png" width=200>
 </div>
 
-Di seguito un esempio di come inserire i dati per una partita. In questo caso ``56466`` è il seed che tutti dovrano inserire uguale. Poi il numero totale di giocatori, in questo caso ``4``. Ed infine il numero del giocatore, che in questo caso può andare da 1 a 4, l'importante è che ogn'uno abbia un numero diverso.
+Di seguito un esempio di come inserire i dati per una partita. In questo caso ``4683474930`` è il seed che tutti dovrano inserire uguale (scegliere numeri di almeno 10 cifre). Poi il numero totale di giocatori, in questo caso ``4``. Ed infine il numero del giocatore, che in questo caso può andare da 1 a 4, l'importante è che ogn'uno abbia un numero diverso.
 
 <div align="center">
-    <img src="readme_images/start_page2.jpg" width=200>
+    <img src="readme_images/start_page2.png" width=200>
 </div>
 
 ### Player turn
@@ -55,7 +65,7 @@ Nella schermata potremmo vedere al centro la carta domanda con uno spazio vuoto 
 Inoltre nella barra in alto, a sinistra vi è un icona per terminare la partita e a destra il nostro attuale punteggio, attualmente 0/0 poiché non abbiamo ancora giocato niente.
 
 <div align="center">
-    <img src="readme_images/game_page.jpg" width=200>
+    <img src="readme_images/game_page.png" width=200>
 </div>
 
 Una volta cliccata la carta scelta verremo indirizzati in una seconda schermata in cui è presente la carta domanda, completata con la risposta da noi scelta. Oltre a questo vi sarà anche un numero che non è altro che l'id della carta, che servirà al giocatore che sta giocando il **Master turn**.
@@ -63,20 +73,17 @@ Una volta cliccata la carta scelta verremo indirizzati in una seconda schermata 
 In fondo alla pagina vi sono due bottoni con cui indicare se in quel turno si ha **vinto** o **perso**, l'obbietivo ovviamente è far ridere, dunque solo chi avrà fatto ridere con la cacata più simpatica potrà gudagnarsi il turno. Rispondete responsabilmente.
 
 <div align="center">
-    <img src="readme_images/card_page.jpg" width=200>
+    <img src="readme_images/card_page.png" width=200>
 </div>
 
 Una volta premuti i tasti della schermata precedente, a meno che non sia il nostro turno di giocare come Master, verremo riportati alla schermata di prima solo che ora i punti saranno cambiati, come la carta domanda. Inoltre la carta utilizzata sarà sostituita da un'altra carta, sempre per un massimo di 10 carte totali nella mano.
 
-<div align="center">
-    <img src="readme_images/game_page2.jpg" width=200>
-</div>
 
 Di seguito un esempio di domanda in cui sono richieste 2 risposte; in questo caso la prima carta cliccata si evidenzierà e fino a che non avremo premuto la seconda non andremo avanti. Perciò possiamo anche decidere di deselezionare la prima carta ricliccandovi sopra. **Importante!** selezionare le carte in ordine o la frase verrà sminchiata.
 
 <div align="center">
-    <img src="readme_images/game_page_2answers.jpg" width=200>
-    <img src="readme_images/card_page_2answers.jpg" width=200>
+    <img src="readme_images/game_page_2answers.png" width=200>
+    <img src="readme_images/card_page_2answers.png" width=200>
 </div>
 
 ### Master turn
@@ -86,18 +93,18 @@ Ci troveremmo quindi davanti ad una schermata che al centro avrà la carta doman
 Inoltre nella barra in alto, a sinistra, vi è un icona per terminare la partita.
 
 <div align="center">
-    <img src="readme_images/master_page.jpg" width=200>
+    <img src="readme_images/master_page.png" width=200>
 </div>
 
-Nell'immagine sottostante possiamo vedere un esempio di come compilare il campo. In questo caso stanno giocando 4 giocatori in totale, quindi escludendo quello che attualmente deve inserire i numeri abbiamo un totale di 3 carte completamento scelte, di conseguenza inseriremo i numeri nel seguente modo: ``364.774.26``. In questo caso l'ordine in cui li inseriamo non è importante.
+Nell'immagine sottostante possiamo vedere un esempio di come compilare il campo. In questo caso stanno giocando 4 giocatori in totale, quindi escludendo quello che attualmente deve inserire i numeri abbiamo un totale di 3 carte completamento scelte, di conseguenza inseriremo i numeri nel seguente modo: ``96.445.237``. In questo caso l'ordine in cui li inseriamo non è importante.
 
 Nel caso la carta domanda necessiti di 2 carte completamento, considerando sempre di essere in 4 giocatori, ecco che i numeri andranno diposti nel modo seguente: ``55.24.7.255.743.112``. L'importante è che le 2 carte scelte dallo stesso giocatore vengano scritte una di seguito all'altra, ad esempio 55 e 24 sono carte usate dallo stesso giocatore.
 
 Una volta eletta la carta più divertente non ci resta che premere il pulsante **Prossimo round** e passare al turno successivo. Ovviamente questo turno non viene conteggiato nel punteggio poiché non si ha giocato.
 
 <div align="center">
-    <img src="readme_images/master_page2.jpg" width=200>
-    <img src="readme_images/master_page3.jpg" width=200>
+    <img src="readme_images/master_page2.png" width=200>
+    <img src="readme_images/master_page3.png" width=200>
 </div>
 
 ## Download e Installazione
