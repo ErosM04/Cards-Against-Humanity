@@ -1,8 +1,8 @@
 # TODO
-- [ ] Add "only android" disclaimer to README
+- [X] Add "only android" disclaimer to README
 - [X] Devide and clean pages code
 - [ ] Implement iOS version
-- [ ] Round corners of app images in README
+- [X] Round corners of app images in README
 - [X] Add "use numbers with at least 10 digits for better randomization" in start page
 - [X] Change Easteregg
 - [X] Add info icon at the opposite of the subtitle in start page, when clicked shows a box containg info about that textfield
