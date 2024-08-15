@@ -97,7 +97,8 @@ class Installer {
     } catch (e) {
       _callSnackBar(
           message:
-              "Si è verificato un errore durante l'installazione manuale dell'aggiornamento :(");
+              "Si è verificato un errore durante l'installazione manuale dell'aggiornamento :(",
+          durationInSec: 5);
     }
   }
 
