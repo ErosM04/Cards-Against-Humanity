@@ -25,15 +25,15 @@ void main() {
   test(
     'Verify seed behavior in Random',
     () {
-      print('Campione seed: 0-1000');
+      // print('Campione seed: 0-1000');
       lerciume(firstSeed: 0, lastSeed: 1000);
 
       for (var i = 0; i < 10; i++) {
         int lower = pow(10, i + 5).round();
         int higher = (pow(10, i + 5).round()) + 1000;
 
-        print('------------------');
-        print('Campione seed: $lower-$higher');
+        // print('------------------');
+        // print('Campione seed: $lower-$higher');
         lerciume(firstSeed: lower, lastSeed: higher);
       }
     },
@@ -73,7 +73,7 @@ void _salame(List<String> list) {
   // List<List<int>> temp = [];
   for (var i = 0; i < numeri.length; i++) {
     if ((numeri[i] - avg) > 0) {
-      print('${i + 1} = ${(numeri[i] - avg)}');
+      // print('${i + 1} = ${(numeri[i] - avg)}');
     }
     if ((numeri[i] - avg) > 0) {
       contatoreScartiPositivi++;
@@ -84,9 +84,9 @@ void _salame(List<String> list) {
     }
   }
   avgScartiPos = (avgScartiPos / contatoreScartiPositivi).round();
-  print('---------------------------------------');
-  print('Avg scarti pos: $avgScartiPos');
-  print('---------------------------------------');
+  // print('---------------------------------------');
+  // print('Avg scarti pos: $avgScartiPos');
+  // print('---------------------------------------');
 
   List<List<int>> moltoPresenti = [];
   for (var i = 0; i < numeri.length; i++) {
@@ -94,11 +94,11 @@ void _salame(List<String> list) {
       moltoPresenti.add([i + 1, (numeri[i] - avg)]);
     }
   }
-  for (var element in moltoPresenti) {
-    print(
-        'Pos: ${element[0]} - Occ: ${element[1]} -\tFrase: ${list[element[0] - 1]}');
-  }
-  print('tot: ${moltoPresenti.length}');
+  // for (var element in moltoPresenti) {
+  // print(
+  //     'Pos: ${element[0]} - Occ: ${element[1]} -\tFrase: ${list[element[0] - 1]}');
+  // }
+  // print('tot: ${moltoPresenti.length}');
 }
 
 // ----------- TESTING RANDOM CON SBORRA (SEED) -----------------
@@ -110,7 +110,7 @@ void lerciume({
   int drawPerSeed = 100,
 }) {
   List<int> numeri = List.filled(numberOfOutcome, 0);
-  double avg = (((lastSeed - firstSeed) * drawPerSeed) / numberOfOutcome);
+  // double avg = (((lastSeed - firstSeed) * drawPerSeed) / numberOfOutcome);
 
   for (var i = firstSeed; i < lastSeed; i++) {
     for (var j = 0; j < drawPerSeed; j++) {
@@ -118,15 +118,11 @@ void lerciume({
     }
   }
 
-  // for (var i = 0; i < numeri.length; i++) {
-  //   print('${i + 1} : ${numeri[i]}');
+  // double deviazStd = 0;
+  // for (var element in numeri) {
+  //   deviazStd += pow(element - avg, 2);
   // }
 
-  double deviazStd = 0;
-  for (var element in numeri) {
-    deviazStd += pow(element - avg, 2);
-  }
-
-  print('varianza: ${(deviazStd / lastSeed).toStringAsFixed(2)}');
-  print('sqm: ${sqrt(deviazStd / lastSeed).toStringAsFixed(2)}');
+  // print('varianza: ${(deviazStd / lastSeed).toStringAsFixed(2)}');
+  // print('sqm: ${sqrt(deviazStd / lastSeed).toStringAsFixed(2)}');
 }
