@@ -67,7 +67,7 @@ class Installer {
     } else {
       _callSnackBar(
         message:
-            " Ti verrà ora chiesto di dare il permesso per installare il pacchetto di aggiornamento",
+            "Ti verrà ora chiesto di dare il permesso per installare il pacchetto di aggiornamento",
         durationInSec: 5,
       );
       Future.delayed(

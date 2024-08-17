@@ -91,18 +91,34 @@ class Updater {
     }
   }
 
-  /// Uses the ``[PermissionManager]`` object to ask permission to access to **to the external storage**.
-  /// If the permission is granted, ``[_invokeDownloadDialog]`` is called, and then provides to invoke the ``[DownloadDialog]``.
+  /// Uses ``[PermissionManager]`` to check if the permission to access to **to the external storage** is already given.
+  /// If the permission is not granted a [SnackBarMessage] is shown, informing the user that he/she will be asked to give
+  /// the permission to access to to the external storage.
   ///
+  /// Than ``[PermissionManager]`` is used to ask to the user for consent.
+  /// If the permission is granted, ``[_invokeDownloadDialog]`` is called, and then provides to invoke the ``[DownloadDialog]``.
   /// If the permission is not granted, [SnackBar] is shown to insult the user.
   ///
   /// #### Parameter
   /// - ``String latestVersion`` : the latest version of the app, e.g. "1.4.67".
-  void _downloadUpdate(String latestVersion) async =>
-      PermissionManager.requestExternalStorage(
+  void _downloadUpdate(String latestVersion) async {
+    int delay = 0;
+    if (!(await PermissionManager.checkExternalStorage())) {
+      delay = 5;
+      _callSnackBar(
+        message:
+            "Ti verrà ora chiesto di dare il permesso per accedere ai file del dispositivo",
+        durationInSec: 5,
+      );
+    }
+    Future.delayed(
+      Duration(seconds: delay),
+      () => PermissionManager.requestExternalStorage(
         onGranted: () => _invokeDownloadDialog(latestVersion),
         onDenied: () => _callSnackBar(message: 'Fottiti'),
-      );
+      ),
+    );
+  }
 
   /// Use the ``[showGeneralDialog]`` method to show a ``[DownloadDialog]`` that performs the download and keeps the user
   /// updated on the progress with a [CircularProgressIndicator].
