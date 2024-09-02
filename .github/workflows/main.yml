@@ -1,0 +1,46 @@
+name: "Build APK Release"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:  
+  build:      
+    name: Build 
+    runs-on: ubuntu-latest 
+
+    steps:
+        #1 Checkout Repository - checks out your repository code so that the workflow has access to it
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+        #2 Setup Java
+      - name: Set Up Java
+        uses: actions/setup-java@v4.2.2
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+        #3 Setup Flutter
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.1'
+          channel: 'stable'
+
+        #4 Install Dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+        
+        #5 Building APK
+      - name: Build APK
+        run: flutter build apk --release
+
+        #6 Upload Artifacts
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Releases
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
