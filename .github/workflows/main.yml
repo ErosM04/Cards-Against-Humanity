@@ -29,8 +29,8 @@ jobs:
           link-to-sdk: true
 
       # (Use Gradle Wrapper so so you don't have to install Gradle)
-      - name: Build Gradle using Wrapper
-        run: ./gradlew build
+      #- name: Build Gradle using Wrapper
+      #  run: ./gradlew build
 
       - name: Adds the NDK to the PATH and linking it to the Android SDK
         run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
