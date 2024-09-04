@@ -22,6 +22,14 @@ jobs:
           distribution: 'oracle'
           java-version: '17'
 
+      - name: Set Up NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r27d
+
+      - name: Adds the NDK to the PATH and linking it to the Android SDK
+        run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
+
         #3 Setup Flutter
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
