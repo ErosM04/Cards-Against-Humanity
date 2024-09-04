@@ -20,15 +20,9 @@ jobs:
         uses: actions/setup-java@v4.2.2
         with:
           distribution: 'oracle'
-          java-version: '21'
+          java-version: '17'
 
         #3 Setup Flutter
-      #- name: Set Up Flutter
-      #  uses: subosito/flutter-action@v2
-      #  with:
-      #    flutter-version: '3.24.1'
-      #    channel: 'stable'
-
       - name: Setup Flutter SDK
         uses: flutter-actions/setup-flutter@v3
         with:
