@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest 
 
     steps:
-        #1 Checkout Repository - checks out your repository code so that the workflow has access to it
+        #1 Checkout Repository : checks out your repository code so that the workflow has access to it
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -21,19 +21,6 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '17'
-
-      - name: Set Up NDK
-        uses: nttld/setup-ndk@v1
-        with:
-          ndk-version: r26d
-          link-to-sdk: true
-
-      # (Use Gradle Wrapper so so you don't have to install Gradle)
-      #- name: Build Gradle using Wrapper
-      #  run: ./gradlew build
-
-      #- name: Adds the NDK to the PATH and linking it to the Android SDK
-      #  run: ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk
 
         #3 Setup Flutter
       - name: Set Up Flutter
@@ -45,15 +32,19 @@ jobs:
         #4 Install Dependencies
       - name: Install Dependencies
         run: flutter pub get
+
+        #5 Upgrade Dependencies
+      - name: Upgrade Dependencies
+        run: flutter pub upgrade
         
-        #5 Building APK
+        #6 Building APK
       - name: Build APK
         run: flutter build apk --release
 
-        #6 Upload Artifacts
+        #7 Upload Artifacts : saves the release APK in the action artifacts
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Releases
+          name: Release
           path: |
             build/app/outputs/flutter-apk/app-release.apk
