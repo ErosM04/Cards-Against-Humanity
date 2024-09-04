@@ -23,11 +23,17 @@ jobs:
           java-version: '17'
 
         #3 Setup Flutter
-      - name: Set Up Flutter
-        uses: subosito/flutter-action@v2
+      #- name: Set Up Flutter
+      #  uses: subosito/flutter-action@v2
+      #  with:
+      #    flutter-version: '3.24.1'
+      #    channel: 'stable'
+
+      - name: Setup Flutter SDK
+        uses: flutter-actions/setup-flutter@v3
         with:
-          flutter-version: '3.24.1'
-          channel: 'stable'
+          channel: stable
+          version: 3.24.1
 
         #4 Install Dependencies
       - name: Install Dependencies
