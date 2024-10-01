@@ -1,6 +1,6 @@
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/logic/logic.dart';
-import 'package:cards_against_humanity/model/data_reader.dart';
+import 'package:cards_against_humanity/model/csv_reader.dart';
 import 'package:cards_against_humanity/pages/components/appbar.dart';
 import 'package:cards_against_humanity/pages/components/button.dart';
 import 'package:cards_against_humanity/pages/components/info.dart';
