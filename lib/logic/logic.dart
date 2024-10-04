@@ -27,7 +27,7 @@ class CasualityManager {
   /// The player hand, with 10 answer cards that he/she can choose to complete a question card.
   final List<String> _hand = [];
 
-  /// The actual selected card of the current round.
+  /// List of the cards selected by the player in the current round.
   static final List<String> selectedCards = [];
 
   /// The question card that needs to be completed in the current round.
