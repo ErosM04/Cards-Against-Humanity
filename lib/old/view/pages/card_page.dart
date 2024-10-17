@@ -3,7 +3,7 @@ import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/pages/game_page.dart';
 import 'package:cards_against_humanity/old/view/pages/master_page.dart';
-import 'package:cards_against_humanity/old/gamelogic/logic.dart';
+import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:flutter/material.dart';
 
 /// The page that is displayed after the **Game page** and shows the question card, with the answer/s previously

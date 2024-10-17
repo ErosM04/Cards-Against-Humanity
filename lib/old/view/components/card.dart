@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/old/gamelogic/logic.dart';
+import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:flutter/material.dart';
 
 /// Widget used to create the card widget, for answers, questions and both together.

@@ -15,16 +15,7 @@ class CsvReader {
   ///
   /// #### Returns
   /// ``Future<List<String>>`` : the list of answers.
-  Future<List<String>> getAnswers() async {
-    final list = await _loadCSV('answers');
-    List<String> answers = [];
-
-    for (var answer in list) {
-      answers.add(answer[0]);
-    }
-
-    return answers;
-  }
+  Future<List<List>> getAnswers() async => await _loadCSV('answers');
 
   /// Uses the ``[CsvToListConverter]`` object and the method ``convert()`` to convert the string of the specified file into a csv.
   /// #### Parameters
