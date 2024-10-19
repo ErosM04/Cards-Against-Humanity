@@ -25,7 +25,8 @@ dependencies:
   dio: 
   info_popup: 
   flutter_bloc:
-  fpdart: ^1.1.0
+  fpdart: 
+  get_it: 
 
 
 dev_dependencies:
