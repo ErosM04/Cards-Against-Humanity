@@ -7,6 +7,9 @@ import 'package:cards_against_humanity/features/load/domain/usecases/load_questi
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
 import 'package:get_it/get_it.dart';
 
+/// ``[GetIt]`` object used to locate a specific service (dependency).
+///
+/// To use call ``serviceLocator<ServiceName>()`` by specifing the *ServiceName*.
 final serviceLocator = GetIt.instance;
 
 /// Initializes varoious dependencies.
