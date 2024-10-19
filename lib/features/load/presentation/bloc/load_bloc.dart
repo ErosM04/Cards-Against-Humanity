@@ -9,6 +9,7 @@ part 'load_state.dart';
 class LoadBloc extends Bloc<LoadEvent, LoadState> {
   final LoadQuestions _loadQuestions;
   final LoadAnswers _loadAnswers;
+
   LoadBloc({
     required LoadQuestions loadQuestions,
     required LoadAnswers loadAnswers,

@@ -1,6 +1,7 @@
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
+import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/components/info.dart';
@@ -11,6 +12,7 @@ import 'package:cards_against_humanity/features/load/presentation/widgets/textfi
 import 'package:cards_against_humanity/old/updater/updater.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StartPage extends StatefulWidget {
   /// The object used to load data from the csv files in the assets.
@@ -33,7 +35,7 @@ class _StartPageState extends State<StartPage> {
   final playerNumberController = TextEditingController();
 
   /// List of the questions loaded from the csv.
-  late List<List<dynamic>> questionList;
+  late List<List<String>> questionList;
 
   /// List of the answers wloaded from the csv.
   late List<String> answerList;
@@ -43,17 +45,17 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
-    // Loads data from csv
-    widget.csvReader.getQuestions().then((list) => questionList = list);
-    widget.csvReader.getAnswers().then((list) => answerList = list);
-
     // Checks if a new version exists and ask for download consent.
     // The 2 seconds delay is to avoid errors (trust me).
     var updater = Updater(context);
+
     Future.delayed(
       const Duration(seconds: 2),
       () => updater.updateToNewVersion(),
     );
+
+    // Load data from csv
+    context.read<LoadBloc>().add(LoadStart());
 
     super.initState();
   }
@@ -117,14 +119,22 @@ class _StartPageState extends State<StartPage> {
                       ),
                     ),
                     const SizedBox(height: 50),
-                    // Play button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: CustomButton(
-                        text: 'Gioca',
-                        onPressed: () => _startGame(),
-                        horizontalInternalPadding: 80,
-                        verticalInternalPadding: 15,
+                    // Gioca button
+                    BlocListener<LoadBloc, LoadState>(
+                      listener: (context, state) {
+                        if (state is LoadCompleted) {
+                          questionList = state.questions;
+                          answerList = state.answers;
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: CustomButton(
+                          text: 'Gioca',
+                          onPressed: () => _startGame(),
+                          horizontalInternalPadding: 80,
+                          verticalInternalPadding: 15,
+                        ),
                       ),
                     ),
                   ],
@@ -156,7 +166,7 @@ class _StartPageState extends State<StartPage> {
   /// Read the data from the [TextField] and tries to convert them into numbers. If these data are in the correct format
   /// proceeds to redirect the user either to the **Game** or o the **Master** page.
   void _startGame() {
-    formKey.currentState!.validate();
+    if (!formKey.currentState!.validate()) return;
 
     // Cheks if the data in the textfields are empty
     if (seedController.text.isEmpty ||
