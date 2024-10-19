@@ -10,20 +10,20 @@ class LoadRepositoryImpl implements LoadRepository {
   const LoadRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<Either<Failure, List<List<String>>>> getQuestions() async {
+  Future<Either<DataFailure, List<List<String>>>> getQuestions() async {
     try {
       return right(await localDataSource.getQuestions());
     } on DataLoadException catch (e) {
-      return left(Failure(e.message));
+      return left(DataFailure(e.message, dataType: List<List<String>>));
     }
   }
 
   @override
-  Future<Either<Failure, List<String>>> getAnswers() async {
+  Future<Either<DataFailure, List<String>>> getAnswers() async {
     try {
       return right(await localDataSource.getAnswers());
     } on DataLoadException catch (e) {
-      return left(Failure(e.message));
+      return left(DataFailure(e.message, dataType: List<String>));
     }
   }
 }
