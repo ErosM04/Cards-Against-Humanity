@@ -1,10 +1,11 @@
 import 'package:cards_against_humanity/core/error/exceptions.dart';
+import 'package:cards_against_humanity/features/load/data/models/answer_list_model.dart';
+import 'package:cards_against_humanity/features/load/data/models/question_list_model.dart';
 import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
 
 abstract interface class LoadLocalDataSource {
-  Future<List<List<String>>> getQuestions();
-
-  Future<List<String>> getAnswers();
+  Future<QuestionListModel> getQuestions();
+  Future<AnswerListModel> getAnswers();
 }
 
 class LoadLocalDataSourceImpl implements LoadLocalDataSource {
@@ -13,7 +14,18 @@ class LoadLocalDataSourceImpl implements LoadLocalDataSource {
   const LoadLocalDataSourceImpl({required this.csvReader});
 
   @override
-  Future<List<String>> getAnswers() async {
+  Future<QuestionListModel> getQuestions() async {
+    try {
+      return QuestionListModel.fromList(
+        list: (await csvReader.getQuestions()) as List<List<String>>,
+      );
+    } catch (e) {
+      throw DataLoadException(e.toString());
+    }
+  }
+
+  @override
+  Future<AnswerListModel> getAnswers() async {
     try {
       final list = await csvReader.getAnswers();
       List<String> answers = [];
@@ -22,16 +34,7 @@ class LoadLocalDataSourceImpl implements LoadLocalDataSource {
         answers.add(answer[0]);
       }
 
-      return answers;
-    } catch (e) {
-      throw DataLoadException(e.toString());
-    }
-  }
-
-  @override
-  Future<List<List<String>>> getQuestions() async {
-    try {
-      return await csvReader.getQuestions() as List<List<String>>;
+      return AnswerListModel(list: answers);
     } catch (e) {
       throw DataLoadException(e.toString());
     }

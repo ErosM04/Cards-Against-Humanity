@@ -1,6 +1,8 @@
 import 'package:cards_against_humanity/core/error/exceptions.dart';
 import 'package:cards_against_humanity/core/error/failures.dart';
 import 'package:cards_against_humanity/features/load/data/datasource/local_datasource.dart';
+import 'package:cards_against_humanity/features/load/domain/entities/answer_list.dart';
+import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
 import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
@@ -10,7 +12,7 @@ class LoadRepositoryImpl implements LoadRepository {
   const LoadRepositoryImpl({required this.localDataSource});
 
   @override
-  Future<Either<DataFailure, List<List<String>>>> getQuestions() async {
+  Future<Either<DataFailure, QuestionList>> getQuestions() async {
     try {
       return right(await localDataSource.getQuestions());
     } on DataLoadException catch (e) {
@@ -19,7 +21,7 @@ class LoadRepositoryImpl implements LoadRepository {
   }
 
   @override
-  Future<Either<DataFailure, List<String>>> getAnswers() async {
+  Future<Either<DataFailure, AnswerList>> getAnswers() async {
     try {
       return right(await localDataSource.getAnswers());
     } on DataLoadException catch (e) {
