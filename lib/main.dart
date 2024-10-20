@@ -1,4 +1,3 @@
-import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/features/load/presentation/pages/start_page.dart';
@@ -14,7 +13,6 @@ void main() async {
 
 /// Not so politically correct
 class CardsAgainstHumanity extends StatelessWidget {
-  final csvReader = const CsvReader();
   const CardsAgainstHumanity({super.key});
 
   @override

@@ -18,6 +18,7 @@ final serviceLocator = GetIt.instance;
 /// For example if a want to call a bloc, in a provider i can just call **``serviceLocator()``** and specify the type of
 /// dependency (or Bloc) to call:
 /// ```
+/// // Example with Bloc
 /// BlocProvider(
 ///   create: (context) => serviceLocator<LoadBloc>(),
 /// ),
@@ -26,7 +27,7 @@ final serviceLocator = GetIt.instance;
 Future<void> initDependencies() async {
   // By using registerLazySingleton we register a single instance (a Singleton) for a particular type
   // of dependency to share across the app.
-  serviceLocator.registerLazySingleton(() => CsvReader());
+  serviceLocator.registerLazySingleton(() => const CsvReader());
   _initLoad();
 }
 
