@@ -1,6 +1,8 @@
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
+import 'package:cards_against_humanity/features/load/domain/entities/answer_list.dart';
+import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
@@ -35,10 +37,10 @@ class _StartPageState extends State<StartPage> {
   final playerNumberController = TextEditingController();
 
   /// List of the questions loaded from the csv.
-  late List<List<String>> questionList;
+  late QuestionList questionList;
 
   /// List of the answers wloaded from the csv.
-  late List<String> answerList;
+  late AnswerList answerList;
 
   /// The key used to validate the [TextFormField] in the [Form].
   final formKey = GlobalKey<FormState>();
@@ -55,7 +57,8 @@ class _StartPageState extends State<StartPage> {
     );
 
     // Load data from csv
-    context.read<LoadBloc>().add(LoadStart());
+    context.read<LoadBloc>().add(LoadQuestionsStart());
+    context.read<LoadBloc>().add(LoadAnswersStart());
 
     super.initState();
   }
@@ -122,8 +125,9 @@ class _StartPageState extends State<StartPage> {
                     // Gioca button
                     BlocListener<LoadBloc, LoadState>(
                       listener: (context, state) {
-                        if (state is LoadCompleted) {
+                        if (state is LoadQuestionsCompleted) {
                           questionList = state.questions;
+                        } else if (state is LoadAnswersCompleted) {
                           answerList = state.answers;
                         }
                       },
