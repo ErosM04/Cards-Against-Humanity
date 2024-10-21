@@ -1,5 +1,5 @@
 import 'package:cards_against_humanity/features/load/data/models/question_model.dart';
-import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 
 /// The model is only here for the data layer, so it won't be used outside it.
 class QuestionListModel extends QuestionList {

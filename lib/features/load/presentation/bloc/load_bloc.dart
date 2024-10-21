@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:cards_against_humanity/features/load/domain/entities/answer_list.dart';
-import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
+import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_answers.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_questions.dart';
 import 'package:flutter/material.dart';

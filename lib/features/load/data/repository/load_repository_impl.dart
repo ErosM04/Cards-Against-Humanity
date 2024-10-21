@@ -1,8 +1,8 @@
 import 'package:cards_against_humanity/core/error/exceptions.dart';
 import 'package:cards_against_humanity/core/error/failures.dart';
 import 'package:cards_against_humanity/features/load/data/datasource/local_datasource.dart';
-import 'package:cards_against_humanity/features/load/domain/entities/answer_list.dart';
-import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
+import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
 import 'package:fpdart/fpdart.dart';
 

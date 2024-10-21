@@ -1,7 +1,7 @@
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
-import 'package:cards_against_humanity/features/load/domain/entities/answer_list.dart';
-import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
+import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
@@ -215,9 +215,9 @@ class _StartPageState extends State<StartPage> {
     } else {
       // Normal execution
       CasualityManager rand = CasualityManager(
-        seed: seed,
-        playerNumber: playerNumber,
-        totalPlayers: playerAmount,
+        seed: seed!,
+        playerNumber: playerNumber!,
+        totalPlayers: playerAmount!,
         questionList: questionList,
         answerList: answerList,
       );

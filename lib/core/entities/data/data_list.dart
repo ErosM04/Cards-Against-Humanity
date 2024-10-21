@@ -3,6 +3,8 @@ abstract interface class DataList {
 
   bool get isEmpty;
 
+  int get length;
+
   Object getQuestionAt(int index);
 
   Object removeQuestionAt(int index);

@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/features/load/domain/entities/data_list.dart';
+import 'package:cards_against_humanity/core/entities/data/data_list.dart';
 
 class AnswerList implements DataList {
   @override
@@ -8,6 +8,9 @@ class AnswerList implements DataList {
 
   @override
   bool get isEmpty => list.isEmpty;
+
+  @override
+  int get length => list.length;
 
   @override
   String getQuestionAt(int index) => list[index];

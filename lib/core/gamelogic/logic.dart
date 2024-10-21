@@ -1,5 +1,9 @@
 import 'dart:math';
 
+import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
+
 /// Used to manage the logic of the game, such as random draws, score, rounds, hand...
 class CasualityManager {
   /// The seed use by the ``[Random]`` object to draw cards.
@@ -19,10 +23,10 @@ class CasualityManager {
 
   /// The list of questions, with each question being a List containg the question [String] and n [int] with the amount
   /// of answers needed to complete it. E.g. ``["________ non saranno più gli stessi dopo ________.", 2]``.
-  final List<List> questionList;
+  final QuestionList questionList;
 
   /// The list of answers, with each being a [String].
-  final List<String> answerList;
+  final AnswerList answerList;
 
   /// The player hand, with 10 answer cards that he/she can choose to complete a question card.
   final List<String> _hand = [];
@@ -31,10 +35,7 @@ class CasualityManager {
   static final List<String> selectedCards = [];
 
   /// The question card that needs to be completed in the current round.
-  String _actualQuestion = '';
-
-  /// The amount of answers needed to complete the question of the current round.
-  static int _answersNeeded = 0;
+  static Question _currentQuestion = const Question(text: '', answerNeeded: 0);
 
   /// The score of the player.
   int _score = 0;
@@ -64,10 +65,10 @@ class CasualityManager {
   List<String> get hand => _hand;
 
   /// The question card that needs to be completed in the current round.
-  String get question => _actualQuestion;
+  String get question => _currentQuestion.text;
 
   /// The amount of answers needed to complete the question of the current round.
-  static int get answersNeeded => _answersNeeded;
+  static int get answersNeeded => _currentQuestion.answerNeeded;
 
   /// The score of the player.
   int get score => _score;
@@ -106,7 +107,7 @@ class CasualityManager {
       }
       _randomAnswerCard.nextInt(answerList.length);
     }
-    _hand.add('$position - ${answerList[position]}');
+    _hand.add('$position - ${answerList.getQuestionAt(position)}');
   }
 
   /// Returns a list of answer cards, but without the id.
@@ -118,8 +119,10 @@ class CasualityManager {
   ///
   /// #### Returns
   /// - ``List<String>`` : the list of answers.
-  List<String> revealAnswerCards(List<int> numbers) =>
-      List.generate(numbers.length, (index) => answerList[numbers[index]]);
+  List<String> revealAnswerCards(List<int> numbers) => List.generate(
+        numbers.length,
+        (index) => answerList.getQuestionAt(numbers[index]),
+      );
 
   /// Pick a random question card from ``[questionList]``, and saves the text in ``[question]`` and the number of empty spaces to fill in ``[_answersNeeded]``.
   /// Also increments the [round]. At the end of the method, the last time the question card is accessed it's also removed from ``[questionList]`` to avoid
@@ -129,8 +132,10 @@ class CasualityManager {
     if (((_round - 1) % totalPlayers).floor() != playerNumber) _playedRounds++;
 
     int position = _randomQuestionCard.nextInt(questionList.length);
-    _actualQuestion = questionList[position][0];
-    _answersNeeded = questionList.removeAt(position)[1];
+    _currentQuestion = Question(
+      text: questionList.getQuestionAt(position).text,
+      answerNeeded: questionList.removeQuestionAt(position).answerNeeded,
+    );
   }
 
   /// Used when a round is won. Increase the ``[score]`` and clears ``[selectedCards]``.

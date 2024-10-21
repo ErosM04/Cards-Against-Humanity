@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/core/error/failures.dart';
 import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/usecase.dart';
