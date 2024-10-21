@@ -6,7 +6,7 @@ import 'package:cards_against_humanity/old/view/components/info.dart';
 import 'package:cards_against_humanity/old/view/pages/game_page.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/features/load/presentation/pages/start_page.dart';
-import 'package:cards_against_humanity/features/load/presentation/widgets/textfield.dart';
+import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:flutter/material.dart';
 
 /// Page of the player which has to insert the ids of the cards selected by the other players.

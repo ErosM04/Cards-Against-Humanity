@@ -1,6 +1,5 @@
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
-import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
 import 'package:cards_against_humanity/features/load/domain/entities/answer_list.dart';
 import 'package:cards_against_humanity/features/load/domain/entities/question_list.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
@@ -10,16 +9,13 @@ import 'package:cards_against_humanity/old/view/components/info.dart';
 import 'package:cards_against_humanity/old/view/pages/easteregg.dart';
 import 'package:cards_against_humanity/old/view/pages/game_page.dart';
 import 'package:cards_against_humanity/old/view/pages/master_page.dart';
-import 'package:cards_against_humanity/features/load/presentation/widgets/textfield.dart';
+import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:cards_against_humanity/old/updater/updater.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class StartPage extends StatefulWidget {
-  /// The object used to load data from the csv files in the assets.
-  final CsvReader csvReader = const CsvReader();
-
   const StartPage({super.key});
 
   @override
@@ -27,6 +23,12 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
+  /// List of the questions loaded from the csv.
+  late QuestionList questionList;
+
+  /// List of the answers wloaded from the csv.
+  late AnswerList answerList;
+
   /// The controller of the [TextField] of the seed.
   final seedController = TextEditingController();
 
@@ -36,14 +38,28 @@ class _StartPageState extends State<StartPage> {
   /// The controller of the [TextField] of the specific number of the player.
   final playerNumberController = TextEditingController();
 
-  /// List of the questions loaded from the csv.
-  late QuestionList questionList;
-
-  /// List of the answers wloaded from the csv.
-  late AnswerList answerList;
-
   /// The key used to validate the [TextFormField] in the [Form].
   final formKey = GlobalKey<FormState>();
+
+  /// Routes to a different [page] using `pushReplacement`.
+  static void route({
+    required BuildContext context,
+    required Widget page,
+  }) =>
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => page),
+      );
+
+  /// Uses [route] to invoke a [MasterGamePage] which takes [rand].
+  static void routeToMasterPage(
+          {required BuildContext context, required CasualityManager rand}) =>
+      route(context: context, page: MasterGamePage(rand));
+
+  /// Uses [route] to invoke a [GamePage] which takes [rand].
+  static void routeToGamePage(
+          {required BuildContext context, required CasualityManager rand}) =>
+      route(context: context, page: GamePage(rand));
 
   @override
   void initState() {
@@ -86,6 +102,7 @@ class _StartPageState extends State<StartPage> {
                     // Seed
                     _buildSubTitle(
                         subTitle: 'Codice partita', infoText: seedInfo),
+                    // Tip
                     Row(
                       children: [
                         Text(
@@ -96,18 +113,23 @@ class _StartPageState extends State<StartPage> {
                     ),
                     CustomTextField(controller: seedController),
                     const SizedBox(height: 100),
+
                     // Total players
                     _buildSubTitle(
-                        subTitle: 'Totale giocatori',
-                        infoText: totalPlayersInfo),
+                      subTitle: 'Totale giocatori',
+                      infoText: totalPlayersInfo,
+                    ),
                     CustomTextField(controller: playerAmountController),
                     const SizedBox(height: 100),
+
                     // Player number
                     _buildSubTitle(
-                        subTitle: 'Numero giocatore',
-                        infoText: playerNumberInfo),
+                      subTitle: 'Numero giocatore',
+                      infoText: playerNumberInfo,
+                    ),
                     CustomTextField(controller: playerNumberController),
                     const SizedBox(height: 50),
+
                     // Link guide
                     GestureDetector(
                       onTap: () => launchUrl(Uri.parse(
@@ -122,6 +144,7 @@ class _StartPageState extends State<StartPage> {
                       ),
                     ),
                     const SizedBox(height: 50),
+
                     // Gioca button
                     BlocListener<LoadBloc, LoadState>(
                       listener: (context, state) {
@@ -170,32 +193,20 @@ class _StartPageState extends State<StartPage> {
   /// Read the data from the [TextField] and tries to convert them into numbers. If these data are in the correct format
   /// proceeds to redirect the user either to the **Game** or o the **Master** page.
   void _startGame() {
+    // Checks if the content of the text fields is empty.
     if (!formKey.currentState!.validate()) return;
 
-    // Cheks if the data in the textfields are empty
-    if (seedController.text.isEmpty ||
-        playerAmountController.text.isEmpty ||
-        playerNumberController.text.isEmpty) {
-      _cojion();
-      return;
-    }
-
-    // tries converting to int
+    // Tries to convert the input to int
     int? seed = _tryParseInput(seedController);
     int? playerAmount = _tryParseInput(playerAmountController);
     int? playerNumber = _tryParseInput(playerNumberController);
 
-    // Checks if the data are in the correct format
-    if (seed == null ||
-        playerAmount == null ||
-        playerNumber == null ||
-        playerNumber <= 0 ||
-        playerNumber > playerAmount ||
-        playerAmount < 3 ||
-        playerAmount > 20) {
-      _cojion();
-      return;
-    }
+    // Checks if the data are in the correct format, otherwise displays an error message
+    if (!_validateInputValues(
+      seed: seed,
+      playerAmount: playerAmount,
+      playerNumber: playerNumber,
+    )) return;
 
     if (seed == 104 && mounted) {
       // Easter egg
@@ -213,11 +224,9 @@ class _StartPageState extends State<StartPage> {
 
       // If this is the 1st player starts as a master, otherwise start as normal player
       if (playerNumber == 1) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => MasterGamePage(rand)));
+        routeToMasterPage(context: context, rand: rand);
       } else {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => GamePage(rand)));
+        routeToGamePage(context: context, rand: rand);
       }
     }
   }
@@ -230,10 +239,31 @@ class _StartPageState extends State<StartPage> {
           .replaceAll('.', '')
           .replaceAll('-', ''));
 
-  /// Set all text fields of the page as "Cojion", to infor the user he inserted the data in a wrong format.
-  void _cojion() {
-    seedController.text = 'Cojion';
-    playerAmountController.text = 'Cojion';
-    playerNumberController.text = 'Cojion';
+  /// Controls the values passed, which should be the input from the text fields, and if verifies there is any problem.
+  /// For each problem the respective field's text is set to a message describes the error.
+  ///
+  /// Returns `true` there are no problems, or `flase` otherwise.
+  bool _validateInputValues({
+    required int? seed,
+    required int? playerAmount,
+    required int? playerNumber,
+  }) {
+    if (seed == null || playerAmount == null || playerNumber == null) {
+      seedController.text = 'Cazzo hai scritto?!';
+      playerAmountController.text = 'Cazzo hai scritto?!';
+      playerNumberController.text = 'Cazzo hai scritto?!';
+      return false;
+    } else if (playerAmount < 3) {
+      playerAmountController.text = 'Minimo $minPlayers giocatori!';
+      return false;
+    } else if (playerAmount > 20) {
+      playerAmountController.text = 'Massimo $maxPlayers giocatori!';
+      return false;
+    } else if (playerNumber <= 0 || playerNumber > playerAmount) {
+      playerNumberController.text =
+          'Il valore $playerNumber è fuori dal range!';
+      return false;
+    }
+    return true;
   }
 }

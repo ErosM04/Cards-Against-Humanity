@@ -14,3 +14,6 @@ Esempio con 3 giocatori che scelgono le risposte:
 Nel caso di una sola risposta per giocatore mettere i due numeri distanziati da un punto: 30.40.50
 
 Nel caso di 2 risposte per giocatore mettere i due numeri di ogni giocatore distanziati da un punto e uno dopo l'altro: 30.31.40.41.50.51""";
+
+const int maxPlayers = 20;
+const int minPlayers = 3;

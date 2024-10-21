@@ -21,9 +21,10 @@ class CustomTextField extends StatelessWidget {
         // Used to priviledge numbers over letters and still access the '.' character.
         keyboardType: TextInputType.phone,
         validator: (value) {
-          if (value!.isEmpty) {
-            return "Non hai scritto un cazzo";
+          if (value == null || value.isEmpty) {
+            return "Non hai scritto un cazzo!";
           }
+          // Everything okay
           return null;
         },
       );
