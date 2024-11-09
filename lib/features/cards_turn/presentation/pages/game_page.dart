@@ -1,6 +1,6 @@
 import 'package:cards_against_humanity/old/view/components/card.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
-import 'package:cards_against_humanity/old/view/pages/card_page.dart';
+import 'package:cards_against_humanity/features/cards_turn/presentation/pages/card_page.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/features/load/presentation/pages/start_page.dart';
 import 'package:flutter/material.dart';
