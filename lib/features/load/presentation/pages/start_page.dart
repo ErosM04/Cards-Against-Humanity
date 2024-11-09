@@ -6,9 +6,8 @@ import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/components/info.dart';
-import 'package:cards_against_humanity/old/view/pages/easteregg.dart';
-import 'package:cards_against_humanity/old/view/pages/game_page.dart';
-import 'package:cards_against_humanity/old/view/pages/master_page.dart';
+import 'package:cards_against_humanity/features/cards_turn/presentation/pages/game_page.dart';
+import 'package:cards_against_humanity/features/master_turn/presentation/page/master_page.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:cards_against_humanity/old/updater/updater.dart';
 import 'package:flutter/material.dart';
@@ -208,26 +207,20 @@ class _StartPageState extends State<StartPage> {
       playerNumber: playerNumber,
     )) return;
 
-    if (seed == 104 && mounted) {
-      // Easter egg
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const EasterEgg()));
-    } else {
-      // Normal execution
-      CasualityManager rand = CasualityManager(
-        seed: seed!,
-        playerNumber: playerNumber!,
-        totalPlayers: playerAmount!,
-        questionList: questionList,
-        answerList: answerList,
-      );
+    // Normal execution
+    CasualityManager rand = CasualityManager(
+      seed: seed!,
+      playerNumber: playerNumber!,
+      totalPlayers: playerAmount!,
+      questionList: questionList,
+      answerList: answerList,
+    );
 
-      // If this is the 1st player starts as a master, otherwise start as normal player
-      if (playerNumber == 1) {
-        routeToMasterPage(context: context, rand: rand);
-      } else {
-        routeToGamePage(context: context, rand: rand);
-      }
+    // If this is the 1st player starts as a master, otherwise start as normal player
+    if (playerNumber == 1) {
+      routeToMasterPage(context: context, rand: rand);
+    } else {
+      routeToGamePage(context: context, rand: rand);
     }
   }
 
