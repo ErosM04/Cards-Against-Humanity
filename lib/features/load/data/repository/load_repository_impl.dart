@@ -6,6 +6,8 @@ import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
+/// Implements the [LoadRepository] by defining how every method peforms the actions (using the `data source`)
+/// and returns the result, or return a [Failure].
 class LoadRepositoryImpl implements LoadRepository {
   final LoadLocalDataSource localDataSource;
 

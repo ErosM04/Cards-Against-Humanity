@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 
-/// Used to access to assets's csv files and convert them.
+/// Class to access to assets's csv files and convert them.
 class CsvReader {
   const CsvReader();
 
@@ -14,7 +14,7 @@ class CsvReader {
   /// Uses the method ``[_loadCSV]`` to load the answers from a file in the assets.
   ///
   /// #### Returns
-  /// ``Future<List<String>>`` : the list of answers.
+  /// ``Future<List<List>>`` : the list of answers.
   Future<List<List>> getAnswers() async => await _loadCSV('answers');
 
   /// Uses the ``[CsvToListConverter]`` object and the method ``convert()`` to convert the string of the specified file into a csv.
