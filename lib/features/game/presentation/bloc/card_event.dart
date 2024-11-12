@@ -4,10 +4,7 @@ part of 'card_bloc.dart';
 sealed class CardEvent {}
 
 final class CardClicked extends CardEvent {
-  final int clickedCards;
-  final int totalCardsToClick;
+  final CardAH card;
 
-  CardClicked({required this.clickedCards, required this.totalCardsToClick});
+  CardClicked(this.card);
 }
-
-// invoke with: context.read<CardBloc>().add(CardClicked());
