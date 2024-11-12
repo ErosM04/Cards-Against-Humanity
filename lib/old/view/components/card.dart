@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Widget used to create the card widget, for answers, questions and both together.
 /// To preserve state even when cards are out of the screen the State class comes with ``[AutomaticKeepAliveClientMixin]``.
-class CardAH extends StatefulWidget {
+class CardAHW extends StatefulWidget {
   /// The text to display inside the card.
   final String text;
 
@@ -20,7 +20,7 @@ class CardAH extends StatefulWidget {
   /// If empty only shows the text of the question.
   final List<String> answersList;
 
-  const CardAH({
+  const CardAHW({
     super.key,
     required this.text,
     this.isClickable = true,
@@ -30,11 +30,11 @@ class CardAH extends StatefulWidget {
   });
 
   @override
-  State<CardAH> createState() => _CardAHState();
+  State<CardAHW> createState() => _CardAHWState();
 }
 
-class _CardAHState extends State<CardAH>
-    with AutomaticKeepAliveClientMixin<CardAH> {
+class _CardAHWState extends State<CardAHW>
+    with AutomaticKeepAliveClientMixin<CardAHW> {
   bool isClicked = false;
 
   @override

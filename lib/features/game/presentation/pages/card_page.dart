@@ -70,7 +70,7 @@ class CardPage extends StatelessWidget {
   /// Answers are in a different color.
   Widget _buildCompleteCard() => Column(
         children: [
-          CardAH(
+          CardAHW(
             text: random.question,
             isClickable: false,
             isMainCard: true,

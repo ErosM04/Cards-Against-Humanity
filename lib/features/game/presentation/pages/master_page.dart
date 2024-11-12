@@ -43,7 +43,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
             child: Column(children: [
               // Card
               const SizedBox(height: 30),
-              CardAH(
+              CardAHW(
                 text: widget.random.question,
                 isClickable: false,
                 isMainCard: true,
@@ -163,7 +163,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
             onPressed: onPressed,
           ));
 
-  /// Takes a list of answers and build a horizontal list of [CardAH] containg the different answers of the different
+  /// Takes a list of answers and build a horizontal list of [CardAHW] containg the different answers of the different
   /// players (shuffled).
   Widget _buildCardCarousel(List<String> list) => SizedBox(
         height: 220,
@@ -172,7 +172,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
             shrinkWrap: true,
             controller: ScrollController(),
             scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) => CardAH(
+            itemBuilder: (context, index) => CardAHW(
                   text: list[index],
                   isClickable: false,
                 )),
