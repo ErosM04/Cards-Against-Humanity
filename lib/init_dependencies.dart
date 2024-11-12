@@ -40,27 +40,24 @@ Future<void> initDependencies() async {
 ///     - [LoadRepositoryImpl]
 ///     - [LoadLocalDataSourceImpl]
 void _initLoad() {
-  serviceLocator.registerLazySingleton<LoadLocalDataSource>(
-    () => LoadLocalDataSourceImpl(csvReader: serviceLocator()),
-  );
-
-  serviceLocator.registerLazySingleton<LoadRepository>(
-    () => LoadRepositoryImpl(localDataSource: serviceLocator()),
-  );
-
-  serviceLocator.registerLazySingleton(
-    () => LoadQuestions(loadRepository: serviceLocator()),
-  );
-
-  serviceLocator.registerLazySingleton(
-    () => LoadQuestions(loadRepository: serviceLocator()),
-  );
-
-  // the bloc should have only one instance, otherwise if it has a particular state and it gets called from the app, it resets.
-  serviceLocator.registerLazySingleton(
-    () => LoadBloc(
-      loadQuestions: serviceLocator(),
-      loadAnswers: serviceLocator(),
-    ),
-  );
+  serviceLocator
+    ..registerLazySingleton<LoadLocalDataSource>(
+      () => LoadLocalDataSourceImpl(csvReader: serviceLocator()),
+    )
+    ..registerLazySingleton<LoadRepository>(
+      () => LoadRepositoryImpl(localDataSource: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => LoadQuestions(loadRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => LoadQuestions(loadRepository: serviceLocator()),
+    )
+    // the bloc should have only one instance, otherwise if it has a particular state and it gets called from the app, it resets.
+    ..registerLazySingleton(
+      () => LoadBloc(
+        loadQuestions: serviceLocator(),
+        loadAnswers: serviceLocator(),
+      ),
+    );
 }
