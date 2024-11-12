@@ -6,8 +6,8 @@ import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/components/info.dart';
-import 'package:cards_against_humanity/features/cards_turn/presentation/pages/game_page.dart';
-import 'package:cards_against_humanity/features/master_turn/presentation/page/master_page.dart';
+import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
+import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:cards_against_humanity/old/updater/updater.dart';
 import 'package:flutter/material.dart';
