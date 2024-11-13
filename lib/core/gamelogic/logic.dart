@@ -1,15 +1,14 @@
 import 'dart:math';
-
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 
 /// Used to manage the logic of the game, such as random draws, score, rounds, hand...
 class GameManager {
-  /// The seed use by the ``[Random]`` object to draw cards.
+  /// The seed used by the ``[Random]`` object to draw cards.
   final int seed;
 
-  /// The dpecific number of the player between 0 and ``[totalPlayers]``.
+  /// The specific number of the player between 0 and ``[totalPlayers]``.
   final int playerNumber;
 
   /// The total number of players (3-20).
@@ -28,7 +27,7 @@ class GameManager {
   /// The list of answers, with each being a [String].
   final AnswerList answerList;
 
-  /// The player hand, with 10 answer cards that he/she can choose to complete a question card.
+  /// The player hand, always containing 10 answer cards that he/she can use to complete a question card.
   final List<String> _hand = [];
 
   /// List of the cards selected by the player in the current round.
