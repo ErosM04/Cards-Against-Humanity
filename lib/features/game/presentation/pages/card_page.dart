@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 /// selected by the player that fills the empty spots. The answer text color follows the [Theme] of the app.
 class CardPage extends StatelessWidget {
   /// The object that manages the logic of the game.
-  final CasualityManager random;
+  final GameManager random;
 
   const CardPage(this.random, {super.key});
 
@@ -74,7 +74,7 @@ class CardPage extends StatelessWidget {
             text: random.question,
             isClickable: false,
             isMainCard: true,
-            answersList: CasualityManager.selectedCards,
+            answersList: GameManager.selectedCards,
           ),
           const SizedBox(height: 10),
           Text('ID carta/e: ${_extractCardsId()}'),
@@ -83,8 +83,8 @@ class CardPage extends StatelessWidget {
 
   /// Extracts the ids of the card saved in ``CasualityManager.selectedCards``. E.g.: "121, 557"
   String _extractCardsId() => List<String>.generate(
-          CasualityManager.selectedCards.length,
-          (index) => CasualityManager.selectedCards[index].split('-')[0].trim())
+          GameManager.selectedCards.length,
+          (index) => GameManager.selectedCards[index].split('-')[0].trim())
       .toString()
       .replaceAll('[', '')
       .replaceAll(']', '');

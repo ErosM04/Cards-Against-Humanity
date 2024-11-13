@@ -52,12 +52,12 @@ class _StartPageState extends State<StartPage> {
 
   /// Uses [route] to invoke a [MasterGamePage] which takes [rand].
   static void routeToMasterPage(
-          {required BuildContext context, required CasualityManager rand}) =>
+          {required BuildContext context, required GameManager rand}) =>
       route(context: context, page: MasterGamePage(rand));
 
   /// Uses [route] to invoke a [GamePage] which takes [rand].
   static void routeToGamePage(
-          {required BuildContext context, required CasualityManager rand}) =>
+          {required BuildContext context, required GameManager rand}) =>
       route(context: context, page: GamePage(rand));
 
   @override
@@ -208,7 +208,7 @@ class _StartPageState extends State<StartPage> {
     )) return;
 
     // Normal execution
-    CasualityManager rand = CasualityManager(
+    GameManager rand = GameManager(
       seed: seed!,
       playerNumber: playerNumber!,
       totalPlayers: playerAmount!,

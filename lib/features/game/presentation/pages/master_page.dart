@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 /// Page of the player which has to insert the ids of the cards selected by the other players.
 class MasterGamePage extends StatefulWidget {
   /// The object that manages the logic of the game.
-  final CasualityManager random;
+  final GameManager random;
 
   const MasterGamePage(this.random, {super.key});
 
@@ -70,8 +70,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
     if (str.contains('.') &&
         (str.split('.').length ==
-            (CasualityManager.answersNeeded *
-                (widget.random.totalPlayers - 1)))) {
+            (GameManager.answersNeeded * (widget.random.totalPlayers - 1)))) {
       final splitArr = str.split('.');
 
       // If data inserted aren't numbers the function stops
@@ -85,7 +84,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
               splitArr.length, (index) => int.parse(splitArr[index])));
 
       if (answerList.length ==
-          (CasualityManager.answersNeeded * (widget.random.totalPlayers - 1))) {
+          (GameManager.answersNeeded * (widget.random.totalPlayers - 1))) {
         // True if only 1 answer per player is requested
         if (answerList.length == (widget.random.totalPlayers - 1)) {
           answerList.shuffle();
@@ -113,7 +112,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
   /// Goes to the normal Game page.
   void _goToNewRound() {
     // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
-    CasualityManager.selectedCards.clear();
+    GameManager.selectedCards.clear();
     widget.random.fillHand();
     widget.random.drawQuestionCard();
     Navigator.pushReplacement(context,

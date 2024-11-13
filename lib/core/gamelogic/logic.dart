@@ -5,7 +5,7 @@ import 'package:cards_against_humanity/core/entities/data/question.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 
 /// Used to manage the logic of the game, such as random draws, score, rounds, hand...
-class CasualityManager {
+class GameManager {
   /// The seed use by the ``[Random]`` object to draw cards.
   final int seed;
 
@@ -46,7 +46,7 @@ class CasualityManager {
   /// The amount of rounds that the player has played (excluding those played as the Master).
   int _playedRounds = -1;
 
-  CasualityManager({
+  GameManager({
     required this.seed,
     required this.playerNumber,
     this.totalPlayers = 3,
@@ -145,5 +145,5 @@ class CasualityManager {
   void lost() => _clearSelectedCard();
 
   /// Clears ``[selectedCards]``.
-  void _clearSelectedCard() => CasualityManager.selectedCards.clear();
+  void _clearSelectedCard() => GameManager.selectedCards.clear();
 }

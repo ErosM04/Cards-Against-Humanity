@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 /// question card.
 class GamePage extends StatefulWidget {
   /// The object that manages the logic of the game.
-  final CasualityManager random;
+  final GameManager random;
 
   const GamePage(this.random, {super.key});
 
@@ -89,9 +89,8 @@ class _GamePageState extends State<GamePage> {
   /// #### Parameters
   /// - ``String [text]`` : the text of the card that has been clicked.
   void _selectCard(String text) {
-    if (CasualityManager.selectedCards.length ==
-        CasualityManager.answersNeeded) {
-      for (var cardText in CasualityManager.selectedCards) {
+    if (GameManager.selectedCards.length == GameManager.answersNeeded) {
+      for (var cardText in GameManager.selectedCards) {
         widget.random.useCard(cardText);
       }
 

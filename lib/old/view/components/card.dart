@@ -167,18 +167,17 @@ class _CardAHWState extends State<CardAHW>
       text: text.split(' - ')[1],
       style: TextStyle(color: Theme.of(context).colorScheme.secondary));
 
-  /// If it's activated (``[isClicked]`` is true) the aspect is changed, the card is added to the list in [CasualityManager]
+  /// If it's activated (``[isClicked]`` is true) the aspect is changed, the card is added to the list in [GameManager]
   /// and the parameter method is called.
   void _isClicked() {
     if (isClicked) {
       // Removes the card from the selected card list
-      CasualityManager.selectedCards.remove(widget.text);
+      GameManager.selectedCards.remove(widget.text);
       setState(() => isClicked = !isClicked);
-    } else if (CasualityManager.selectedCards.length <
-        CasualityManager.answersNeeded) {
+    } else if (GameManager.selectedCards.length < GameManager.answersNeeded) {
       // Adds the card to the selected card list (if there is space for it)
       setState(() => isClicked = !isClicked);
-      CasualityManager.selectedCards.add(widget.text);
+      GameManager.selectedCards.add(widget.text);
 
       if (widget.onClicked != null) widget.onClicked!();
     }
