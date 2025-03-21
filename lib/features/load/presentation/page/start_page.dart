@@ -205,7 +205,9 @@ class _StartPageState extends State<StartPage> {
       seed: seed,
       playerAmount: playerAmount,
       playerNumber: playerNumber,
-    )) return;
+    )) {
+      return;
+    }
 
     // Normal execution
     GameManager rand = GameManager(

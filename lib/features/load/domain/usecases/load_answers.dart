@@ -2,10 +2,10 @@ import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:cards_against_humanity/core/error/failures.dart';
 import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
-import 'package:cards_against_humanity/features/load/domain/usecases/usecase.dart';
+import 'package:cards_against_humanity/features/load/domain/usecases/load_usecase.dart';
 
 /// Use case for answers loading.
-class LoadAnswers implements UseCase<AnswerList> {
+class LoadAnswers implements LoadUseCase<AnswerList> {
   LoadRepository loadRepository;
 
   LoadAnswers({required this.loadRepository});

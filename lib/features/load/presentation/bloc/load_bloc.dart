@@ -9,7 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'load_event.dart';
 part 'load_state.dart';
 
-/// Manages the retrival of **cards related data** from the app'assets.
+/// Manages the retrival of **cards related data** from the app's assets.
 ///
 /// Through its events provides a list of questions and a list of answer, based on the content of the card of
 /// Cards Against Humanity.
