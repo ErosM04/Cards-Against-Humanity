@@ -118,7 +118,7 @@ class GameManager {
   ///
   /// #### Returns
   /// - ``List<String>`` : the list of answers.
-  List<String> revealAnswerCards(List<int> numbers) => List.generate(
+  List<String> getRespectiveText(List<int> numbers) => List.generate(
         numbers.length,
         (index) => answerList.getQuestionAt(numbers[index]),
       );
