@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/core/error/failures.dart';
+import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:fpdart/fpdart.dart';
 
 /// Basic use case with no parameters.
