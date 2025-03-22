@@ -1,5 +1,6 @@
 /// Stores the informations of a Cards Against Humanity's card.
-class CardAH {
+/// Cannot be instantiated because it must be overwritten.
+abstract class CardAH {
   /// The id of the card
   final int id;
 
