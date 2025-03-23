@@ -5,4 +5,14 @@ import 'package:cards_against_humanity/core/entities/data/card_list.dart';
 /// Cannot be instantiated because it must be overwritten.
 class AnswerList extends CardList {
   const AnswerList({required List<Answer> answers}) : super(list: answers);
+
+  @override
+  Answer getCardAt(int index) {
+    return super.getCardAt(index) as Answer;
+  }
+
+  @override
+  Answer removeCardAt(int index) {
+    return super.removeCardAt(index) as Answer;
+  }
 }
