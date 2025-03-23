@@ -1,4 +1,3 @@
-import 'package:cards_against_humanity/core/entities/data/card.dart';
 import 'package:cards_against_humanity/core/entities/data/card_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question.dart';
 
