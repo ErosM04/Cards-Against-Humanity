@@ -5,9 +5,11 @@ import 'dart:math';
 /// Defines the methods that are used to manage the models and manipulate the data.
 abstract interface class RandomCardSource<CardList> {
   /// Returns the next random card.
+  /// Throws [RangeError] if there are no more cards in the list.
   CardAH getRandomCard();
 
   /// Returns the next random card and deletes it from the list.
+  /// Throws [RangeError] if there are no more cards in the list.
   CardAH removeRandomCard();
 }
 
@@ -32,8 +34,20 @@ class RandomCardSourceImpl implements RandomCardSource<CardList> {
   int get _nextRandPos => _randomCard.nextInt(_cardList.length);
 
   @override
-  CardAH getRandomCard() => _cardList.getCardAt(_nextRandPos);
+  CardAH getRandomCard() {
+    try {
+      return _cardList.getCardAt(_nextRandPos);
+    } catch (e) {
+      throw RangeError(e.toString());
+    }
+  }
 
   @override
-  CardAH removeRandomCard() => _cardList.removeCardAt(_nextRandPos);
+  CardAH removeRandomCard() {
+    try {
+      return _cardList.removeCardAt(_nextRandPos);
+    } catch (e) {
+      throw RangeError(e.toString());
+    }
+  }
 }
