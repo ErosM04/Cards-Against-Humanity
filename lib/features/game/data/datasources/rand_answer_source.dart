@@ -26,6 +26,15 @@ class RandomAnswersSource implements RandomCardSource<Answer> {
   int get _nextRandPos => _randomCard.nextInt(_answerList.length);
 
   @override
+  Answer getCardAt(int index) {
+    try {
+      return _answerList.getCardAt(index);
+    } catch (e) {
+      throw RangeError(e.toString());
+    }
+  }
+
+  @override
   Answer getRandomCard() {
     try {
       return _answerList.getCardAt(_nextRandPos);
