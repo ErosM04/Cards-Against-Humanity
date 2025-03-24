@@ -31,7 +31,7 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
-  Either<DataRangeFailure, AnswerList> drawAnswerCards(int amount) {
+  Either<DataRangeFailure, AnswerList> drawAnswerCards([int amount = 0]) {
     try {
       return right(AnswerList(
           answers: List<Answer>.generate(

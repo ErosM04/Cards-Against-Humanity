@@ -9,7 +9,7 @@ abstract interface class GameRepository {
   Either<DataRangeFailure, Question> drawQuestionCard();
 
   /// Retrives [amount] random answer cards from the datasource and removes them.
-  Either<DataRangeFailure, AnswerList> drawAnswerCards(int amount);
+  Either<DataRangeFailure, AnswerList> drawAnswerCards([int amount = 1]);
 
   /// Handles the call to the datasource (list of answers) to retrive the list of answers based on the given ids.
   Either<DataRangeFailure, AnswerList> retriveAnswers(List<int> ids);
