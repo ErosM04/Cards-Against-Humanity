@@ -3,7 +3,7 @@ import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 
 /// The model is only here for the data layer, so it won't be used outside it.
 class QuestionListModel extends QuestionList {
-  const QuestionListModel({required super.list});
+  const QuestionListModel({required super.questions});
 
   /// Takes a [list] which where a `List` contains all the questions, whith each question being a `List`
   /// containing two elements, the qeuestion string and the amount of answers needed:
@@ -17,20 +17,22 @@ class QuestionListModel extends QuestionList {
   /// ]
   /// ```
   ///
-  /// Than for each sub-list creates a [QuestionModel] to populate a list used to create the [QuestionListModel] object.
+  /// Then for each sub-list creates a [QuestionModel] to populate a list used to create the [QuestionListModel] object.
   factory QuestionListModel.fromList({required List<List<String>> list}) {
     List<QuestionModel> finalList = [];
 
-    for (var subList in list) {
+    for (int i = 0; i < list.length; i++) {
+      var subList = list[i];
       finalList.add(
         QuestionModel(
+          id: i,
           text: subList[0].toString(),
           answerNeeded: _parse(subList[1]),
         ),
       );
     }
 
-    return QuestionListModel(list: []);
+    return QuestionListModel(questions: finalList);
   }
 
   /// Parses a [value] to an int, otherwise returns `1`.
