@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/core/error/exceptions.dart';
+import 'package:cards_against_humanity/core/errors/exceptions.dart';
 import 'package:cards_against_humanity/features/load/data/models/answer_list_model.dart';
 import 'package:cards_against_humanity/features/load/data/models/question_list_model.dart';
 import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
@@ -14,6 +14,7 @@ abstract interface class LoadLocalDataSource {
 
 /// Implementation of ``[LoadLocalDataSource]`` that defines the main methods the data layer has to provide.
 class LoadLocalDataSourceImpl implements LoadLocalDataSource {
+  /// Object used to read csv file in assets.
   final CsvReader csvReader;
 
   const LoadLocalDataSourceImpl({required this.csvReader});
@@ -39,7 +40,7 @@ class LoadLocalDataSourceImpl implements LoadLocalDataSource {
         answers.add(answer[0]);
       }
 
-      return AnswerListModel(list: answers);
+      return AnswerListModel.fromList(list: answers);
     } catch (e) {
       throw DataLoadException(e.toString());
     }
