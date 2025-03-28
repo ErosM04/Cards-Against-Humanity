@@ -1,9 +1,9 @@
-import 'package:cards_against_humanity/core/error/failures.dart';
+import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:fpdart/fpdart.dart';
 
-/// Defines the methods that will be used by the `usecases`.
+/// Defines the methods that will be used by the `usecases` and implemented in the data layer.
 // Here we don't pass the QuestionListModel because it would violate encapsulation
 abstract interface class LoadRepository {
   /// Handles the call to the `data source` to retrive the list of questions.

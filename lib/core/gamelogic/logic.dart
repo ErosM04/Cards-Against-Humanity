@@ -106,7 +106,7 @@ class GameManager {
       }
       _randomAnswerCard.nextInt(answerList.length);
     }
-    _hand.add('$position - ${answerList.getQuestionAt(position)}');
+    _hand.add('$position - ${answerList.getCardAt(position)}');
   }
 
   /// Returns a list of answer cards, but without the id.
