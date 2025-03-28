@@ -6,6 +6,7 @@ import 'package:fpdart/fpdart.dart';
 
 /// Draws a [Question] card.
 class DrawNextQuestion implements UseCase<Question> {
+  /// Utility used to obtain the data from the data layer.
   final GameRepository gameRepository;
 
   const DrawNextQuestion({required this.gameRepository});

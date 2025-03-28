@@ -7,6 +7,7 @@ import 'package:fpdart/fpdart.dart';
 /// Draws an [Answer] card for each player and then returns only the one corresponding
 /// to the actual player.
 class DrawNextAnswer implements UseCaseParam<Answer, DrawAnswerParams> {
+  /// Utility used to obtain the data from the data layer.
   final GameRepository gameRepository;
 
   const DrawNextAnswer({required this.gameRepository});

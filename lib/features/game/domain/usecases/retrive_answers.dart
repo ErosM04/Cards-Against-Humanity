@@ -8,6 +8,7 @@ import 'package:fpdart/fpdart.dart';
 /// Takes a list of ids, where each id is the identifier of an [Answer] card and returns an [AnswerList]
 /// containg all the [Answer]s with that specific id.
 class RetriveAnswers implements UseCaseParam<AnswerList, List<int>> {
+  /// Utility used to obtain the data from the data layer.
   final GameRepository gameRepository;
 
   const RetriveAnswers({required this.gameRepository});
