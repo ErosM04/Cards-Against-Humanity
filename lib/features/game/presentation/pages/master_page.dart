@@ -79,7 +79,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
       }
 
       // Converts the array of number into an array with the corresponding answer
-      final List<String> answerList = widget.random.revealAnswerCards(
+      final List<String> answerList = widget.random.getRespectiveText(
           List<int>.generate(
               splitArr.length, (index) => int.parse(splitArr[index])));
 
