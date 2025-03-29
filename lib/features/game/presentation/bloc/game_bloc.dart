@@ -1,11 +1,11 @@
-import 'package:cards_against_humanity/core/entities/game/card.dart';
+import 'package:cards_against_humanity/core/entities/data/card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-part 'card_event.dart';
-part 'card_state.dart';
+part 'game_event.dart';
+part 'game_state.dart';
 
-class CardBloc extends Bloc<CardEvent, CardState> {
+class GameBloc extends Bloc<GameEvent, GameState> {
   /// The amount of answer cards to click to complete the question (1 or 2).
   int cardsToClick;
 
@@ -15,12 +15,12 @@ class CardBloc extends Bloc<CardEvent, CardState> {
   /// The variable used to save the first card clicked, in case 2 cards are required ([cardsToClick] = 2).
   late CardAH _firstCard;
 
-  CardBloc(this.cardsToClick) : super(NoCardClicked()) {
+  GameBloc(this.cardsToClick) : super(NoCardClicked()) {
     clickedCard();
   }
 
   void clickedCard() {
-    return on<CardClicked>((event, emit) {
+    return on<GameClicked>((event, emit) {
       clickedCards++;
       _firstCard = event.card;
 
@@ -30,7 +30,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
           emit(OneCardCliked(card: event.card));
         } else {
           // Two answers were required so the previous card, saved in the local variable, is used.
-          emit(TwoCardCliked(card1: _firstCard, card2: event.card));
+          emit(TwoCardsCliked(card1: _firstCard, card2: event.card));
         }
       }
     });
