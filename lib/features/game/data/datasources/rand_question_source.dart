@@ -1,13 +1,13 @@
 import 'package:cards_against_humanity/features/game/data/datasources/rand_card_source.dart';
-import 'package:cards_against_humanity/core/entities/data/question.dart';
-import 'package:cards_against_humanity/core/entities/data/question_list.dart';
+import 'package:cards_against_humanity/features/game/data/models/question_list_model.dart';
+import 'package:cards_against_humanity/features/game/data/models/question_model.dart';
 import 'dart:math';
 
 /// Implements the methods that are used to manage the models and manipulate the data,
 /// specifically for the question cards.
-class RandomQuestionsSource implements RandomCardSource<Question> {
+class RandomQuestionsSource implements RandomCardSource<QuestionModel> {
   /// The list of question cards.
-  final QuestionList _answerList;
+  final QuestionListModel _answerList;
 
   /// The seed used by the ``[Random]`` object to generate randomic numbers.
   final int seed;
@@ -18,7 +18,7 @@ class RandomQuestionsSource implements RandomCardSource<Question> {
 
   RandomQuestionsSource({
     required this.seed,
-    required QuestionList questionList,
+    required QuestionListModel questionList,
   })  : _answerList = questionList,
         _randomCard = Random(seed);
 
@@ -26,27 +26,27 @@ class RandomQuestionsSource implements RandomCardSource<Question> {
   int get _nextRandPos => _randomCard.nextInt(_answerList.length);
 
   @override
-  Question getCardAt(int index) {
+  QuestionModel getCardAt(int index) {
     try {
-      return _answerList.getCardAt(index);
+      return _answerList.getCardAt(index) as QuestionModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
   }
 
   @override
-  Question getRandomCard() {
+  QuestionModel getRandomCard() {
     try {
-      return _answerList.getCardAt(_nextRandPos);
+      return _answerList.getCardAt(_nextRandPos) as QuestionModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
   }
 
   @override
-  Question removeRandomCard() {
+  QuestionModel removeRandomCard() {
     try {
-      return _answerList.removeCardAt(_nextRandPos);
+      return _answerList.removeCardAt(_nextRandPos) as QuestionModel;
     } catch (e) {
       throw RangeError(e.toString());
     }

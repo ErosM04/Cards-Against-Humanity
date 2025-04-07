@@ -1,13 +1,13 @@
 import 'package:cards_against_humanity/features/game/data/datasources/rand_card_source.dart';
-import 'package:cards_against_humanity/core/entities/data/answer.dart';
-import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
+import 'package:cards_against_humanity/features/game/data/models/answer_list_model.dart';
+import 'package:cards_against_humanity/features/game/data/models/answer_model.dart';
 import 'dart:math';
 
 /// Implements the methods that are used to manage the models and manipulate the data,
 /// specifically for the answer cards.
-class RandomAnswersSource implements RandomCardSource<Answer> {
+class RandomAnswersSource implements RandomCardSource<AnswerModel> {
   /// The list of cards.
-  final AnswerList _answerList;
+  final AnswerListModel _answerList;
 
   /// The seed used by the ``[Random]`` object to generate randomic numbers.
   final int seed;
@@ -18,7 +18,7 @@ class RandomAnswersSource implements RandomCardSource<Answer> {
 
   RandomAnswersSource({
     required this.seed,
-    required AnswerList answerList,
+    required AnswerListModel answerList,
   })  : _answerList = answerList,
         _randomCard = Random(seed);
 
@@ -26,27 +26,27 @@ class RandomAnswersSource implements RandomCardSource<Answer> {
   int get _nextRandPos => _randomCard.nextInt(_answerList.length);
 
   @override
-  Answer getCardAt(int index) {
+  AnswerModel getCardAt(int index) {
     try {
-      return _answerList.getCardAt(index);
+      return _answerList.getCardAt(index) as AnswerModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
   }
 
   @override
-  Answer getRandomCard() {
+  AnswerModel getRandomCard() {
     try {
-      return _answerList.getCardAt(_nextRandPos);
+      return _answerList.getCardAt(_nextRandPos) as AnswerModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
   }
 
   @override
-  Answer removeRandomCard() {
+  AnswerModel removeRandomCard() {
     try {
-      return _answerList.removeCardAt(_nextRandPos);
+      return _answerList.removeCardAt(_nextRandPos) as AnswerModel;
     } catch (e) {
       throw RangeError(e.toString());
     }

@@ -1,6 +1,6 @@
+import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question.dart';
 import 'package:cards_against_humanity/core/errors/failures.dart';
-import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:fpdart/fpdart.dart';
 
 /// Defines the methods that will be used by the `usecases` and implemented in the data layer.
