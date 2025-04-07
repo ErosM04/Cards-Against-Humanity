@@ -40,7 +40,7 @@ class LoadLocalDataSourceImpl implements LoadLocalDataSource {
         answers.add(answer[0]);
       }
 
-      return AnswerListModel.fromList(list: answers);
+      return AnswerListModel.fromStrings(list: answers);
     } catch (e) {
       throw DataLoadException(e.toString());
     }

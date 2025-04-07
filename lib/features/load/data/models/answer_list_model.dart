@@ -18,7 +18,7 @@ class AnswerListModel extends AnswerList {
   /// ```
   ///
   /// For each sub-list creates a [AnswerModel] to populate a [List] used to create the [AnswerListModel] object.
-  factory AnswerListModel.fromList({required List<String> list}) {
+  factory AnswerListModel.fromStrings({required List<String> list}) {
     List<AnswerModel> finalList = [];
 
     for (int i = 0; i < list.length; i++) {

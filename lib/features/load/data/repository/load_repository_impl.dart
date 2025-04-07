@@ -18,7 +18,7 @@ class LoadRepositoryImpl implements LoadRepository {
   @override
   Future<Either<DataFailure, QuestionList>> getQuestions() async {
     try {
-      return right(await localDataSource.getQuestions());
+      return right((await localDataSource.getQuestions()));
     } on DataLoadException catch (e) {
       return left(DataFailure(e.message, dataType: LoadLocalDataSource));
     }

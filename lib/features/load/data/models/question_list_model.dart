@@ -1,5 +1,5 @@
-import 'package:cards_against_humanity/features/load/data/models/question_model.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
+import 'package:cards_against_humanity/features/load/data/models/question_model.dart';
 
 /// The model is only here for the data layer, so it won't be used outside it.
 class QuestionListModel extends QuestionList {
@@ -43,4 +43,8 @@ class QuestionListModel extends QuestionList {
       return int.tryParse(value.toString()) ?? 1;
     }
   }
+
+  /// veccio porco dio come figa faccio che altrimenti la datasource esplode pk se estendo QuestionList del core mi si fotte pk
+  /// al suo interno usa QUestion del core e non QuestionModel, dio serpente
+  // QuestionList toEntity() => QuestionList(questions: );
 }
