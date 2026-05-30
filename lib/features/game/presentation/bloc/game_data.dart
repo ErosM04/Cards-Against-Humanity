@@ -1,8 +1,9 @@
 import 'package:cards_against_humanity/constants.dart';
+import 'package:cards_against_humanity/core/entities/data/answer.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 
-/// Stores the data ralated to the current state of the game.
-class GameState {
+/// Stores the data ralated to the current state of the game. It's a Singleton.
+class GameData {
   /// The specific number of the player between 0 and ``[_totalPlayers]``.
   int _playerNumber;
 
@@ -22,7 +23,7 @@ class GameState {
   int _score;
 
   /// The unique instance of the class.
-  static final GameState? _instance;
+  static final GameData? _instance;
 
   /// The specific number of the player between 0 and ``[_totalPlayers]``.
   int get playerNumber => _playerNumber;
@@ -39,9 +40,12 @@ class GameState {
   /// The score of the player.
   int get score => _score;
 
+  /// THe number of card in the hand.
+  int get hand => _hand.length;
+
   /// The actual constructor that builds the object. If the number of player is not contained in the
   /// defined range, [RangeError] is thrown.
-  GameState._privateConstructor({
+  GameData._privateConstructor({
     required int playerNumber,
     required int totalPlayers,
     required AnswerList hand,
@@ -61,13 +65,15 @@ class GameState {
     }
   }
 
-  factory GameState({
+  /// Constructor that stores data ralated to the current state of the game.
+  /// This is a factory constructor used to implement a Singleton.
+  factory GameData({
     required int playerNumber,
     required int totalPlayers,
     required AnswerList hand,
   }) =>
       _instance ??
-      GameState._privateConstructor(
+      GameData._privateConstructor(
         playerNumber: playerNumber,
         totalPlayers: totalPlayers,
         hand: hand,
@@ -79,11 +85,28 @@ class GameState {
     required int totalPlayers,
     required AnswerList hand,
   }) =>
-      GameState._privateConstructor(
+      GameData._privateConstructor(
         playerNumber: playerNumber,
         totalPlayers: totalPlayers,
         hand: hand,
       );
+
+  /// Counts this round as one played as a normal Player and increments both the player
+  /// and the total round counters.
+  void newRoundAsPlayer() {
+    _playerRounds++;
+    _totalRounds++;
+  }
+
+  /// Counts this round as one played as a Master and increments only the total round counter.
+  void newRoundAsMaster() {
+    _totalRounds++;
+  }
+
+  /// Adds a new Answer card at the end of the hand.
+  void addAnswerCard(Answer answer) {
+    _hand.addCard(answer);
+  }
 
   /// Returns the amount of answer cards that must be skipped when drawing.
   /// This happens in order to avoid drawing the same cards of other players.
