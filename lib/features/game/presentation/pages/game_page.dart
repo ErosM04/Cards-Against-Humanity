@@ -1,9 +1,12 @@
-import 'package:cards_against_humanity/old/view/components/card.dart';
-import 'package:cards_against_humanity/old/view/components/appbar.dart';
-import 'package:cards_against_humanity/features/game/presentation/pages/card_page.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
+import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
+import 'package:cards_against_humanity/features/game/presentation/pages/card_page.dart';
 import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
+import 'package:cards_against_humanity/init_dependencies.dart';
+import 'package:cards_against_humanity/old/view/components/appbar.dart';
+import 'package:cards_against_humanity/old/view/components/card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// The normal Game page, where the player has to choose the funniest answer/s card/s to complete the
 /// question card.
@@ -94,8 +97,15 @@ class _GamePageState extends State<GamePage> {
         widget.random.useCard(cardText);
       }
 
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => CardPage(widget.random)));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: serviceLocator<GameBloc>(),
+            child: CardPage(widget.random),
+          ),
+        ),
+      );
     }
   }
 }

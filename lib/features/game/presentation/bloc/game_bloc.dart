@@ -1,5 +1,4 @@
 import 'package:cards_against_humanity/constants.dart';
-import 'package:cards_against_humanity/core/entities/data/answer.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/card.dart';
 import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_answer.dart';
@@ -24,6 +23,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   late GameData _gameData;
 
+  GameData get gameData => _gameData;
+
   /// The amount of answer cards to click to complete the question (1 or 2).
   int _cardsToClick = 1;
 
@@ -33,8 +34,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   /// The variable used to save the first card clicked, in case 2 cards are required ([_cardsToClick] = 2).
   CardAH? _firstCard;
 
-  /// The BlocProvider to initialize this bloc goes into route, that from the same start page goes to the game pages.
-  /// In that route you get the integers, meanwhile use serviceLocator.nomeUseCase for the usecases
   /// Draws the starting hand.
   GameBloc({
     required RetriveAnswers retriveAnswers,
@@ -64,7 +63,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     /// events definition
     on<StartRound>(_roundStart);
     on<AnswerCardsRequested>(_answerCardRequested);
-    on<CardClicked>(clickedCard);
+    on<CardClicked>(_clickedCard);
+    on<RoundWon>((event, emit) => _gameData.incrementScore());
+    on<RoundLost>((event, emit) {});
   }
 
   /// Draws missing cards to complete hand until it contains [handLength] cards.
@@ -74,6 +75,16 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     } else {
       _gameData.newRoundAsPlayer();
     }
+
+    final questionRes = _drawNextQuestion();
+    questionRes.fold(
+      (fail) => emit(LoadFailure()),
+      (question) {
+        _cardsToClick = question.answerNeeded;
+        _clickedCards = 0;
+        _firstCard = null;
+      },
+    );
 
     for (var i = 0; i < handLength; i++) {
       final res = _drawNextAnswer(DrawAnswerParams(
@@ -89,19 +100,27 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     emit(RoundReady());
   }
 
-  void _answerCardRequested(event, emit) {}
+  void _answerCardRequested(
+      AnswerCardsRequested event, Emitter<GameState> emit) {
+    final res = _retriveAnswers(event.ids);
+    res.fold(
+      (fail) => emit(LoadFailure()),
+      (answers) => emit(AnswerCardsLoaded(answers: answers)),
+    );
+  }
 
-  void clickedCard(event, emit) {
+  void _clickedCard(CardClicked event, Emitter<GameState> emit) {
     _clickedCards++;
-    _firstCard = event.card;
+
+    if (_clickedCards == 1) {
+      _firstCard = event.card;
+    }
 
     if (_clickedCards == _cardsToClick) {
       if (_cardsToClick == 1) {
-        // Only one answer was required
         emit(FirstCardCliked(card: event.card));
       } else {
-        // Two answers were required so the previous card, saved in the local variable, is used.
-        emit(SecondCardCliked(card1: _firstCard, card2: event.card));
+        emit(SecondCardCliked(card1: _firstCard!, card2: event.card));
       }
     }
   }

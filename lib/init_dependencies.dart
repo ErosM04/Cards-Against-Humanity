@@ -1,3 +1,17 @@
+import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
+import 'package:cards_against_humanity/core/entities/data/question_list.dart';
+import 'package:cards_against_humanity/core/models/answer_list_model.dart';
+import 'package:cards_against_humanity/core/models/answer_model.dart';
+import 'package:cards_against_humanity/core/models/question_list_model.dart';
+import 'package:cards_against_humanity/core/models/question_model.dart';
+import 'package:cards_against_humanity/features/game/data/datasources/rand_answer_source.dart';
+import 'package:cards_against_humanity/features/game/data/datasources/rand_question_source.dart';
+import 'package:cards_against_humanity/features/game/data/repository/game_repo_impl.dart';
+import 'package:cards_against_humanity/features/game/domain/repository/game_repository.dart';
+import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_answer.dart';
+import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_question.dart';
+import 'package:cards_against_humanity/features/game/domain/usecases/retrive_answers.dart';
+import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/load/data/datasource/local_datasource.dart';
 import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
 import 'package:cards_against_humanity/features/load/data/repository/load_repository_impl.dart';
@@ -51,13 +65,101 @@ void _initLoad() {
       () => LoadQuestions(loadRepository: serviceLocator()),
     )
     ..registerLazySingleton(
-      () => LoadQuestions(loadRepository: serviceLocator()),
+      () => LoadAnswers(loadRepository: serviceLocator()),
     )
     // the bloc should have only one instance, otherwise if it has a particular state and it gets called from the app, it resets.
     ..registerLazySingleton(
       () => LoadBloc(
         loadQuestions: serviceLocator(),
         loadAnswers: serviceLocator(),
+      ),
+    );
+}
+
+/// Initializes all the dependencies (and sub-dependencies) related to the ``game`` feature.
+void initGameDependencies({
+  required int seed,
+  required int playerNumber,
+  required int totalPlayers,
+  required QuestionList questionList,
+  required AnswerList answerList,
+}) {
+  if (serviceLocator.isRegistered<GameBloc>()) {
+    serviceLocator.unregister<GameBloc>();
+  }
+  if (serviceLocator.isRegistered<DrawNextAnswer>()) {
+    serviceLocator.unregister<DrawNextAnswer>();
+  }
+  if (serviceLocator.isRegistered<DrawNextQuestion>()) {
+    serviceLocator.unregister<DrawNextQuestion>();
+  }
+  if (serviceLocator.isRegistered<RetriveAnswers>()) {
+    serviceLocator.unregister<RetriveAnswers>();
+  }
+  if (serviceLocator.isRegistered<GameRepository>()) {
+    serviceLocator.unregister<GameRepository>();
+  }
+  if (serviceLocator.isRegistered<RandomAnswersSource>()) {
+    serviceLocator.unregister<RandomAnswersSource>();
+  }
+  if (serviceLocator.isRegistered<RandomQuestionsSource>()) {
+    serviceLocator.unregister<RandomQuestionsSource>();
+  }
+
+  final qModel = questionList is QuestionListModel
+      ? questionList
+      : QuestionListModel(
+          questions: List.generate(
+            questionList.length,
+            (i) => QuestionModel(
+              id: questionList.getCardAt(i).id,
+              text: questionList.getCardAt(i).text,
+              answerNeeded: questionList.getCardAt(i).answerNeeded,
+            ),
+          ),
+        );
+
+  final aModel = answerList is AnswerListModel
+      ? answerList
+      : AnswerListModel(
+          answers: List.generate(
+            answerList.length,
+            (i) => AnswerModel(
+              id: answerList.getCardAt(i).id,
+              text: answerList.getCardAt(i).text,
+            ),
+          ),
+        );
+
+  serviceLocator
+    ..registerLazySingleton(
+      () => RandomQuestionsSource(seed: seed, questionList: qModel),
+    )
+    ..registerLazySingleton(
+      () => RandomAnswersSource(seed: seed, answerList: aModel),
+    )
+    ..registerLazySingleton<GameRepository>(
+      () => GameRepositoryImpl(
+        randQuestionsSource: serviceLocator(),
+        randAnswersSource: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => DrawNextQuestion(gameRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => DrawNextAnswer(gameRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => RetriveAnswers(gameRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => GameBloc(
+        retriveAnswers: serviceLocator(),
+        drawNextQuestion: serviceLocator(),
+        drawNextAnswer: serviceLocator(),
+        playerNumber: playerNumber,
+        totalPlayers: totalPlayers,
       ),
     );
 }

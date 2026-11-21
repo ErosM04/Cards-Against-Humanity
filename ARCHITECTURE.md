@@ -297,9 +297,9 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 
 To facilitate subsequent refactoring steps, be aware of the following transitional state:
 
-1. **Dual State Management (GameManager vs GameBloc)**:
-   - UI pages (`GamePage`, `CardPage`, `MasterGamePage`) currently depend on the imperative `GameManager` (`lib/core/gamelogic/logic.dart`).
-   - `GameBloc` is partially implemented but not yet registered in `init_dependencies.dart` or connected to the game pages.
+1. **GameBloc Registration & Presentation Provider Integration [RESOLVED]**:
+   - `initGameDependencies()` in `init_dependencies.dart` dynamically registers `GameBloc`, `GameRepository`, use cases, and PRNG card data sources in `GetIt` when a match begins on `StartPage`.
+   - Connected `GameBloc` across presentation routes (`StartPage`, `GamePage`, `CardPage`, `MasterGamePage`) via `BlocProvider.value`, dispatching `StartRound`, `RoundWon`, `RoundLost`, and `AnswerCardsRequested`.
 2. **Duplicated Models in `load` and `game` [RESOLVED]**:
    - Consolidated into shared models in `lib/core/models/` (`question_model.dart`, `question_list_model.dart`, `answer_model.dart`, `answer_list_model.dart`). The redundant feature-local model folders were deleted.
 3. **Card Lookup Index Bug in `GameRepositoryImpl` [RESOLVED]**:

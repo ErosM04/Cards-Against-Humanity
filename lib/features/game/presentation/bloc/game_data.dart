@@ -23,7 +23,7 @@ class GameData {
   int _score;
 
   /// The unique instance of the class.
-  static final GameData? _instance;
+  static GameData? _instance;
 
   /// The specific number of the player between 0 and ``[_totalPlayers]``.
   int get playerNumber => _playerNumber;
@@ -43,6 +43,9 @@ class GameData {
   /// THe number of card in the hand.
   int get hand => _hand.length;
 
+  /// The hand of cards.
+  AnswerList get handList => _hand;
+
   /// The actual constructor that builds the object. If the number of player is not contained in the
   /// defined range, [RangeError] is thrown.
   GameData._privateConstructor({
@@ -55,13 +58,13 @@ class GameData {
         _totalRounds = 0,
         _playerRounds = -1,
         _score = 0 {
-    if (_totalPlayers < minPlayers && _totalPlayers > maxPlayers) {
+    if (_totalPlayers < minPlayers || _totalPlayers > maxPlayers) {
       throw RangeError(
           'Total players must be between $minPlayers and $maxPlayers');
     }
     if (_hand.length != 10) {
       throw FormatException(
-          'The amount of cards contained in a hand must be between $minPlayers and $maxPlayers');
+          'The amount of cards contained in a hand must be $handLength');
     }
   }
 
@@ -72,24 +75,24 @@ class GameData {
     required int totalPlayers,
     required AnswerList hand,
   }) =>
-      _instance ??
-      GameData._privateConstructor(
+      _instance ??= GameData._privateConstructor(
         playerNumber: playerNumber,
         totalPlayers: totalPlayers,
         hand: hand,
       );
 
-  /// Resets the internal fata of the object. Used to start a new game.
-  void resetState({
+  /// Resets the internal data of the object. Used to start a new game.
+  static void resetState({
     required int playerNumber,
     required int totalPlayers,
     required AnswerList hand,
-  }) =>
-      GameData._privateConstructor(
-        playerNumber: playerNumber,
-        totalPlayers: totalPlayers,
-        hand: hand,
-      );
+  }) {
+    _instance = GameData._privateConstructor(
+      playerNumber: playerNumber,
+      totalPlayers: totalPlayers,
+      hand: hand,
+    );
+  }
 
   /// Counts this round as one played as a normal Player and increments both the player
   /// and the total round counters.
@@ -106,6 +109,11 @@ class GameData {
   /// Adds a new Answer card at the end of the hand.
   void addAnswerCard(Answer answer) {
     _hand.addCard(answer);
+  }
+
+  /// Increments the player's score.
+  void incrementScore() {
+    _score++;
   }
 
   /// Returns the amount of answer cards that must be skipped when drawing.

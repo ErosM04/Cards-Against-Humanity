@@ -2,7 +2,9 @@ import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
+import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
+import 'package:cards_against_humanity/init_dependencies.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/components/info.dart';
@@ -53,12 +55,24 @@ class _StartPageState extends State<StartPage> {
   /// Uses [route] to invoke a [MasterGamePage] which takes [rand].
   static void routeToMasterPage(
           {required BuildContext context, required GameManager rand}) =>
-      route(context: context, page: MasterGamePage(rand));
+      route(
+        context: context,
+        page: BlocProvider.value(
+          value: serviceLocator<GameBloc>(),
+          child: MasterGamePage(rand),
+        ),
+      );
 
   /// Uses [route] to invoke a [GamePage] which takes [rand].
   static void routeToGamePage(
           {required BuildContext context, required GameManager rand}) =>
-      route(context: context, page: GamePage(rand));
+      route(
+        context: context,
+        page: BlocProvider.value(
+          value: serviceLocator<GameBloc>(),
+          child: GamePage(rand),
+        ),
+      );
 
   @override
   void initState() {
@@ -209,11 +223,20 @@ class _StartPageState extends State<StartPage> {
       return;
     }
 
-    // Normal execution
-    GameManager rand = GameManager(
+    // Initialize game session dependencies for BLoC
+    initGameDependencies(
       seed: seed!,
       playerNumber: playerNumber!,
       totalPlayers: playerAmount!,
+      questionList: questionList,
+      answerList: answerList,
+    );
+
+    // Normal execution
+    GameManager rand = GameManager(
+      seed: seed,
+      playerNumber: playerNumber,
+      totalPlayers: playerAmount,
       questionList: questionList,
       answerList: answerList,
     );

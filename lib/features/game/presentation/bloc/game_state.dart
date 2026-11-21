@@ -25,5 +25,12 @@ final class SecondCardCliked extends GameState {
   });
 }
 
+/// The answer cards for the given IDs have been retrieved.
+final class AnswerCardsLoaded extends GameState {
+  final AnswerList answers;
+
+  const AnswerCardsLoaded({required this.answers});
+}
+
 /// The operation of accessing a card returned a failure
 final class LoadFailure extends GameState {}

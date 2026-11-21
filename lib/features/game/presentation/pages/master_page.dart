@@ -1,13 +1,16 @@
 import 'package:cards_against_humanity/constants.dart';
-import 'package:cards_against_humanity/old/view/components/card.dart';
+import 'package:cards_against_humanity/core/gamelogic/logic.dart';
+import 'package:cards_against_humanity/core/widgets/textfield.dart';
+import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
+import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
+import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
+import 'package:cards_against_humanity/init_dependencies.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
+import 'package:cards_against_humanity/old/view/components/card.dart';
 import 'package:cards_against_humanity/old/view/components/info.dart';
-import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
-import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
-import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Page of the player which has to insert the ids of the cards selected by the other players.
 class MasterGamePage extends StatefulWidget {
@@ -78,10 +81,14 @@ class _MasterGamePageState extends State<MasterGamePage> {
         if (int.tryParse(element) == null) return;
       }
 
+      final cardIds = List<int>.generate(
+          splitArr.length, (index) => int.parse(splitArr[index]));
+
+      // Notify BLoC of requested answer card IDs
+      context.read<GameBloc>().add(AnswerCardsRequested(ids: cardIds));
+
       // Converts the array of number into an array with the corresponding answer
-      final List<String> answerList = widget.random.getRespectiveText(
-          List<int>.generate(
-              splitArr.length, (index) => int.parse(splitArr[index])));
+      final List<String> answerList = widget.random.getRespectiveText(cardIds);
 
       if (answerList.length ==
           (GameManager.answersNeeded * (widget.random.totalPlayers - 1))) {
@@ -115,8 +122,16 @@ class _MasterGamePageState extends State<MasterGamePage> {
     GameManager.selectedCards.clear();
     widget.random.fillHand();
     widget.random.drawQuestionCard();
-    Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) => GamePage(widget.random)));
+    context.read<GameBloc>().add(const StartRound(isMaster: false));
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: serviceLocator<GameBloc>(),
+          child: GamePage(widget.random),
+        ),
+      ),
+    );
   }
 
   /// Builds the set of widgets used to take the cards id as input, to later save them into ``[answerCardList]``.

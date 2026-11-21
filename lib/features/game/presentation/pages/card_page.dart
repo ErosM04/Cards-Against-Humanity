@@ -1,10 +1,13 @@
-import 'package:cards_against_humanity/old/view/components/card.dart';
-import 'package:cards_against_humanity/old/view/components/appbar.dart';
-import 'package:cards_against_humanity/old/view/components/button.dart';
+import 'package:cards_against_humanity/core/gamelogic/logic.dart';
+import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
+import 'package:cards_against_humanity/init_dependencies.dart';
+import 'package:cards_against_humanity/old/view/components/appbar.dart';
+import 'package:cards_against_humanity/old/view/components/button.dart';
+import 'package:cards_against_humanity/old/view/components/card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// The page that is displayed after the **Game page** and shows the question card, with the answer/s previously
 /// selected by the player that fills the empty spots. The answer text color follows the [Theme] of the app.
@@ -30,13 +33,19 @@ class CardPage extends StatelessWidget {
                 children: [
                   _buildEndButton(
                     text: 'Ho perso',
-                    onPressed: () => random.lost(),
+                    onPressed: () {
+                      random.lost();
+                      context.read<GameBloc>().add(const RoundLost());
+                    },
                     color: Colors.red,
                     context: context,
                   ),
                   _buildEndButton(
                     text: 'Ho vinto',
-                    onPressed: () => random.won(),
+                    onPressed: () {
+                      random.won();
+                      context.read<GameBloc>().add(const RoundWon());
+                    },
                     color: Colors.green,
                     context: context,
                   ),
@@ -97,12 +106,20 @@ class CardPage extends StatelessWidget {
     // The first condition is true if, for ex, there are 4 players and the actual player is the 4th (so it's his turn).
     // The secon condition is true if, for ex, the user is the player 1 and there are 4 player and is the round 5:
     // 5 % 4 = 1, which is equal to the number player number (1).
-    (((random.round % random.totalPlayers) == 0 &&
+    final isNextMaster = (((random.round % random.totalPlayers) == 0 &&
                 (random.playerNumber == random.totalPlayers)) ||
-            (random.round % random.totalPlayers) == random.playerNumber)
-        ? Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => MasterGamePage(random)))
-        : Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => GamePage(random)));
+            (random.round % random.totalPlayers) == random.playerNumber);
+
+    context.read<GameBloc>().add(StartRound(isMaster: isNextMaster));
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider.value(
+          value: serviceLocator<GameBloc>(),
+          child: isNextMaster ? MasterGamePage(random) : GamePage(random),
+        ),
+      ),
+    );
   }
 }
