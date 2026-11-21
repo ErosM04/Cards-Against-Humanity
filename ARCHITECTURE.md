@@ -306,7 +306,9 @@ To facilitate subsequent refactoring steps, be aware of the following transition
    - Fixed in `lib/features/game/data/repository/game_repo_impl.dart`: `randAnswersSource.getCardAt(ids[index])` properly accesses the passed card ID instead of the loop index.
 4. **Seed Stride in `GameManager` [RESOLVED]**:
    - Fixed in `lib/core/gamelogic/logic.dart`: `_drawAnswerCard()` now advances the PRNG stream by exactly one card per player in the loop, preventing desynchronization.
-5. **Seed Stride & Offset in Game Data Sources [OPEN]**:
-   - In `features/game/data/datasources/rand_question_source.dart`, the `seed + 1` offset used in `GameManager` is not yet applied, and `rand_answer_source.dart` needs to mirror the interleaved drawing logic across players when replacing `GameManager`.
-6. **Legacy UI Widget Dependencies [OPEN]**:
+5. **Seed Offset in RandomQuestionsSource [RESOLVED]**:
+   - Fixed in `features/game/data/datasources/rand_question_source.dart`: `Random(seed + 1)` is now used to match the question PRNG sequence in `GameManager`. Renamed internal field `_answerList` to `_questionList`.
+6. **Interleaved Drawing in RandomAnswersSource [OPEN]**:
+   - `rand_answer_source.dart` needs to support the interleaved drawing stride across players when transitioning away from `GameManager`.
+7. **Legacy UI Widget Dependencies [OPEN]**:
    - The game presentation pages still import `CardAHW`, `CustomAppBar`, `CustomButton`, and `GameInfo` from `lib/old/view/components/`. Migrating these into modern widgets or `lib/core/widgets/` is part of the refactoring roadmap.

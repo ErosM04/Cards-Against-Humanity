@@ -7,28 +7,28 @@ import 'dart:math';
 /// specifically for the question cards.
 class RandomQuestionsSource implements RandomCardSource<QuestionModel> {
   /// The list of question cards.
-  final QuestionListModel _answerList;
+  final QuestionListModel _questionList;
 
   /// The seed used by the ``[Random]`` object to generate randomic numbers.
   final int seed;
 
   /// The object used to generate random numbers, that correspond to the question cards contained
-  /// in ``[_answerList]``.
+  /// in ``[_questionList]``.
   final Random _randomCard;
 
   RandomQuestionsSource({
     required this.seed,
     required QuestionListModel questionList,
-  })  : _answerList = questionList,
-        _randomCard = Random(seed);
+  })  : _questionList = questionList,
+        _randomCard = Random(seed + 1);
 
   /// Getter that returns the next random number.
-  int get _nextRandPos => _randomCard.nextInt(_answerList.length);
+  int get _nextRandPos => _randomCard.nextInt(_questionList.length);
 
   @override
   QuestionModel getCardAt(int index) {
     try {
-      return _answerList.getCardAt(index) as QuestionModel;
+      return _questionList.getCardAt(index) as QuestionModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
@@ -37,7 +37,7 @@ class RandomQuestionsSource implements RandomCardSource<QuestionModel> {
   @override
   QuestionModel getRandomCard() {
     try {
-      return _answerList.getCardAt(_nextRandPos) as QuestionModel;
+      return _questionList.getCardAt(_nextRandPos) as QuestionModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
@@ -46,7 +46,7 @@ class RandomQuestionsSource implements RandomCardSource<QuestionModel> {
   @override
   QuestionModel removeRandomCard() {
     try {
-      return _answerList.removeCardAt(_nextRandPos) as QuestionModel;
+      return _questionList.removeCardAt(_nextRandPos) as QuestionModel;
     } catch (e) {
       throw RangeError(e.toString());
     }
