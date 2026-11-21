@@ -45,10 +45,8 @@ void main() {
 Future<List<List>> _ciapa() async {
   // row added to initialize Binding for test pourpose
   WidgetsFlutterBinding.ensureInitialized();
-  return const CsvToListConverter().convert(
-      await rootBundle.loadString("assets/csv/answers.csv"),
-      fieldDelimiter: ';',
-      shouldParseNumbers: false);
+  return const CsvDecoder(fieldDelimiter: ';', dynamicTyping: false).convert(
+      await rootBundle.loadString("assets/csv/answers.csv"));
 }
 
 void _salame(List<String> list) {

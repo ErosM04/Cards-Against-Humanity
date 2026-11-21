@@ -258,7 +258,7 @@ Responsible for reading raw CSV cards from app assets on startup and making them
 - [load_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/bloc/load_bloc.dart): Handles `LoadQuestionsStart` and `LoadAnswersStart` events, emits `LoadInProgress`, `LoadQuestionsCompleted`, `LoadAnswersCompleted`, or error states.
 - [load_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/bloc/load_event.dart): Sealed event hierarchy for card loading.
 - [load_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/bloc/load_state.dart): Sealed state hierarchy for card loading.
-- [start_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/page/start_page.dart): Entry screen where players input game seed, total players, and player number. Dispatches loading events to `LoadBloc`, listens for completed card lists, validates inputs, instantiates `GameManager`, and routes to `MasterGamePage` or `GamePage`.
+- [start_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/page/start_page.dart): Entry screen where players input game seed, total players, and player number. Dispatches loading events to `LoadBloc`, listens for completed card lists, validates inputs, initializes `GameBloc`, and routes to `MasterGamePage` or `GamePage`.
 
 ---
 
@@ -309,5 +309,7 @@ To facilitate subsequent refactoring steps, be aware of the following transition
    - Fully eliminated `GameManager` and deleted `lib/core/gamelogic/logic.dart`.
    - Decoupled `CardAHW` in `lib/old/view/components/card.dart` from global static selection state; it now receives `isSelected` and invokes `onClicked` callbacks.
    - Refactored `GamePage`, `CardPage`, `MasterGamePage`, and `StartPage` to use `GameBloc`, `BlocConsumer`, and `GameState` for round starts, hand rendering, card selection, Master answer collection, and winner declarations.
-8. **Legacy UI Widget Dependencies [OPEN]**:
+8. **CSV Decoder API Migration for csv: ^8.0.0 [RESOLVED]**:
+   - Migrated [csv_reader.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/provider/csv_reader.dart) from deprecated/removed `CsvToListConverter` to modern `const CsvDecoder(fieldDelimiter: ';', dynamicTyping: true)` matching `csv: 8.0.0`.
+9. **Legacy UI Widget Dependencies [OPEN]**:
    - The game presentation pages still import `CardAHW`, `CustomAppBar`, `CustomButton`, and `GameInfo` from `lib/old/view/components/`. Migrating these into modern widgets or `lib/core/widgets/` is part of the refactoring roadmap.

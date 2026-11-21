@@ -17,15 +17,14 @@ class CsvReader {
   /// ``Future<List<List>>`` : the list of answers.
   Future<List<List>> getAnswers() async => await _loadCSV('answers');
 
-  /// Uses the ``[CsvToListConverter]`` object and the method ``convert()`` to convert the string of the specified file into a csv.
+  /// Uses the ``[CsvDecoder]`` object and the method ``convert()`` to convert the string of the specified file into a csv.
   /// #### Parameters
   /// - ``String [filename]`` : the name of the csv file, without the extension.
   ///
   /// #### Returns
   /// ``Future<List<List>>`` : the list of row, each cell is a row and is a list itself; each item of the row list is a cell of the csv file.
   Future<List<List>> _loadCSV(String filename) async =>
-      const CsvToListConverter().convert(
+      const CsvDecoder(fieldDelimiter: ';', dynamicTyping: true).convert(
         await rootBundle.loadString("assets/csv/$filename.csv"),
-        fieldDelimiter: ';',
       );
 }
