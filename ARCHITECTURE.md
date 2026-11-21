@@ -272,8 +272,8 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 
 #### Data Layer
 - [rand_card_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_card_source.dart): Interface `RandomCardSource<Card>` for drawing random cards, removing them, or getting cards by index.
-- [rand_question_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_question_source.dart): `RandomQuestionsSource` implementation managing deterministic card draws from `QuestionListModel` using `Random(seed)`.
-- [rand_answer_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_answer_source.dart): `RandomAnswersSource` implementation managing answer selection from `AnswerListModel` using `Random(seed)`.
+- [rand_question_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_question_source.dart): `RandomQuestionsSource` implementation managing deterministic card draws from `QuestionListModel` using `Random(seed + 1)`.
+- [rand_answer_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_answer_source.dart): `RandomAnswersSource` implementation managing answer selection and card skipping from `AnswerListModel` using `Random(seed)`.
 - [game_repo_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/repository/game_repo_impl.dart): Implements `GameRepository`. Bridges random card data sources with domain use cases.
 
 #### Domain Layer
@@ -308,7 +308,7 @@ To facilitate subsequent refactoring steps, be aware of the following transition
    - Fixed in `lib/core/gamelogic/logic.dart`: `_drawAnswerCard()` now advances the PRNG stream by exactly one card per player in the loop, preventing desynchronization.
 5. **Seed Offset in RandomQuestionsSource [RESOLVED]**:
    - Fixed in `features/game/data/datasources/rand_question_source.dart`: `Random(seed + 1)` is now used to match the question PRNG sequence in `GameManager`. Renamed internal field `_answerList` to `_questionList`.
-6. **Interleaved Drawing in RandomAnswersSource [OPEN]**:
-   - `rand_answer_source.dart` needs to support the interleaved drawing stride across players when transitioning away from `GameManager`.
+6. **Interleaved Drawing & Card Skipping in RandomAnswersSource [RESOLVED]**:
+   - Implemented `skipCards(amount)` and `getRandomCardWithSkip(totalPlayers, playerNumber)` in `features/game/data/datasources/rand_answer_source.dart` to advance the PRNG stream deterministically and deal player-specific cards.
 7. **Legacy UI Widget Dependencies [OPEN]**:
    - The game presentation pages still import `CardAHW`, `CustomAppBar`, `CustomButton`, and `GameInfo` from `lib/old/view/components/`. Migrating these into modern widgets or `lib/core/widgets/` is part of the refactoring roadmap.

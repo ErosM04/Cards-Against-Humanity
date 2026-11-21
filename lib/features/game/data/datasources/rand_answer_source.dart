@@ -51,4 +51,30 @@ class RandomAnswersSource implements RandomCardSource<AnswerModel> {
       throw RangeError(e.toString());
     }
   }
+
+  /// Skips [amount] cards in the random sequence to keep PRNG streams synchronized.
+  void skipCards(int amount) {
+    if (_answerList.isEmpty) {
+      throw RangeError('Cannot skip cards when answer list is empty');
+    }
+    for (var i = 0; i < amount; i++) {
+      _randomCard.nextInt(_answerList.length);
+    }
+  }
+
+  /// Draws a random answer card for a specific player ([playerNumber] between 1 and [totalPlayers])
+  /// while skipping the cards belonging to other players, advancing the random generator
+  /// by [totalPlayers] steps to maintain deterministic synchronization across all devices.
+  AnswerModel getRandomCardWithSkip({
+    required int totalPlayers,
+    required int playerNumber,
+  }) {
+    if (playerNumber < 1 || playerNumber > totalPlayers) {
+      throw RangeError.range(playerNumber, 1, totalPlayers, 'playerNumber');
+    }
+    skipCards(playerNumber - 1);
+    final card = getRandomCard();
+    skipCards(totalPlayers - playerNumber);
+    return card;
+  }
 }
