@@ -11,7 +11,7 @@ import 'package:cards_against_humanity/features/game/presentation/pages/game_pag
 import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:cards_against_humanity/old/updater/updater.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,8 +52,7 @@ class _StartPageState extends State<StartPage> {
       );
 
   /// Uses [route] to invoke a [MasterGamePage].
-  static void routeToMasterPage({required BuildContext context}) =>
-      route(
+  static void routeToMasterPage({required BuildContext context}) => route(
         context: context,
         page: BlocProvider.value(
           value: serviceLocator<GameBloc>(),
@@ -62,8 +61,7 @@ class _StartPageState extends State<StartPage> {
       );
 
   /// Uses [route] to invoke a [GamePage].
-  static void routeToGamePage({required BuildContext context}) =>
-      route(
+  static void routeToGamePage({required BuildContext context}) => route(
         context: context,
         page: BlocProvider.value(
           value: serviceLocator<GameBloc>(),

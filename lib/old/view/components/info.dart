@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:info_popup/info_popup.dart';
 
 /// Displays an ⓘ icon which can be clicked to show a popup box containg some text.

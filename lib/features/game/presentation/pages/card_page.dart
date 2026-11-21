@@ -5,7 +5,7 @@ import 'package:cards_against_humanity/init_dependencies.dart';
 import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/components/card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// The page that is displayed after the **Game page** and shows the question card, with the answer/s previously
@@ -79,9 +79,8 @@ class CardPage extends StatelessWidget {
   /// Used to build the complete card with the question and all the answer.
   /// Answers are in a different color.
   Widget _buildCompleteCard(GameBloc gameBloc) {
-    final selectedTexts = gameBloc.selectedCards
-        .map((c) => '${c.id} - ${c.text}')
-        .toList();
+    final selectedTexts =
+        gameBloc.selectedCards.map((c) => '${c.id} - ${c.text}').toList();
     return Column(
       children: [
         CardAHW(

@@ -8,7 +8,7 @@ import 'package:cards_against_humanity/old/view/components/appbar.dart';
 import 'package:cards_against_humanity/old/view/components/button.dart';
 import 'package:cards_against_humanity/old/view/components/card.dart';
 import 'package:cards_against_humanity/old/view/components/info.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Page of the player which has to insert the ids of the cards selected by the other players.

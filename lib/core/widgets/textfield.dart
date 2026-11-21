@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Pre-fabricated ``[TextField]`` with phone keyboard.
 class CustomTextField extends StatelessWidget {

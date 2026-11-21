@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Widget used to create the card widget, for answers, questions and both together.
 /// To preserve state even when cards are out of the screen the State class comes with ``[AutomaticKeepAliveClientMixin]``.

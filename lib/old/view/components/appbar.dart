@@ -1,5 +1,5 @@
 import 'package:cards_against_humanity/constants.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Customized [AppBar] for Cards Against Humanity
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
