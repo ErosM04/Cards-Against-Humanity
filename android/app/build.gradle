@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     id "com.android.application"
-    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    
 }
 
 def localProperties = new Properties()
@@ -23,17 +26,21 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "ErosM04.cards_against_humanity"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion "27.0.12077973"
+    namespace = "ErosM04.cards_against_humanity"
+    compileSdkVersion = flutter.compileSdkVersion
+    ndkVersion = "30.0.16248370"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.fromTarget("17")
+            languageVersion = KotlinVersion.fromVersion("2.4")
+            apiVersion = KotlinVersion.fromVersion("2.4")
+        }
     }
 
     sourceSets {
@@ -55,11 +62,11 @@ android {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
     }
 }
 
 flutter {
-    source '../..'
+    source = '../..'
 }
