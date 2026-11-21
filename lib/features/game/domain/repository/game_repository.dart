@@ -1,3 +1,4 @@
+import 'package:cards_against_humanity/core/entities/data/answer.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question.dart';
 import 'package:cards_against_humanity/core/errors/failures.dart';
@@ -8,7 +9,13 @@ abstract interface class GameRepository {
   /// Retrives a question card from the datasource and removes it.
   Either<DataRangeFailure, Question> drawQuestionCard();
 
-  /// Retrives [amount] random answer cards from the datasource and removes them.
+  /// Draws a random answer card for a specific player, skipping other players' cards.
+  Either<DataRangeFailure, Answer> drawAnswerCard({
+    required int totalPlayers,
+    required int playerNumber,
+  });
+
+  /// Retrives [amount] random answer cards from the datasource.
   Either<DataRangeFailure, AnswerList> drawAnswerCards([int amount = 1]);
 
   /// Handles the call to the datasource (list of answers) to retrive the list of answers based on the given ids.

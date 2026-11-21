@@ -31,6 +31,21 @@ class GameRepositoryImpl implements GameRepository {
   }
 
   @override
+  Either<DataRangeFailure, Answer> drawAnswerCard({
+    required int totalPlayers,
+    required int playerNumber,
+  }) {
+    try {
+      return right(randAnswersSource.getRandomCardWithSkip(
+        totalPlayers: totalPlayers,
+        playerNumber: playerNumber,
+      ));
+    } on RangeError {
+      return left(DataRangeFailure(dataType: RandomAnswersSource));
+    }
+  }
+
+  @override
   Either<DataRangeFailure, AnswerList> drawAnswerCards([int amount = 0]) {
     try {
       return right(AnswerList(

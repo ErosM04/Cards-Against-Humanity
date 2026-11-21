@@ -13,13 +13,11 @@ class DrawNextAnswer implements UseCaseParam<Answer, DrawAnswerParams> {
   const DrawNextAnswer({required this.gameRepository});
 
   @override
-  Either<Failure, Answer> call(DrawAnswerParams params) {
-    var res = gameRepository.drawAnswerCards(params.totalPlayers);
-    return res.fold(
-      (fail) => Left(fail),
-      (answers) => Right(answers.getCardAt(params.playerNumber - 1)),
-    );
-  }
+  Either<Failure, Answer> call(DrawAnswerParams params) =>
+      gameRepository.drawAnswerCard(
+        totalPlayers: params.totalPlayers,
+        playerNumber: params.playerNumber,
+      );
 }
 
 /// The class used to store the parameters for the [DrawNextAnswer] usecase.

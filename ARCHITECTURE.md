@@ -277,9 +277,9 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 - [game_repo_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/repository/game_repo_impl.dart): Implements `GameRepository`. Bridges random card data sources with domain use cases.
 
 #### Domain Layer
-- [game_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/repository/game_repository.dart): Interface defining operations `drawQuestionCard()`, `drawAnswerCards(amount)`, and `retriveAnswers(ids)`.
+- [game_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/repository/game_repository.dart): Interface defining operations `drawQuestionCard()`, `drawAnswerCard(totalPlayers, playerNumber)`, `drawAnswerCards(amount)`, and `retriveAnswers(ids)`.
 - [draw_next_question.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/draw_next_question.dart): Use case to pull the current round's question card.
-- [draw_next_answer.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/draw_next_answer.dart): Use case to pull interleaved answer cards based on `totalPlayers` and `playerNumber`.
+- [draw_next_answer.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/draw_next_answer.dart): Use case to pull player-specific answer card delegating directly to `drawAnswerCard` with deterministic card skipping.
 - [retrive_answers.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/retrive_answers.dart): Use case to look up answer cards by their integer IDs.
 
 #### Presentation Layer

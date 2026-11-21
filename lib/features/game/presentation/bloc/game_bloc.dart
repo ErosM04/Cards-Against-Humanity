@@ -33,9 +33,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   /// The variable used to save the first card clicked, in case 2 cards are required ([_cardsToClick] = 2).
   CardAH? _firstCard;
 
-  /// Il BlocProvider per inizializzare questo bloc va messo nel route che dalla start page ti porta
-  /// alle game pages. In quel route mi faccio passare gli interi, mentre per gli usecases
-  /// usa serviceLocator.nomeUseCase
+  /// The BlocProvider to initialize this bloc goes into route, that from the same start page goes to the game pages.
+  /// In that route you get the integers, meanwhile use serviceLocator.nomeUseCase for the usecases
   /// Draws the starting hand.
   GameBloc({
     required RetriveAnswers retriveAnswers,
