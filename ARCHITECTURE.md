@@ -147,6 +147,10 @@ lib/
 │   │   ├── usecase.dart
 │   │   └── usecase_param.dart
 │   └── widgets/
+│       ├── appbar.dart
+│       ├── button.dart
+│       ├── card.dart
+│       ├── info.dart
 │       └── textfield.dart
 │
 └── features/
@@ -232,7 +236,11 @@ lib/
 - [failures.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/errors/failures.dart): Defines failure objects returned across repository/usecase boundaries (`Failure`, `DataFailure`, `DataRangeFailure`).
 
 #### Theme & Widgets (`lib/core/theme/`, `lib/core/widgets/`)
-- [theme.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/theme/theme.dart): App dark theme styling with orange color accents (`ColorScheme.dark`), transparent app bar, and rounded button themes.
+- [theme.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/theme/theme.dart): App dark theme styling with orange color accents (`ColorScheme.dark`), transparent app bar, and rounded button themes using `material_ui`.
+- [appbar.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/appbar.dart): `CustomAppBar` lightweight `StatelessWidget` implementing `PreferredSizeWidget` displaying app title and dynamic score/rounds counter.
+- [button.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/button.dart): `CustomButton` styled `ElevatedButton` wrapper with typed `VoidCallback onPressed` and preset typography and padding.
+- [card.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/card.dart): `CardAHW` question and answer card widget supporting selection highlights, text scroll, and inline blank replacement.
+- [info.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/info.dart): `GameInfo` popup widget displaying contextual information tooltips via `InfoPopupWidget`.
 - [textfield.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/textfield.dart): `CustomTextField` wrapper for `TextFormField` configured with `TextInputType.phone` (optimized for digits and dots `.`) and basic validation.
 
 #### Use Cases Abstraction (`lib/core/usecases/`)
@@ -311,5 +319,12 @@ To facilitate subsequent refactoring steps, be aware of the following transition
    - Refactored `GamePage`, `CardPage`, `MasterGamePage`, and `StartPage` to use `GameBloc`, `BlocConsumer`, and `GameState` for round starts, hand rendering, card selection, Master answer collection, and winner declarations.
 8. **CSV Decoder API Migration for csv: ^8.0.0 [RESOLVED]**:
    - Migrated [csv_reader.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/provider/csv_reader.dart) from deprecated/removed `CsvToListConverter` to modern `const CsvDecoder(fieldDelimiter: ';', dynamicTyping: true)` matching `csv: 8.0.0`.
-9. **Legacy UI Widget Dependencies [OPEN]**:
-   - The game presentation pages still import `CardAHW`, `CustomAppBar`, `CustomButton`, and `GameInfo` from `lib/old/view/components/`. Migrating these into modern widgets or `lib/core/widgets/` is part of the refactoring roadmap.
+9. **Legacy UI View Components Refactoring & Migration [RESOLVED]**:
+   - Refactored all view components from `lib/old/view/components/` into `lib/core/widgets/`:
+     - [appbar.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/appbar.dart): Converted to a clean `StatelessWidget` implementing `PreferredSizeWidget`.
+     - [button.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/button.dart): Converted raw `Function onPressed` to typed `VoidCallback onPressed`.
+     - [card.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/card.dart): Decoupled from legacy global state, taking `isSelected` and invoking `onClicked`.
+     - [info.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/info.dart): Moved to core widgets.
+   - Deleted `lib/old/view/` completely and updated all page and dialog imports.
+10. **main.dart ThemeData Alignment [RESOLVED]**:
+    - Aligned `core/theme/theme.dart` with `material_ui` to ensure consistent `ThemeData` typing for `MaterialApp` in [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart), resolving the analyzer error.
