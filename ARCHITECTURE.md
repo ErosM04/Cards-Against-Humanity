@@ -76,6 +76,42 @@ The project is undergoing refactoring from a legacy monolithic state (`lib/old` 
 - **Data**: Implements domain repository contracts. Uses data providers (e.g., CSV reader) and data sources (local asset reader, PRNG card source) to fetch raw data and map it to domain entities via models.
 - **Core**: Cross-cutting utilities, base use case abstractions, global error handling classes, app theme, and shared UI components.
 
+### S.O.L.I.D. Principles in Code Structure
+
+The refactored architecture strictly enforces the **S.O.L.I.D.** object-oriented design principles:
+
+1. **Single Responsibility Principle (SRP)**:
+   - Each class and file encapsulates exactly one responsibility and has one reason to change:
+     - **Providers** (`CsvReader`) only read and parse file assets.
+     - **Data Sources** (`LoadLocalDataSource`, `RandomQuestionsSource`) only provide typed models from their underlying store or PRNG.
+     - **Repositories** (`LoadRepositoryImpl`, `GameRepositoryImpl`) only coordinate data sources, handle exceptions, and map data models into domain entities.
+     - **Use Cases** (`LoadQuestions`, `DrawNextQuestion`, `RetriveAnswers`) encapsulate a single business action.
+     - **BLoCs** (`LoadBloc`, `GameBloc`) only manage UI event-to-state transformations without embedding domain calculations or data fetching logic.
+
+2. **Open/Closed Principle (OCP)**:
+   - System modules are open for extension but closed for modification:
+     - Domain foundations rely on polymorphic base abstractions: `CardAH`, `CardList<Card>`, `RandomCardSource<Card>`, and `UseCase<SuccessType>`.
+     - Adding new card types, new game variations, or alternative data storage (e.g. remote HTTP backend or SQLite) requires creating new implementations of existing interfaces rather than modifying core domain entities or use cases.
+
+3. **Liskov Substitution Principle (LSP)**:
+   - Derived classes can substitute their base classes without breaking program correctness:
+     - `Question` and `Answer` derive from `CardAH` and honor all base invariants.
+     - `QuestionList` and `AnswerList` derive from `CardList<T>`.
+     - Data models (`QuestionModel`, `AnswerModel`, `QuestionListModel`, `AnswerListModel`) inherit from their domain counterparts and can be substituted transparently across the repository layer.
+
+4. **Interface Segregation Principle (ISP)**:
+   - Clients depend only on small, focused, purpose-built interfaces rather than large monolithic contracts:
+     - Distinct abstract repository contracts (`LoadRepository`, `GameRepository`) rather than a single bulky repository.
+     - Segregated use case interfaces in core (`UseCase` vs `UseCaseParam`, synchronous vs `UseCaseAsync` / `UseCaseAsyncParam`).
+     - Data sources expose dedicated contracts (`LoadLocalDataSource`, `RandomCardSource`) tailored solely to the data they supply.
+
+5. **Dependency Inversion Principle (DIP)**:
+   - High-level business modules (UseCases, BLoCs) never depend directly on low-level implementation details (CSV parsing, Flutter framework assets, specific `dart:math` PRNG instances). Both rely on abstractions (interfaces):
+     - `LoadBloc` depends on abstract `LoadQuestions` and `LoadAnswers` use cases.
+     - Use cases depend on the abstract `LoadRepository` and `GameRepository` interfaces.
+     - Concrete repository implementations (`LoadRepositoryImpl`, `GameRepositoryImpl`) depend on abstract data source interfaces (`LoadLocalDataSource`, `RandomCardSource`).
+     - All concrete dependencies are wired via constructor injection and managed centrally through the service locator (`GetIt` in [init_dependencies.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/init_dependencies.dart)).
+
 ---
 
 ## 3. Directory & File Scheme (`lib/`)
