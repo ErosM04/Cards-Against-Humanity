@@ -1,6 +1,6 @@
+import 'package:cards_against_humanity/core/models/question_list_model.dart';
+import 'package:cards_against_humanity/core/models/question_model.dart';
 import 'package:cards_against_humanity/features/game/data/datasources/rand_card_source.dart';
-import 'package:cards_against_humanity/features/game/data/models/question_list_model.dart';
-import 'package:cards_against_humanity/features/game/data/models/question_model.dart';
 import 'dart:math';
 
 /// Implements the methods that are used to manage the models and manipulate the data,

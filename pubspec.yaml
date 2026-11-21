@@ -27,6 +27,7 @@ dependencies:
   flutter_bloc:
   fpdart: 
   get_it: 
+  material_ui: ^1.11.1
 
 
 dev_dependencies:

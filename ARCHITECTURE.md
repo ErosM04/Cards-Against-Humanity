@@ -133,6 +133,11 @@ lib/
 │   │       ├── question_list.dart
 │   │       ├── answer.dart
 │   │       └── answer_list.dart
+│   ├── models/
+│   │   ├── question_model.dart
+│   │   ├── question_list_model.dart
+│   │   ├── answer_model.dart
+│   │   └── answer_list_model.dart
 │   ├── errors/
 │   │   ├── exceptions.dart
 │   │   └── failures.dart
@@ -151,11 +156,6 @@ lib/
     │   ├── data/
     │   │   ├── datasource/
     │   │   │   └── local_datasource.dart
-    │   │   ├── models/
-    │   │   │   ├── question_model.dart
-    │   │   │   ├── question_list_model.dart
-    │   │   │   ├── answer_model.dart
-    │   │   │   └── answer_list_model.dart
     │   │   ├── provider/
     │   │   │   └── csv_reader.dart
     │   │   └── repository/
@@ -180,11 +180,6 @@ lib/
         │   │   ├── rand_card_source.dart
         │   │   ├── rand_question_source.dart
         │   │   └── rand_answer_source.dart
-        │   ├── models/
-        │   │   ├── question_model.dart
-        │   │   ├── question_list_model.dart
-        │   │   ├── answer_model.dart
-        │   │   └── answer_list_model.dart
         │   └── repository/
         │       └── game_repo_impl.dart
         ├── domain/
@@ -228,6 +223,12 @@ lib/
 - [answer.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/entities/data/answer.dart): `Answer` entity extending `CardAH`.
 - [answer_list.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/entities/data/answer_list.dart): `AnswerList` entity extending `CardList<Answer>`.
 
+#### Shared Models (`lib/core/models/`)
+- [question_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/models/question_model.dart): Data layer model representation of a question extending `Question`.
+- [question_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/models/question_list_model.dart): Model extending `QuestionList`, providing `.fromList()` factory parser for CSV matrix rows.
+- [answer_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/models/answer_model.dart): Data layer model representation of an answer extending `Answer`.
+- [answer_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/models/answer_list_model.dart): Model extending `AnswerList`, providing `.fromStrings()` factory parser.
+
 #### Error Handling (`lib/core/errors/`)
 - [exceptions.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/errors/exceptions.dart): Defines runtime exceptions thrown by data providers and sources (e.g. `DataLoadException`).
 - [failures.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/errors/failures.dart): Defines failure objects returned across repository/usecase boundaries (`Failure`, `DataFailure`, `DataRangeFailure`).
@@ -241,7 +242,7 @@ lib/
 - [usecase_param.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/usecases/usecase_param.dart): Interfaces for parameterized operations: `UseCaseParam<SuccessType, Param>` and `UseCaseAsyncParam<SuccessType, Param>`.
 
 #### Legacy Bridge / Monolith (`lib/core/gamelogic/`)
-- [logic.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/gamelogic/logic.dart): `GameManager` class. Contains the complete legacy implementation of PRNG card drawing (`Random(seed)` and `Random(seed + 1)`), hand filling, answer ID resolution, and score tracking. Currently used by presentation pages during the refactoring migration.
+- [logic.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/gamelogic/logic.dart): `GameManager` class. Contains PRNG card drawing (`Random(seed)` and `Random(seed + 1)`), hand filling, answer ID resolution, and score tracking. Currently used by presentation pages during the refactoring migration.
 
 ---
 
@@ -251,10 +252,6 @@ Responsible for reading raw CSV cards from app assets on startup and making them
 #### Data Layer
 - [csv_reader.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/provider/csv_reader.dart): Raw data provider reading `assets/csv/questions.csv` and `assets/csv/answers.csv` with semicolon delimiter via `csv` package.
 - [local_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/datasource/local_datasource.dart): `LoadLocalDataSource` interface and `LoadLocalDataSourceImpl`. Translates raw CSV lists into `QuestionListModel` and `AnswerListModel`.
-- [question_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/models/question_model.dart): Data layer model representation of a question.
-- [question_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/models/question_list_model.dart): Model extending `QuestionList`, providing `.fromList()` factory parser for CSV matrix rows.
-- [answer_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/models/answer_model.dart): Data layer model representation of an answer.
-- [answer_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/models/answer_list_model.dart): Model extending `AnswerList`, providing `.fromStrings()` factory parser.
 - [load_repository_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/repository/load_repository_impl.dart): Implements `LoadRepository`. Catches `DataLoadException` and returns `Either<DataFailure, QuestionList>` / `AnswerList`.
 
 #### Domain Layer
@@ -277,10 +274,6 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 - [rand_card_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_card_source.dart): Interface `RandomCardSource<Card>` for drawing random cards, removing them, or getting cards by index.
 - [rand_question_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_question_source.dart): `RandomQuestionsSource` implementation managing deterministic card draws from `QuestionListModel` using `Random(seed)`.
 - [rand_answer_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_answer_source.dart): `RandomAnswersSource` implementation managing answer selection from `AnswerListModel` using `Random(seed)`.
-- [question_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/models/question_model.dart): Game feature question model.
-- [question_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/models/question_list_model.dart): Game feature question list model.
-- [answer_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/models/answer_model.dart): Game feature answer model.
-- [answer_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/models/answer_list_model.dart): Game feature answer list model.
 - [game_repo_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/repository/game_repo_impl.dart): Implements `GameRepository`. Bridges random card data sources with domain use cases.
 
 #### Domain Layer
@@ -307,12 +300,13 @@ To facilitate subsequent refactoring steps, be aware of the following transition
 1. **Dual State Management (GameManager vs GameBloc)**:
    - UI pages (`GamePage`, `CardPage`, `MasterGamePage`) currently depend on the imperative `GameManager` (`lib/core/gamelogic/logic.dart`).
    - `GameBloc` is partially implemented but not yet registered in `init_dependencies.dart` or connected to the game pages.
-2. **Duplicated Models in `load` and `game`**:
-   - `question_model.dart`, `question_list_model.dart`, `answer_model.dart`, and `answer_list_model.dart` exist identically in both `features/load/data/models/` and `features/game/data/models/`. These should be unified or scoped cleanly.
-3. **Card Lookup Index Bug in `GameRepositoryImpl`**:
-   - In `lib/features/game/data/repository/game_repo_impl.dart` line 52:
-     `randAnswersSource.getCardAt(index)` uses the loop iteration `index` rather than `ids[index]`. This must be corrected when connecting `RetriveAnswers`.
-4. **Seed Stride in Game Data Sources**:
-   - In `lib/core/gamelogic/logic.dart`, `_randomQuestionCard = Random(seed + 1)` and `_randomAnswerCard = Random(seed)`. In `features/game/data/datasources/rand_question_source.dart`, the seed offset `+ 1` is not yet applied, and interleaved drawing across players needs to match the exact mathematical sequence of `GameManager`.
-5. **Legacy UI Widget Dependencies**:
+2. **Duplicated Models in `load` and `game` [RESOLVED]**:
+   - Consolidated into shared models in `lib/core/models/` (`question_model.dart`, `question_list_model.dart`, `answer_model.dart`, `answer_list_model.dart`). The redundant feature-local model folders were deleted.
+3. **Card Lookup Index Bug in `GameRepositoryImpl` [RESOLVED]**:
+   - Fixed in `lib/features/game/data/repository/game_repo_impl.dart`: `randAnswersSource.getCardAt(ids[index])` properly accesses the passed card ID instead of the loop index.
+4. **Seed Stride in `GameManager` [RESOLVED]**:
+   - Fixed in `lib/core/gamelogic/logic.dart`: `_drawAnswerCard()` now advances the PRNG stream by exactly one card per player in the loop, preventing desynchronization.
+5. **Seed Stride & Offset in Game Data Sources [OPEN]**:
+   - In `features/game/data/datasources/rand_question_source.dart`, the `seed + 1` offset used in `GameManager` is not yet applied, and `rand_answer_source.dart` needs to mirror the interleaved drawing logic across players when replacing `GameManager`.
+6. **Legacy UI Widget Dependencies [OPEN]**:
    - The game presentation pages still import `CardAHW`, `CustomAppBar`, `CustomButton`, and `GameInfo` from `lib/old/view/components/`. Migrating these into modern widgets or `lib/core/widgets/` is part of the refactoring roadmap.

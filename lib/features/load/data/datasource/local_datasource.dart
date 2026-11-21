@@ -1,6 +1,6 @@
 import 'package:cards_against_humanity/core/errors/exceptions.dart';
-import 'package:cards_against_humanity/features/load/data/models/answer_list_model.dart';
-import 'package:cards_against_humanity/features/load/data/models/question_list_model.dart';
+import 'package:cards_against_humanity/core/models/answer_list_model.dart';
+import 'package:cards_against_humanity/core/models/question_list_model.dart';
 import 'package:cards_against_humanity/features/load/data/provider/csv_reader.dart';
 
 /// Interface that declares the methods that the data layer has to provide.
@@ -23,7 +23,7 @@ class LoadLocalDataSourceImpl implements LoadLocalDataSource {
   Future<QuestionListModel> getQuestions() async {
     try {
       return QuestionListModel.fromList(
-        list: (await csvReader.getQuestions()) as List<List<String>>,
+        list: await csvReader.getQuestions(),
       );
     } catch (e) {
       throw DataLoadException(e.toString());
@@ -37,7 +37,7 @@ class LoadLocalDataSourceImpl implements LoadLocalDataSource {
       List<String> answers = [];
 
       for (var answer in list) {
-        answers.add(answer[0]);
+        answers.add(answer[0].toString());
       }
 
       return AnswerListModel.fromStrings(list: answers);

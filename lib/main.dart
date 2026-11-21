@@ -3,7 +3,7 @@ import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
 import 'package:cards_against_humanity/core/theme/theme.dart';
 import 'package:cards_against_humanity/init_dependencies.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() async {

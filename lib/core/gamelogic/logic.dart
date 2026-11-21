@@ -34,7 +34,8 @@ class GameManager {
   static final List<String> selectedCards = [];
 
   /// The question card that needs to be completed in the current round.
-  static Question _currentQuestion = const Question(text: '', answerNeeded: 0);
+  static Question _currentQuestion =
+      const Question(id: -1, text: '', answerNeeded: 0);
 
   /// The score of the player.
   int _score = 0;
@@ -101,10 +102,10 @@ class GameManager {
   void _drawAnswerCard() {
     int position = 0;
     for (var i = 0; i < totalPlayers; i++) {
+      final cardPos = _randomAnswerCard.nextInt(answerList.length);
       if (playerNumber - 1 == i) {
-        position = _randomAnswerCard.nextInt(answerList.length);
+        position = cardPos;
       }
-      _randomAnswerCard.nextInt(answerList.length);
     }
     _hand.add('$position - ${answerList.getCardAt(position)}');
   }
@@ -120,7 +121,7 @@ class GameManager {
   /// - ``List<String>`` : the list of answers.
   List<String> getRespectiveText(List<int> numbers) => List.generate(
         numbers.length,
-        (index) => answerList.getQuestionAt(numbers[index]),
+        (index) => answerList.getCardAt(numbers[index]).text,
       );
 
   /// Pick a random question card from ``[questionList]``, and saves the text in ``[question]`` and the number of empty spaces to fill in ``[_answersNeeded]``.
@@ -131,10 +132,7 @@ class GameManager {
     if (((_round - 1) % totalPlayers).floor() != playerNumber) _playedRounds++;
 
     int position = _randomQuestionCard.nextInt(questionList.length);
-    _currentQuestion = Question(
-      text: questionList.getQuestionAt(position).text,
-      answerNeeded: questionList.removeQuestionAt(position).answerNeeded,
-    );
+    _currentQuestion = questionList.removeCardAt(position);
   }
 
   /// Used when a round is won. Increase the ``[score]`` and clears ``[selectedCards]``.

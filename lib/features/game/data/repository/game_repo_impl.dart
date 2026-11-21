@@ -49,7 +49,7 @@ class GameRepositoryImpl implements GameRepository {
       return right(AnswerList(
           answers: List<Answer>.generate(
         ids.length,
-        (index) => randAnswersSource.getCardAt(index),
+        (index) => randAnswersSource.getCardAt(ids[index]),
       )));
     } on RangeError {
       return left(DataRangeFailure(dataType: RandomAnswersSource));
