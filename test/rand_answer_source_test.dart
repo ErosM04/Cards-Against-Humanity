@@ -1,7 +1,12 @@
 import 'dart:math';
 import 'package:cards_against_humanity/core/models/answer_list_model.dart';
 import 'package:cards_against_humanity/core/models/answer_model.dart';
+import 'package:cards_against_humanity/core/models/question_list_model.dart';
+import 'package:cards_against_humanity/core/models/question_model.dart';
 import 'package:cards_against_humanity/features/game/data/datasources/rand_answer_source.dart';
+import 'package:cards_against_humanity/features/game/data/datasources/rand_question_source.dart';
+import 'package:cards_against_humanity/features/game/data/repository/game_repo_impl.dart';
+import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_answer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -75,6 +80,29 @@ void main() {
       expect(
         () => source.getRandomCardWithSkip(totalPlayers: 4, playerNumber: 5),
         throwsA(isA<RangeError>()),
+      );
+    });
+
+    test('DrawNextAnswer delegates to GameRepository.drawAnswerCard with skip', () {
+      final questionSource = RandomQuestionsSource(
+        seed: seed,
+        questionList: const QuestionListModel(questions: [
+          QuestionModel(id: 0, text: 'Q', answerNeeded: 1),
+        ]),
+      );
+      final repo = GameRepositoryImpl(
+        randQuestionsSource: questionSource,
+        randAnswersSource: RandomAnswersSource(seed: seed, answerList: answerList),
+      );
+      final drawNextAnswer = DrawNextAnswer(gameRepository: repo);
+
+      final rawRandom = Random(seed);
+      final expectedPlayer2CardId = [rawRandom.nextInt(100), rawRandom.nextInt(100)][1];
+
+      final result = drawNextAnswer(const DrawAnswerParams(totalPlayers: 2, playerNumber: 2));
+      result.fold(
+        (failure) => fail('Expected success: ${failure.message}'),
+        (answer) => expect(answer.id, equals(expectedPlayer2CardId)),
       );
     });
   });
