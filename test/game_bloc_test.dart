@@ -1,8 +1,4 @@
 import 'package:cards_against_humanity/constants.dart';
-import 'package:cards_against_humanity/core/entities/data/answer.dart';
-import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
-import 'package:cards_against_humanity/core/entities/data/question.dart';
-import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/core/models/answer_list_model.dart';
 import 'package:cards_against_humanity/core/models/answer_model.dart';
 import 'package:cards_against_humanity/core/models/question_list_model.dart';
@@ -25,7 +21,8 @@ void main() {
     questions = QuestionListModel(
       questions: List.generate(
         10,
-        (i) => QuestionModel(id: i, text: 'Question $i', answerNeeded: i % 2 == 0 ? 1 : 2),
+        (i) => QuestionModel(
+            id: i, text: 'Question $i', answerNeeded: i % 2 == 0 ? 1 : 2),
       ),
     );
 
@@ -36,9 +33,11 @@ void main() {
       ),
     );
 
-    final qSource = RandomQuestionsSource(seed: 1234567890, questionList: questions);
+    final qSource =
+        RandomQuestionsSource(seed: 1234567890, questionList: questions);
     final aSource = RandomAnswersSource(seed: 1234567890, answerList: answers);
-    final repo = GameRepositoryImpl(randQuestionsSource: qSource, randAnswersSource: aSource);
+    final repo = GameRepositoryImpl(
+        randQuestionsSource: qSource, randAnswersSource: aSource);
 
     bloc = GameBloc(
       retriveAnswers: RetriveAnswers(gameRepository: repo),
@@ -90,7 +89,8 @@ void main() {
     }
   });
 
-  test('AnswerCardsRequested emits AnswerCardsLoaded with correct cards', () async {
+  test('AnswerCardsRequested emits AnswerCardsLoaded with correct cards',
+      () async {
     bloc.add(const AnswerCardsRequested(ids: [5, 10, 15]));
     await expectLater(
       bloc.stream,
