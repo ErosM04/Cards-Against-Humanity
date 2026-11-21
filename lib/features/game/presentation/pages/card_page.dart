@@ -1,4 +1,3 @@
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
@@ -12,21 +11,23 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// The page that is displayed after the **Game page** and shows the question card, with the answer/s previously
 /// selected by the player that fills the empty spots. The answer text color follows the [Theme] of the app.
 class CardPage extends StatelessWidget {
-  /// The object that manages the logic of the game.
-  final GameManager random;
-
-  const CardPage(this.random, {super.key});
+  const CardPage({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: CustomAppBar(score: random.score, maxPoints: random.playedRounds),
+  Widget build(BuildContext context) {
+    final gameBloc = context.read<GameBloc>();
+    return Scaffold(
+      appBar: CustomAppBar(
+        score: gameBloc.gameData.score,
+        maxPoints: gameBloc.gameData.playerRounds,
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildCompleteCard(),
+              _buildCompleteCard(gameBloc),
               const SizedBox(height: 100),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -34,7 +35,6 @@ class CardPage extends StatelessWidget {
                   _buildEndButton(
                     text: 'Ho perso',
                     onPressed: () {
-                      random.lost();
                       context.read<GameBloc>().add(const RoundLost());
                     },
                     color: Colors.red,
@@ -43,7 +43,6 @@ class CardPage extends StatelessWidget {
                   _buildEndButton(
                     text: 'Ho vinto',
                     onPressed: () {
-                      random.won();
                       context.read<GameBloc>().add(const RoundWon());
                     },
                     color: Colors.green,
@@ -54,7 +53,9 @@ class CardPage extends StatelessWidget {
             ],
           ),
         ),
-      ));
+      ),
+    );
+  }
 
   /// Used to build a the ``Ho perso`` and ``Ho vinto`` buttons.
   Widget _buildEndButton({
@@ -77,47 +78,42 @@ class CardPage extends StatelessWidget {
 
   /// Used to build the complete card with the question and all the answer.
   /// Answers are in a different color.
-  Widget _buildCompleteCard() => Column(
-        children: [
-          CardAHW(
-            text: random.question,
-            isClickable: false,
-            isMainCard: true,
-            answersList: GameManager.selectedCards,
-          ),
-          const SizedBox(height: 10),
-          Text('ID carta/e: ${_extractCardsId()}'),
-        ],
-      );
+  Widget _buildCompleteCard(GameBloc gameBloc) {
+    final selectedTexts = gameBloc.selectedCards
+        .map((c) => '${c.id} - ${c.text}')
+        .toList();
+    return Column(
+      children: [
+        CardAHW(
+          text: gameBloc.currentQuestion?.text ?? '',
+          isClickable: false,
+          isMainCard: true,
+          answersList: selectedTexts,
+        ),
+        const SizedBox(height: 10),
+        Text('ID carta/e: ${_extractCardsId(gameBloc)}'),
+      ],
+    );
+  }
 
-  /// Extracts the ids of the card saved in ``CasualityManager.selectedCards``. E.g.: "121, 557"
-  String _extractCardsId() => List<String>.generate(
-          GameManager.selectedCards.length,
-          (index) => GameManager.selectedCards[index].split('-')[0].trim())
-      .toString()
-      .replaceAll('[', '')
-      .replaceAll(']', '');
+  /// Extracts the ids of the selected cards. E.g.: "121, 557"
+  String _extractCardsId(GameBloc gameBloc) =>
+      gameBloc.selectedCards.map((c) => c.id.toString()).join(', ');
 
   /// Goes to a Master page if the next round is the round of the actual player, otherwise goes to the Game page.
   void _goToNewRound(BuildContext context) {
-    random.fillHand();
-    random.drawQuestionCard();
+    final gameBloc = context.read<GameBloc>();
+    final nextRound = gameBloc.gameData.totalRounds + 1;
+    final isNextMaster = gameBloc.gameData.isMasterForRound(nextRound);
 
-    // The first condition is true if, for ex, there are 4 players and the actual player is the 4th (so it's his turn).
-    // The secon condition is true if, for ex, the user is the player 1 and there are 4 player and is the round 5:
-    // 5 % 4 = 1, which is equal to the number player number (1).
-    final isNextMaster = (((random.round % random.totalPlayers) == 0 &&
-                (random.playerNumber == random.totalPlayers)) ||
-            (random.round % random.totalPlayers) == random.playerNumber);
-
-    context.read<GameBloc>().add(StartRound(isMaster: isNextMaster));
+    gameBloc.add(StartRound(isMaster: isNextMaster));
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider.value(
           value: serviceLocator<GameBloc>(),
-          child: isNextMaster ? MasterGamePage(random) : GamePage(random),
+          child: isNextMaster ? const MasterGamePage() : const GamePage(),
         ),
       ),
     );

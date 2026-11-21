@@ -15,4 +15,7 @@ abstract class CardList<Card> {
 
   /// Adds a new card in tail.
   void addCard(Card card) => _list.add(card);
+
+  /// Removes a card from the list.
+  bool removeCard(Card card) => _list.remove(card);
 }

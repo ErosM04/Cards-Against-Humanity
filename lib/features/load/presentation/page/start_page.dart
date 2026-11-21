@@ -1,5 +1,4 @@
 import 'package:cards_against_humanity/constants.dart';
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
@@ -52,25 +51,23 @@ class _StartPageState extends State<StartPage> {
         MaterialPageRoute(builder: (context) => page),
       );
 
-  /// Uses [route] to invoke a [MasterGamePage] which takes [rand].
-  static void routeToMasterPage(
-          {required BuildContext context, required GameManager rand}) =>
+  /// Uses [route] to invoke a [MasterGamePage].
+  static void routeToMasterPage({required BuildContext context}) =>
       route(
         context: context,
         page: BlocProvider.value(
           value: serviceLocator<GameBloc>(),
-          child: MasterGamePage(rand),
+          child: const MasterGamePage(),
         ),
       );
 
-  /// Uses [route] to invoke a [GamePage] which takes [rand].
-  static void routeToGamePage(
-          {required BuildContext context, required GameManager rand}) =>
+  /// Uses [route] to invoke a [GamePage].
+  static void routeToGamePage({required BuildContext context}) =>
       route(
         context: context,
         page: BlocProvider.value(
           value: serviceLocator<GameBloc>(),
-          child: GamePage(rand),
+          child: const GamePage(),
         ),
       );
 
@@ -232,20 +229,15 @@ class _StartPageState extends State<StartPage> {
       answerList: answerList,
     );
 
-    // Normal execution
-    GameManager rand = GameManager(
-      seed: seed,
-      playerNumber: playerNumber,
-      totalPlayers: playerAmount,
-      questionList: questionList,
-      answerList: answerList,
-    );
+    final isMaster = (playerNumber == 1);
+    final gameBloc = serviceLocator<GameBloc>();
+    gameBloc.add(StartRound(isMaster: isMaster));
 
     // If this is the 1st player starts as a master, otherwise start as normal player
-    if (playerNumber == 1) {
-      routeToMasterPage(context: context, rand: rand);
+    if (isMaster) {
+      routeToMasterPage(context: context);
     } else {
-      routeToGamePage(context: context, rand: rand);
+      routeToGamePage(context: context);
     }
   }
 

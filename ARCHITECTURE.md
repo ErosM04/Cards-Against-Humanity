@@ -51,7 +51,7 @@ Rounds rotate sequentially among players from Player 1 to Player $N$:
 
 ## 2. Target Architecture: BLoC & Clean Architecture
 
-The project is undergoing refactoring from a legacy monolithic state (`lib/old` and `lib/core/gamelogic/logic.dart`) to the **BLoC pattern** following clean architecture layer boundaries:
+The project is undergoing refactoring from legacy state (`lib/old`) to the **BLoC pattern** following clean architecture layer boundaries:
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -141,8 +141,6 @@ lib/
 │   ├── errors/
 │   │   ├── exceptions.dart
 │   │   └── failures.dart
-│   ├── gamelogic/
-│   │   └── logic.dart
 │   ├── theme/
 │   │   └── theme.dart
 │   ├── usecases/
@@ -241,9 +239,6 @@ lib/
 - [usecase.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/usecases/usecase.dart): Interfaces for parameterless operations: `UseCase<SuccessType>` (synchronous) and `UseCaseAsync<SuccessType>` (asynchronous).
 - [usecase_param.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/usecases/usecase_param.dart): Interfaces for parameterized operations: `UseCaseParam<SuccessType, Param>` and `UseCaseAsyncParam<SuccessType, Param>`.
 
-#### Legacy Bridge / Monolith (`lib/core/gamelogic/`)
-- [logic.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/gamelogic/logic.dart): `GameManager` class. Contains PRNG card drawing (`Random(seed)` and `Random(seed + 1)`), hand filling, answer ID resolution, and score tracking. Currently used by presentation pages during the refactoring migration.
-
 ---
 
 ### Feature 1: Load (`lib/features/load/`)
@@ -283,13 +278,13 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 - [retrive_answers.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/retrive_answers.dart): Use case to look up answer cards by their integer IDs.
 
 #### Presentation Layer
-- [game_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_bloc.dart): BLoC for game orchestration. Manages initial hand generation, round starts, and multi-card click tracking (`FirstCardCliked`, `SecondCardCliked`).
-- [game_data.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_data.dart): Singleton state holder for game round counters, score, and active player hand.
+- [game_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_bloc.dart): BLoC for game orchestration. Manages initial hand generation, round starts, multi-card click tracking (`FirstCardCliked`, `SecondCardCliked`), and answer card lookups (`AnswerCardsLoaded`).
+- [game_data.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_data.dart): Singleton state holder for game round counters, score, active player hand, and Master turn rotation helper `isMasterForRound(round)`.
 - [game_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_event.dart): Sealed game events (`StartRound`, `AnswerCardsRequested`, `CardClicked`, `RoundWon`, `RoundLost`).
-- [game_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_state.dart): Sealed game states (`RoundStart`, `RoundReady`, `FirstCardCliked`, `SecondCardCliked`, `LoadFailure`).
-- [game_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/game_page.dart): Normal player UI displaying current question, hand carousel, and card selection logic. *(Currently driven by `GameManager`)*.
-- [card_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/card_page.dart): Displays the completed question with chosen answer(s) and card IDs, along with "Ho vinto" and "Ho perso" outcome buttons. *(Currently driven by `GameManager`)*.
-- [master_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/master_page.dart): Master UI displaying current question, text input for card IDs, and randomized card carousel for selecting the winner. *(Currently driven by `GameManager`)*.
+- [game_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_state.dart): Sealed game states (`RoundStart`, `RoundReady`, `FirstCardCliked`, `SecondCardCliked`, `AnswerCardsLoaded`, `LoadFailure`).
+- [game_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/game_page.dart): Normal player UI displaying current question, hand carousel, and card selection logic via `BlocConsumer<GameBloc, GameState>`.
+- [card_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/card_page.dart): Displays the completed question with chosen answer(s) and card IDs from `GameBloc`, along with "Ho vinto" and "Ho perso" outcome buttons dispatching `RoundWon` / `RoundLost` and `StartRound`.
+- [master_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/master_page.dart): Master UI displaying current question, text input for card IDs, and randomized card carousel for selecting the winner via `BlocConsumer<GameBloc, GameState>`.
 
 ---
 
@@ -304,11 +299,15 @@ To facilitate subsequent refactoring steps, be aware of the following transition
    - Consolidated into shared models in `lib/core/models/` (`question_model.dart`, `question_list_model.dart`, `answer_model.dart`, `answer_list_model.dart`). The redundant feature-local model folders were deleted.
 3. **Card Lookup Index Bug in `GameRepositoryImpl` [RESOLVED]**:
    - Fixed in `lib/features/game/data/repository/game_repo_impl.dart`: `randAnswersSource.getCardAt(ids[index])` properly accesses the passed card ID instead of the loop index.
-4. **Seed Stride in `GameManager` [RESOLVED]**:
-   - Fixed in `lib/core/gamelogic/logic.dart`: `_drawAnswerCard()` now advances the PRNG stream by exactly one card per player in the loop, preventing desynchronization.
+4. **Seed Stride Synchronization & GameManager Elimination [RESOLVED]**:
+   - Synchronized PRNG seed stride across devices via `getRandomCardWithSkip()` in `RandomAnswersSource`. `GameManager` and `lib/core/gamelogic/logic.dart` have been completely removed.
 5. **Seed Offset in RandomQuestionsSource [RESOLVED]**:
-   - Fixed in `features/game/data/datasources/rand_question_source.dart`: `Random(seed + 1)` is now used to match the question PRNG sequence in `GameManager`. Renamed internal field `_answerList` to `_questionList`.
+   - Fixed in `features/game/data/datasources/rand_question_source.dart`: `Random(seed + 1)` is used for question PRNG sequencing. Renamed internal field `_answerList` to `_questionList`.
 6. **Interleaved Drawing & Card Skipping in RandomAnswersSource [RESOLVED]**:
    - Implemented `skipCards(amount)` and `getRandomCardWithSkip(totalPlayers, playerNumber)` in `features/game/data/datasources/rand_answer_source.dart` to advance the PRNG stream deterministically and deal player-specific cards.
-7. **Legacy UI Widget Dependencies [OPEN]**:
+7. **GameManager Removal & Full Presentation BLoC Integration [RESOLVED]**:
+   - Fully eliminated `GameManager` and deleted `lib/core/gamelogic/logic.dart`.
+   - Decoupled `CardAHW` in `lib/old/view/components/card.dart` from global static selection state; it now receives `isSelected` and invokes `onClicked` callbacks.
+   - Refactored `GamePage`, `CardPage`, `MasterGamePage`, and `StartPage` to use `GameBloc`, `BlocConsumer`, and `GameState` for round starts, hand rendering, card selection, Master answer collection, and winner declarations.
+8. **Legacy UI Widget Dependencies [OPEN]**:
    - The game presentation pages still import `CardAHW`, `CustomAppBar`, `CustomButton`, and `GameInfo` from `lib/old/view/components/`. Migrating these into modern widgets or `lib/core/widgets/` is part of the refactoring roadmap.

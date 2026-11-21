@@ -111,6 +111,13 @@ class GameData {
     _hand.addCard(answer);
   }
 
+  /// Removes an Answer card from the hand.
+  bool removeAnswerCard(Answer answer) => _hand.removeCard(answer);
+
+  /// Checks whether a given round is played as Master by this player.
+  bool isMasterForRound(int round) =>
+      ((round - 1) % _totalPlayers) + 1 == _playerNumber;
+
   /// Increments the player's score.
   void incrementScore() {
     _score++;

@@ -1,4 +1,3 @@
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/card_page.dart';
 import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
@@ -11,10 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// The normal Game page, where the player has to choose the funniest answer/s card/s to complete the
 /// question card.
 class GamePage extends StatefulWidget {
-  /// The object that manages the logic of the game.
-  final GameManager random;
-
-  const GamePage(this.random, {super.key});
+  const GamePage({super.key});
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -22,32 +18,50 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: CustomAppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const StartPage())),
-          ),
-          score: widget.random.score,
-          maxPoints: widget.random.playedRounds,
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(children: [
-              const SizedBox(height: 30),
-              CardAHW(
-                text: widget.random.question,
-                isClickable: false,
-                isMainCard: true,
+  Widget build(BuildContext context) => BlocConsumer<GameBloc, GameState>(
+        listener: (context, state) {
+          if (state is FirstCardCliked || state is SecondCardCliked) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider.value(
+                  value: serviceLocator<GameBloc>(),
+                  child: const CardPage(),
+                ),
               ),
-              const SizedBox(height: 100),
-              _buildSubTitle('La tua mano:'),
-              const SizedBox(height: 20),
-              _buildCardCarousel(widget.random.hand),
-            ]),
-          ),
-        ),
+            );
+          }
+        },
+        builder: (context, state) {
+          final gameBloc = context.read<GameBloc>();
+          return Scaffold(
+            appBar: CustomAppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const StartPage())),
+              ),
+              score: gameBloc.gameData.score,
+              maxPoints: gameBloc.gameData.playerRounds,
+            ),
+            body: SingleChildScrollView(
+              child: Center(
+                child: Column(children: [
+                  const SizedBox(height: 30),
+                  CardAHW(
+                    text: gameBloc.currentQuestion?.text ?? '',
+                    isClickable: false,
+                    isMainCard: true,
+                  ),
+                  const SizedBox(height: 100),
+                  _buildSubTitle('La tua mano:'),
+                  const SizedBox(height: 20),
+                  _buildCardCarousel(gameBloc),
+                ]),
+              ),
+            ),
+          );
+        },
       );
 
   /// Builds the subtitles
@@ -75,37 +89,29 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  /// Takes a list of answers and build a horizontal list of card using the [CardAHW] widget.
-  /// Every time a card widget is clicked the method [_selectCard] is called.
-  Widget _buildCardCarousel(List<String> list) => SizedBox(
-        height: 220,
-        child: ListView.builder(
-            itemCount: list.length,
-            shrinkWrap: true,
-            controller: ScrollController(),
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) => CardAHW(
-                onClicked: () => _selectCard(list[index]), text: list[index])),
-      );
-
-  /// Takes the text of the clicked card and if all the cards needed were selected proceeds to redirect the user to the rigth page.
-  /// #### Parameters
-  /// - ``String [text]`` : the text of the card that has been clicked.
-  void _selectCard(String text) {
-    if (GameManager.selectedCards.length == GameManager.answersNeeded) {
-      for (var cardText in GameManager.selectedCards) {
-        widget.random.useCard(cardText);
-      }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: serviceLocator<GameBloc>(),
-            child: CardPage(widget.random),
-          ),
-        ),
-      );
-    }
+  /// Takes the player hand and builds a horizontal list of cards using the [CardAHW] widget.
+  Widget _buildCardCarousel(GameBloc gameBloc) {
+    final hand = gameBloc.gameData.handList;
+    return SizedBox(
+      height: 220,
+      child: ListView.builder(
+        itemCount: hand.length,
+        shrinkWrap: true,
+        controller: ScrollController(),
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          final card = hand.getCardAt(index);
+          final cardText = '${card.id} - ${card.text}';
+          final isSelected = gameBloc.selectedCards.contains(card);
+          return CardAHW(
+            text: cardText,
+            isSelected: isSelected,
+            onClicked: () {
+              context.read<GameBloc>().add(CardClicked(card));
+            },
+          );
+        },
+      ),
+    );
   }
 }

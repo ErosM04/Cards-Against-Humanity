@@ -1,5 +1,4 @@
 import 'package:cards_against_humanity/constants.dart';
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
@@ -14,10 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Page of the player which has to insert the ids of the cards selected by the other players.
 class MasterGamePage extends StatefulWidget {
-  /// The object that manages the logic of the game.
-  final GameManager random;
-
-  const MasterGamePage(this.random, {super.key});
+  const MasterGamePage({super.key});
 
   @override
   State<MasterGamePage> createState() => _MasterGamePageState();
@@ -31,49 +27,88 @@ class _MasterGamePageState extends State<MasterGamePage> {
   final textController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: CustomAppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            onPressed: () => Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const StartPage())),
-          ),
-          score: widget.random.score,
-          maxPoints: widget.random.playedRounds,
-        ),
-        body: SingleChildScrollView(
-          child: Center(
-            child: Column(children: [
-              // Card
-              const SizedBox(height: 30),
-              CardAHW(
-                text: widget.random.question,
-                isClickable: false,
-                isMainCard: true,
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => BlocConsumer<GameBloc, GameState>(
+        listener: (context, state) {
+          if (state is AnswerCardsLoaded) {
+            final gameBloc = context.read<GameBloc>();
+            final answers = state.answers;
+            final expectedCount =
+                gameBloc.cardsToClick * (gameBloc.gameData.totalPlayers - 1);
+
+            if (answers.length == expectedCount) {
+              final answerTexts = List<String>.generate(
+                answers.length,
+                (index) => answers.getCardAt(index).text,
+              );
+
+              if (gameBloc.cardsToClick == 1) {
+                answerTexts.shuffle();
+                setState(() => answerCardList = answerTexts);
+              } else {
+                List<List<String>> bigList = [];
+                for (var i = 0; i < answerTexts.length; i += 2) {
+                  bigList.add([answerTexts[i], answerTexts[i + 1]]);
+                }
+                bigList.shuffle();
+
+                List<String> resultList = [];
+                for (List<String> list in bigList) {
+                  resultList.add('${list[0]}\n\n${list[1]}');
+                }
+                setState(() => answerCardList = resultList);
+              }
+            }
+          }
+        },
+        builder: (context, state) {
+          final gameBloc = context.read<GameBloc>();
+          return Scaffold(
+            appBar: CustomAppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const StartPage())),
               ),
-              const SizedBox(height: 50),
-              // The if is used to show the input field to insert the cards id (when the answer list is empty).
-              // Then after the button is clicked and the answer list isn't empty anymore the list of cards containg the answers
-              // is showed in place of the input field.
-              (answerCardList.isEmpty)
-                  ? _buildCardInputWidgets()
-                  : _buildCardsListWidgets(),
-            ]),
-          ),
-        ),
+              score: gameBloc.gameData.score,
+              maxPoints: gameBloc.gameData.playerRounds,
+            ),
+            body: SingleChildScrollView(
+              child: Center(
+                child: Column(children: [
+                  const SizedBox(height: 30),
+                  CardAHW(
+                    text: gameBloc.currentQuestion?.text ?? '',
+                    isClickable: false,
+                    isMainCard: true,
+                  ),
+                  const SizedBox(height: 50),
+                  (answerCardList.isEmpty)
+                      ? _buildCardInputWidgets(gameBloc)
+                      : _buildCardsListWidgets(),
+                ]),
+              ),
+            ),
+          );
+        },
       );
 
-  /// Read the data from the textfield, converts it into a list of numbers and then use these ids to get the answers and returns a list
-  /// of answers that is save in [answerCardList].
-  void _getAnswerCards() {
+  /// Read the data from the textfield, converts it into a list of numbers and then use these ids to get the answers.
+  void _getAnswerCards(GameBloc gameBloc) {
     String str = textController.text
         .replaceAll(' ', '')
         .replaceAll(',', '')
         .replaceAll('-', '');
 
-    if (str.contains('.') &&
-        (str.split('.').length ==
-            (GameManager.answersNeeded * (widget.random.totalPlayers - 1)))) {
+    final expectedCount =
+        gameBloc.cardsToClick * (gameBloc.gameData.totalPlayers - 1);
+
+    if (str.contains('.') && (str.split('.').length == expectedCount)) {
       final splitArr = str.split('.');
 
       // If data inserted aren't numbers the function stops
@@ -86,56 +121,29 @@ class _MasterGamePageState extends State<MasterGamePage> {
 
       // Notify BLoC of requested answer card IDs
       context.read<GameBloc>().add(AnswerCardsRequested(ids: cardIds));
-
-      // Converts the array of number into an array with the corresponding answer
-      final List<String> answerList = widget.random.getRespectiveText(cardIds);
-
-      if (answerList.length ==
-          (GameManager.answersNeeded * (widget.random.totalPlayers - 1))) {
-        // True if only 1 answer per player is requested
-        if (answerList.length == (widget.random.totalPlayers - 1)) {
-          answerList.shuffle();
-          setState(() => answerCardList = answerList);
-        } else {
-          List<List<String>> bigList = [];
-          for (var i = 0; i < answerList.length; i += 2) {
-            bigList.add([answerList[i], answerList[i + 1]]);
-          }
-
-          bigList.shuffle();
-
-          List<String> resultList = [];
-          for (List<String> list in bigList) {
-            for (var i = 0; i < list.length; i += 2) {
-              resultList.add('${list[i]}\n\n${list[i + 1]}');
-            }
-          }
-          setState(() => answerCardList = resultList);
-        }
-      }
     }
   }
 
-  /// Goes to the normal Game page.
+  /// Goes to the next round.
   void _goToNewRound() {
-    // As the cards can be clicked, they alter the list of selectedCards, so here is cleared
-    GameManager.selectedCards.clear();
-    widget.random.fillHand();
-    widget.random.drawQuestionCard();
-    context.read<GameBloc>().add(const StartRound(isMaster: false));
+    final gameBloc = context.read<GameBloc>();
+    final nextRound = gameBloc.gameData.totalRounds + 1;
+    final isNextMaster = gameBloc.gameData.isMasterForRound(nextRound);
+
+    gameBloc.add(StartRound(isMaster: isNextMaster));
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider.value(
           value: serviceLocator<GameBloc>(),
-          child: GamePage(widget.random),
+          child: isNextMaster ? const MasterGamePage() : const GamePage(),
         ),
       ),
     );
   }
 
   /// Builds the set of widgets used to take the cards id as input, to later save them into ``[answerCardList]``.
-  Widget _buildCardInputWidgets() => Column(
+  Widget _buildCardInputWidgets(GameBloc gameBloc) => Column(
         children: [
           _buildSubTitle('Inserisci i numeri delle carte:', fontSize: 22),
           _buildSubTitle(
@@ -150,7 +158,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
           ),
           _buildButton(
             text: 'Mostra carte',
-            onPressed: () => _getAnswerCards(),
+            onPressed: () => _getAnswerCards(gameBloc),
           ),
         ],
       );

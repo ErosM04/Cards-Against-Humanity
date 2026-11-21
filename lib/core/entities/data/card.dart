@@ -8,4 +8,15 @@ abstract class CardAH {
   final String text;
 
   const CardAH({required this.id, required this.text});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CardAH &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          text == other.text;
+
+  @override
+  int get hashCode => id.hashCode ^ text.hashCode;
 }

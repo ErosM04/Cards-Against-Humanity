@@ -1,4 +1,3 @@
-import 'package:cards_against_humanity/core/gamelogic/logic.dart';
 import 'package:flutter/material.dart';
 
 /// Widget used to create the card widget, for answers, questions and both together.
@@ -11,7 +10,7 @@ class CardAHW extends StatefulWidget {
   final bool isClickable;
 
   /// The function to call if [isClickable] is true and the card is clicked.
-  final Function? onClicked;
+  final VoidCallback? onClicked;
 
   /// If this is true, this card has colored border to highlight its importance.
   final bool isMainCard;
@@ -20,6 +19,9 @@ class CardAHW extends StatefulWidget {
   /// If empty only shows the text of the question.
   final List<String> answersList;
 
+  /// If this card is currently selected.
+  final bool isSelected;
+
   const CardAHW({
     super.key,
     required this.text,
@@ -27,6 +29,7 @@ class CardAHW extends StatefulWidget {
     this.onClicked,
     this.isMainCard = false,
     this.answersList = const [],
+    this.isSelected = false,
   });
 
   @override
@@ -35,32 +38,31 @@ class CardAHW extends StatefulWidget {
 
 class _CardAHWState extends State<CardAHW>
     with AutomaticKeepAliveClientMixin<CardAHW> {
-  bool isClicked = false;
-
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final isCardActive = widget.isClickable && widget.isSelected;
     return Padding(
       padding: EdgeInsets.symmetric(
           vertical: 10, horizontal: (widget.isMainCard) ? 30 : 10),
       child: Container(
         width: (widget.isMainCard) ? double.infinity : 200,
         decoration: BoxDecoration(
-          color: (widget.isClickable && isClicked)
+          color: isCardActive
               ? Theme.of(context).colorScheme.primary
               : Colors.transparent,
           border: Border.all(
             color: (widget.isMainCard)
                 ? (widget.isClickable)
-                    ? (isClicked)
+                    ? (isCardActive)
                         ? Theme.of(context).colorScheme.secondary
                         : Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.primary
                 : (widget.isClickable)
-                    ? (isClicked)
+                    ? (isCardActive)
                         ? Theme.of(context).colorScheme.secondary
                         : Colors.white
                     : Colors.white,
@@ -68,11 +70,11 @@ class _CardAHWState extends State<CardAHW>
           borderRadius: BorderRadius.circular(20),
         ),
         child: GestureDetector(
-          onTap: () => (widget.isClickable) ? _isClicked() : null,
+          onTap: () => widget.isClickable ? widget.onClicked?.call() : null,
           child: Padding(
             padding: EdgeInsets.symmetric(
                 vertical: (widget.isMainCard) ? 40 : 30, horizontal: 20),
-            child: _buildCustomText(),
+            child: _buildCustomText(isCardActive),
           ),
         ),
       ),
@@ -84,13 +86,13 @@ class _CardAHWState extends State<CardAHW>
   /// Otherwise returns a ``[Text]`` using the text parameter.
   ///
   /// Both cases the widget is enclosed in a ``[SingleChildScrollView]`` to scroll the text if it's too long.
-  Widget _buildCustomText() => SingleChildScrollView(
+  Widget _buildCustomText(bool isCardActive) => SingleChildScrollView(
         child: (widget.answersList.isEmpty)
             ? Text(widget.text,
                 textAlign: TextAlign.start,
                 style: TextStyle(
                   fontSize: (widget.isMainCard) ? 20 : 17,
-                  color: (widget.isClickable && isClicked)
+                  color: isCardActive
                       ? Theme.of(context).colorScheme.tertiary
                       : Colors.white,
                 ))
@@ -164,22 +166,6 @@ class _CardAHWState extends State<CardAHW>
 
   /// Builds a custom ``[TextSpan]`` which uses the color of the scheme (used for answers).
   TextSpan _buildCustomAnswerText(String text) => TextSpan(
-      text: text.split(' - ')[1],
+      text: text.contains(' - ') ? text.split(' - ')[1] : text,
       style: TextStyle(color: Theme.of(context).colorScheme.secondary));
-
-  /// If it's activated (``[isClicked]`` is true) the aspect is changed, the card is added to the list in [GameManager]
-  /// and the parameter method is called.
-  void _isClicked() {
-    if (isClicked) {
-      // Removes the card from the selected card list
-      GameManager.selectedCards.remove(widget.text);
-      setState(() => isClicked = !isClicked);
-    } else if (GameManager.selectedCards.length < GameManager.answersNeeded) {
-      // Adds the card to the selected card list (if there is space for it)
-      setState(() => isClicked = !isClicked);
-      GameManager.selectedCards.add(widget.text);
-
-      if (widget.onClicked != null) widget.onClicked!();
-    }
-  }
 }

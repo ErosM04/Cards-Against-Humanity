@@ -1,6 +1,8 @@
 import 'package:cards_against_humanity/constants.dart';
+import 'package:cards_against_humanity/core/entities/data/answer.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/card.dart';
+import 'package:cards_against_humanity/core/entities/data/question.dart';
 import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_answer.dart';
 import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_question.dart';
 import 'package:cards_against_humanity/features/game/domain/usecases/retrive_answers.dart';
@@ -25,11 +27,29 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   GameData get gameData => _gameData;
 
+  /// The question card of the current round.
+  Question? _currentQuestion;
+
+  /// The question card of the current round.
+  Question? get currentQuestion => _currentQuestion;
+
+  /// List of answers selected by the player in the current round.
+  final List<Answer> _selectedCards = [];
+
+  /// List of answers selected by the player in the current round.
+  List<Answer> get selectedCards => List.unmodifiable(_selectedCards);
+
   /// The amount of answer cards to click to complete the question (1 or 2).
   int _cardsToClick = 1;
 
+  /// The amount of answer cards to click to complete the question (1 or 2).
+  int get cardsToClick => _cardsToClick;
+
   /// The answer cards clicked till now.
   int _clickedCards = 0;
+
+  /// The answer cards clicked till now.
+  int get clickedCards => _clickedCards;
 
   /// The variable used to save the first card clicked, in case 2 cards are required ([_cardsToClick] = 2).
   CardAH? _firstCard;
@@ -54,6 +74,11 @@ class GameBloc extends Bloc<GameEvent, GameState> {
           (answer) => hand.addCard(answer));
     }
 
+    GameData.resetState(
+      playerNumber: playerNumber,
+      totalPlayers: totalPlayers,
+      hand: hand,
+    );
     _gameData = GameData(
       playerNumber: playerNumber,
       totalPlayers: totalPlayers,
@@ -64,12 +89,21 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<StartRound>(_roundStart);
     on<AnswerCardsRequested>(_answerCardRequested);
     on<CardClicked>(_clickedCard);
-    on<RoundWon>((event, emit) => _gameData.incrementScore());
-    on<RoundLost>((event, emit) {});
+    on<RoundWon>((event, emit) {
+      _gameData.incrementScore();
+      _selectedCards.clear();
+    });
+    on<RoundLost>((event, emit) {
+      _selectedCards.clear();
+    });
   }
 
   /// Draws missing cards to complete hand until it contains [handLength] cards.
   void _roundStart(StartRound event, Emitter<GameState> emit) {
+    _selectedCards.clear();
+    _clickedCards = 0;
+    _firstCard = null;
+
     if (event.isMaster) {
       _gameData.newRoundAsMaster();
     } else {
@@ -80,13 +114,14 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     questionRes.fold(
       (fail) => emit(LoadFailure()),
       (question) {
+        _currentQuestion = question;
         _cardsToClick = question.answerNeeded;
-        _clickedCards = 0;
-        _firstCard = null;
       },
     );
 
-    for (var i = 0; i < handLength; i++) {
+    // Refill hand up to handLength (10)
+    final missingCards = handLength - _gameData.handList.length;
+    for (var i = 0; i < missingCards; i++) {
       final res = _drawNextAnswer(DrawAnswerParams(
         totalPlayers: _gameData.totalPlayers,
         playerNumber: _gameData.playerNumber,
@@ -110,18 +145,38 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _clickedCard(CardClicked event, Emitter<GameState> emit) {
-    _clickedCards++;
+    final answer = event.card is Answer
+        ? event.card as Answer
+        : Answer(id: event.card.id, text: event.card.text);
+
+    // If card was already selected, deselect it
+    if (_selectedCards.contains(answer)) {
+      _selectedCards.remove(answer);
+      _clickedCards = _selectedCards.length;
+      _firstCard = _selectedCards.isNotEmpty ? _selectedCards.first : null;
+      emit(RoundReady());
+      return;
+    }
+
+    _selectedCards.add(answer);
+    _clickedCards = _selectedCards.length;
 
     if (_clickedCards == 1) {
-      _firstCard = event.card;
+      _firstCard = answer;
     }
 
     if (_clickedCards == _cardsToClick) {
-      if (_cardsToClick == 1) {
-        emit(FirstCardCliked(card: event.card));
-      } else {
-        emit(SecondCardCliked(card1: _firstCard!, card2: event.card));
+      // Remove used cards from hand
+      for (final card in _selectedCards) {
+        _gameData.removeAnswerCard(card);
       }
+      if (_cardsToClick == 1) {
+        emit(FirstCardCliked(card: answer));
+      } else {
+        emit(SecondCardCliked(card1: _firstCard!, card2: answer));
+      }
+    } else {
+      emit(RoundReady());
     }
   }
 }
