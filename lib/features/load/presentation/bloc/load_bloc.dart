@@ -3,7 +3,7 @@ import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_answers.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_questions.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'load_event.dart';
