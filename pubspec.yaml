@@ -24,6 +24,9 @@ dependencies:
   path_provider: 
   dio: 
   info_popup: 
+  flutter_bloc:
+  fpdart: 
+  get_it: 
 
 
 dev_dependencies:
