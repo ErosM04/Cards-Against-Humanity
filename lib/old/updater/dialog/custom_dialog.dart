@@ -1,4 +1,4 @@
-import 'package:cards_against_humanity/old/view/components/button.dart';
+import 'package:cards_against_humanity/core/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 

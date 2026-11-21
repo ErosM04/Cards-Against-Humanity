@@ -1,7 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:info_popup/info_popup.dart';
 
-/// Displays an ⓘ icon which can be clicked to show a popup box containg some text.
+/// Displays an ⓘ icon which can be clicked to show a popup box containing some text.
 class GameInfo extends StatelessWidget {
   /// The text to display inside the popup box, displayed when the object is clicked.
   final String infoText;

@@ -4,10 +4,10 @@ import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc
 import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
 import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
 import 'package:cards_against_humanity/init_dependencies.dart';
-import 'package:cards_against_humanity/old/view/components/appbar.dart';
-import 'package:cards_against_humanity/old/view/components/button.dart';
-import 'package:cards_against_humanity/old/view/components/card.dart';
-import 'package:cards_against_humanity/old/view/components/info.dart';
+import 'package:cards_against_humanity/core/widgets/appbar.dart';
+import 'package:cards_against_humanity/core/widgets/button.dart';
+import 'package:cards_against_humanity/core/widgets/card.dart';
+import 'package:cards_against_humanity/core/widgets/info.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

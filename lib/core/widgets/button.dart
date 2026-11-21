@@ -6,7 +6,7 @@ class CustomButton extends StatelessWidget {
   final String text;
 
   /// The function to call after the button is pressed.
-  final Function onPressed;
+  final VoidCallback onPressed;
 
   /// The color of the button, if no value is provided the color chosen is the first of the theme.
   final Color? color;
@@ -14,10 +14,10 @@ class CustomButton extends StatelessWidget {
   /// The color of the [text], default is black.
   final Color? textColor;
 
-  /// The interal vertical padding of the text.
+  /// The internal vertical padding of the text.
   final double verticalInternalPadding;
 
-  /// The interal horizontal padding of the text.
+  /// The internal horizontal padding of the text.
   final double horizontalInternalPadding;
 
   /// The size of [text].
@@ -37,7 +37,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ElevatedButton(
         style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(color)),
-        onPressed: () => onPressed(),
+        onPressed: onPressed,
         child: Padding(
           padding: EdgeInsets.symmetric(
             vertical: verticalInternalPadding,
