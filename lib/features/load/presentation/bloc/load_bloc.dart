@@ -3,7 +3,7 @@ import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_answers.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_questions.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'load_event.dart';
@@ -24,13 +24,16 @@ class LoadBloc extends Bloc<LoadEvent, LoadState> {
         _loadAnswers = loadAnswers,
         super(LoadInitial()) {
     on<LoadQuestionsStart>(_loadQuestionsStart);
-    on<LoadAnswersStart>(loadAnswersStart);
+    on<LoadAnswersStart>(_loadAnswersStart);
   }
 
   /// Immediatly sets the state as [LoadInProgress] and then proceeds to use [_loadQuestions] to load the
   /// response, than `fold` method is used to either emit a [LoadQuestionsFailure] or a [LoadQuestionsCompleted],
   /// which takes the [QuestionList] of the result, containg the question cards content.
-  FutureOr<void> _loadQuestionsStart(event, emit) async {
+  FutureOr<void> _loadQuestionsStart(
+    LoadQuestionsStart event,
+    Emitter<LoadState> emit,
+  ) async {
     emit(LoadInProgress());
 
     final questionsRes = await _loadQuestions();
@@ -44,7 +47,10 @@ class LoadBloc extends Bloc<LoadEvent, LoadState> {
   /// Immediatly sets the state as [LoadInProgress] and then proceeds to use [_loadAnswers] to load the
   /// response, than `fold` method is used to either emit a [LoadAnswersFailure] or a [LoadAnswersCompleted],
   /// which takes the [AnswerList] of the result, containg the answer cards content.
-  FutureOr<void> loadAnswersStart(event, emit) async {
+  FutureOr<void> _loadAnswersStart(
+    LoadAnswersStart event,
+    Emitter<LoadState> emit,
+  ) async {
     emit(LoadInProgress());
 
     final answersRes = await _loadAnswers();
