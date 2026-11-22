@@ -328,3 +328,7 @@ To facilitate subsequent refactoring steps, be aware of the following transition
    - Deleted `lib/old/view/` completely and updated all page and dialog imports.
 10. **main.dart ThemeData Alignment [RESOLVED]**:
     - Aligned `core/theme/theme.dart` with `material_ui` to ensure consistent `ThemeData` typing for `MaterialApp` in [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart), resolving the analyzer error.
+11. **Gradle 9+ Configuration & Project Dependency Notation [RESOLVED]**:
+    - Solved the Gradle deprecation warning reported in `android/build/reports/problems/problems-report.html` (`using-a-project-object-as-a-dependency-notation` scheduled to fail in Gradle 10) by updating plugin dependency injection in the Flutter Gradle tool to use `project.dependencies.project(mapOf("path" to pluginProject.path))` instead of passing raw `Project` objects.
+    - Updated [build.gradle](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/app/build.gradle) to modern AGP properties (`compileSdk`, `minSdk`, `targetSdk`, and Java 17 compatibility).
+    - Resolved merge conflict markers in [gradle-wrapper.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle/wrapper/gradle-wrapper.properties) and disabled deprecated `android.enableJetifier` in [gradle.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle.properties).
