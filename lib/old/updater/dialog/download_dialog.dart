@@ -1,5 +1,5 @@
 import 'package:cards_against_humanity/old/updater/downloader.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A [Dialog] that uses **[DownloadManager]** to show [CircularProgressIndicator] (with the percentage) start and keep
 /// progress of a download.

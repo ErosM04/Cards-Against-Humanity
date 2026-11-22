@@ -4,7 +4,7 @@ import 'package:cards_against_humanity/old/updater/dialog/download_dialog.dart';
 import 'package:cards_against_humanity/old/updater/installer.dart';
 import 'package:cards_against_humanity/old/updater/permission.dart';
 import 'package:cards_against_humanity/old/updater/snackbar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

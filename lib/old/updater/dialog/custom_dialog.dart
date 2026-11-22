@@ -1,5 +1,5 @@
 import 'package:cards_against_humanity/core/widgets/button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 /// Creates a custom [Dialog].

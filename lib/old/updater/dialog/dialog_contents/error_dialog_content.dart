@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:cards_against_humanity/old/updater/dialog/dialog_contents/dialog_content.dart';
 
 /// Overrides [DialogContent] to create a content to display inside an ``[ErrorDialogContent]``.

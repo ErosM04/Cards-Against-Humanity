@@ -3,7 +3,7 @@ import 'package:cards_against_humanity/old/updater/permission.dart';
 import 'package:cards_against_humanity/old/updater/snackbar.dart';
 import 'package:cards_against_humanity/old/updater/dialog/dialog_builders/error_dialog_builder.dart';
 import 'package:cards_against_humanity/old/updater/dialog/dialog_contents/error_dialog_content.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:cards_against_humanity/old/updater/updater.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:open_file_plus/open_file_plus.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:cards_against_humanity/old/updater/dialog/custom_dialog.dart';
 import 'package:cards_against_humanity/old/updater/dialog/dialog_builders/dialog_builder.dart';
 import 'package:cards_against_humanity/old/updater/dialog/dialog_contents/update_dialog_content.dart';
