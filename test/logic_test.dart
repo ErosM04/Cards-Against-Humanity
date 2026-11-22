@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:csv/csv.dart';
 import 'package:material_ui/material_ui.dart';
@@ -9,13 +10,13 @@ void main() {
     'Analize answers drawing',
     () => _ciapa().then(
       (value) {
-        // print((value[0][0] as String).length);
-        List<String> answers = [];
-        for (var answer in (value[0][0] as String).split('\n')) {
-          answers.add(answer);
+        List<String> answers = value
+            .map((row) => row.isNotEmpty ? row[0].toString() : '')
+            .where((text) => text.trim().isNotEmpty)
+            .toList();
+        if (answers.isNotEmpty) {
+          _salame(answers);
         }
-        // print(answers);
-        _salame(answers);
       },
     ),
   );
@@ -43,6 +44,11 @@ void main() {
 // ----------- TESTING DRAW -----------------
 
 Future<List<List>> _ciapa() async {
+  final file = File('assets/csv/answers.csv');
+  if (file.existsSync()) {
+    return const CsvDecoder(fieldDelimiter: ';', dynamicTyping: false)
+        .convert(await file.readAsString());
+  }
   // row added to initialize Binding for test pourpose
   WidgetsFlutterBinding.ensureInitialized();
   return const CsvDecoder(fieldDelimiter: ';', dynamicTyping: false).convert(
@@ -81,7 +87,9 @@ void _salame(List<String> list) {
       // }
     }
   }
-  avgScartiPos = (avgScartiPos / contatoreScartiPositivi).round();
+  if (contatoreScartiPositivi > 0) {
+    avgScartiPos = (avgScartiPos / contatoreScartiPositivi).round();
+  }
   // print('---------------------------------------');
   // print('Avg scarti pos: $avgScartiPos');
   // print('---------------------------------------');
