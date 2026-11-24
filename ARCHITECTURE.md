@@ -116,8 +116,6 @@ The refactored architecture strictly enforces the **S.O.L.I.D.** object-oriented
 
 ## 3. Directory & File Scheme (`lib/`)
 
-*(Excluding `lib/old`, which contains legacy UI components and the GitHub APK auto-updater).*
-
 ```
 lib/
 ├── constants.dart
@@ -176,32 +174,61 @@ lib/
     │       └── page/
     │           └── start_page.dart
     │
-    └── game/
+    ├── game/
+    │   ├── data/
+    │   │   ├── datasources/
+    │   │   │   ├── rand_card_source.dart
+    │   │   │   ├── rand_question_source.dart
+    │   │   │   └── rand_answer_source.dart
+    │   │   └── repository/
+    │   │       └── game_repo_impl.dart
+    │   ├── domain/
+    │   │   ├── repository/
+    │   │   │   └── game_repository.dart
+    │   │   └── usecases/
+    │   │       ├── draw_next_question.dart
+    │   │       ├── draw_next_answer.dart
+    │   │       └── retrive_answers.dart
+    │   └── presentation/
+    │       ├── bloc/
+    │       │   ├── game_bloc.dart
+    │       │   ├── game_data.dart
+    │       │   ├── game_event.dart
+    │       │   └── game_state.dart
+    │       └── pages/
+    │           ├── start_page.dart  (handled in features/load)
+    │           ├── game_page.dart
+    │           ├── card_page.dart
+    │           └── master_page.dart
+    │
+    └── update/
         ├── data/
         │   ├── datasources/
-        │   │   ├── rand_card_source.dart
-        │   │   ├── rand_question_source.dart
-        │   │   └── rand_answer_source.dart
+        │   │   ├── update_local_datasource.dart
+        │   │   └── update_remote_datasource.dart
+        │   ├── models/
+        │   │   └── app_release_model.dart
         │   └── repository/
-        │       └── game_repo_impl.dart
+        │       └── update_repository_impl.dart
         ├── domain/
+        │   ├── entities/
+        │   │   └── app_release.dart
         │   ├── repository/
-        │   │   └── game_repository.dart
+        │   │   └── update_repository.dart
         │   └── usecases/
-        │       ├── draw_next_question.dart
-        │       ├── draw_next_answer.dart
-        │       └── retrive_answers.dart
+        │       ├── check_for_update.dart
+        │       ├── download_apk.dart
+        │       ├── install_apk.dart
+        │       ├── manage_update_permission.dart
+        │       └── pick_and_install_apk.dart
         └── presentation/
             ├── bloc/
-            │   ├── game_bloc.dart
-            │   ├── game_data.dart
-            │   ├── game_event.dart
-            │   └── game_state.dart
-            └── pages/
-                ├── start_page.dart  (handled in features/load)
-                ├── game_page.dart
-                ├── card_page.dart
-                └── master_page.dart
+            │   ├── update_bloc.dart
+            │   ├── update_event.dart
+            │   └── update_state.dart
+            └── widgets/
+                ├── update_dialog.dart
+                └── update_listener.dart
 ```
 
 ---
@@ -209,9 +236,9 @@ lib/
 ## 4. File-by-File Responsibility Breakdown
 
 ### Root Directory
-- [constants.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/constants.dart): Application-wide constants including strings (name, UI instructions/hints in Italian), boundaries (`minPlayers = 3`, `maxPlayers = 20`), and rule parameters (`handLength = 10`).
-- [init_dependencies.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/init_dependencies.dart): Dependency injection registry using `GetIt`. Registers data providers, data sources, repositories, use cases, and BLoC singletons.
-- [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart): Application entry point. Invokes `initDependencies()`, sets up `MultiBlocProvider` (currently providing `LoadBloc`), sets `appTheme`, and boots to `StartPage`.
+- [constants.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/constants.dart): Application-wide constants including strings (name, UI instructions/hints in Italian), boundaries (`minPlayers = 3`, `maxPlayers = 20`), rule parameters (`handLength = 10`), and release/update endpoints (`appVersion`, `githubLatestReleaseUrl`, `githubReleasesPageUrl`, `githubLatestApkUrl`).
+- [init_dependencies.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/init_dependencies.dart): Dependency injection registry using `GetIt`. Registers data providers, data sources, repositories, use cases, and BLoC singletons (`LoadBloc`, `UpdateBloc`, and session-scoped `GameBloc`).
+- [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart): Application entry point. Invokes `initDependencies()`, sets up `MultiBlocProvider` (providing `LoadBloc` and `UpdateBloc`), sets `appTheme`, and boots to `StartPage`.
 
 ---
 
@@ -296,6 +323,33 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 
 ---
 
+### Feature 3: Update (`lib/features/update/`)
+Responsible for checking GitHub Releases for newer app versions, prompting the user, requesting required Android storage/install permissions, downloading the APK with live progress, launching package installation, and offering manual `.apk` file picking if installation fails.
+
+#### Data Layer
+- [app_release_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/models/app_release_model.dart): `AppReleaseModel` extending `AppRelease` with `.fromJson()` deserialization for GitHub's latest release JSON payload.
+- [update_remote_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/datasources/update_remote_datasource.dart): `UpdateRemoteDataSource` interface and `UpdateRemoteDataSourceImpl` fetching release metadata via `http.Client` and streaming APK downloads via `Dio` with progress callbacks.
+- [update_local_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/datasources/update_local_datasource.dart): `UpdateLocalDataSource` interface and `UpdateLocalDataSourceImpl` handling download directory resolution, collision-safe `.apk` naming, `permission_handler` checks/requests (`manageExternalStorage`, `requestInstallPackages`), `OpenFilex.open()` APK launching, and `FilePicker.pickFile()` manual `.apk` selection.
+- [update_repository_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/repository/update_repository_impl.dart): Implements `UpdateRepository`. Compares release version/draft flags against `appVersion`, coordinates remote/local datasources, and maps exceptions/installer failures into `Either<Failure, ...>` (`UpdateInstallFailure`, `UpdatePermissionFailure`, `Failure`).
+
+#### Domain Layer
+- [app_release.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/entities/app_release.dart): `AppRelease` domain entity holding version, changelog body, draft status, download URL, and release URL.
+- [update_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/repository/update_repository.dart): Domain contract (`UpdateRepository`) and `UpdatePermission` enum (`externalStorage`, `installPackages`).
+- [check_for_update.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/check_for_update.dart): Use case checking whether a newer non-draft release exists.
+- [download_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/download_apk.dart): Use case downloading the release APK with progress callback via `DownloadApkParams`.
+- [install_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/install_apk.dart): Use case launching the OS package installer for a downloaded APK path.
+- [manage_update_permission.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/manage_update_permission.dart): Use case checking and requesting `UpdatePermission` grants.
+- [pick_and_install_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/pick_and_install_apk.dart): Use case triggering the manual `.apk` file picker fallback and installer.
+
+#### Presentation Layer
+- [update_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_bloc.dart): `UpdateBloc` orchestrating check, permission prompt delays, download progress emissions, automatic install handoff, and manual APK fallback.
+- [update_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_event.dart): Sealed events (`UpdateCheckRequested`, `UpdateDeclined`, `UpdateDownloadRequested`, `UpdateInstallRequested`, `UpdateManualInstallRequested`).
+- [update_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_state.dart): Sealed states (`UpdateInitial`, `UpdateUpToDate`, `UpdateAvailable`, `UpdateDownloadInProgress`, `UpdateDownloadCompleted`, `UpdateDownloadFailed`, `UpdateInstallCompleted`, `UpdateInstallFailed`, `UpdateNotice`).
+- [update_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_dialog.dart): Shared `AppAlertDialog`, `UpdatePromptDialog` (with safe GitHub release notes parsing), `DownloadProgressDialog` (reactive via `BlocBuilder<UpdateBloc, UpdateState>`), and `InstallErrorDialog`.
+- [update_listener.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_listener.dart): `UpdateListener` wrapping `StartPage` to present animated update/error dialogs, live download modal, and SnackBars from `UpdateBloc` states without leaking `BuildContext` into BLoC.
+
+---
+
 ## 5. Current Refactoring State & Known Technical Debt
 
 To facilitate subsequent refactoring steps, be aware of the following transitional state:
@@ -332,3 +386,7 @@ To facilitate subsequent refactoring steps, be aware of the following transition
     - Solved the Gradle deprecation warning reported in `android/build/reports/problems/problems-report.html` (`using-a-project-object-as-a-dependency-notation` scheduled to fail in Gradle 10) by updating plugin dependency injection in the Flutter Gradle tool to use `project.dependencies.project(mapOf("path" to pluginProject.path))` instead of passing raw `Project` objects.
     - Updated [build.gradle](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/app/build.gradle) to modern AGP properties (`compileSdk`, `minSdk`, `targetSdk`, and Java 17 compatibility).
     - Resolved merge conflict markers in [gradle-wrapper.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle/wrapper/gradle-wrapper.properties) and disabled deprecated `android.enableJetifier` in [gradle.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle.properties).
+12. **GitHub Auto-Updater Refactoring (`lib/old/updater` -> `lib/features/update`) [RESOLVED]**:
+    - Refactored legacy `Updater`, `DownloadManager`, `Installer`, `PermissionManager`, `SnackBarMessage`, and the 7-class `DialogBuilder`/`DialogContent` hierarchy into Clean Architecture layers + `UpdateBloc` under `lib/features/update/`.
+    - Replaced `open_file_plus` with `open_filex` and updated `file_picker` calls to `FilePicker.pickFile(...)` (`file_picker` v13+).
+    - Fixed edge cases in safe GitHub markdown link stripping and collision-free `.apk` filename resolution, wired `UpdateBloc` via `initDependencies()` / `MultiBlocProvider` / `UpdateListener` on `StartPage`, and deleted `lib/old/` completely.
