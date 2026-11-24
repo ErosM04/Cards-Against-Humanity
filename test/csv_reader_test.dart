@@ -3,6 +3,7 @@ import 'package:cards_against_humanity/core/models/question_list_model.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Runs CSV parsing and model conversion tests for questions and answers.
 void main() {
   test('CsvDecoder parses question rows with semicolon delimiter and dynamic typing', () {
     const raw = '________ : testato dai bambini.;1\n________ . Perfetto per ________ !;2\n';

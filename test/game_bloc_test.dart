@@ -12,6 +12,7 @@ import 'package:cards_against_humanity/features/game/domain/usecases/retrive_ans
 import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Runs unit tests for [GameBloc] hand setup, round lifecycle, and turn rotation.
 void main() {
   late GameBloc bloc;
   late QuestionListModel questions;

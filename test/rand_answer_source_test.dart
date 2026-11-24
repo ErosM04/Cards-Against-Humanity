@@ -9,6 +9,7 @@ import 'package:cards_against_humanity/features/game/data/repository/game_repo_i
 import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_answer.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Runs unit tests for synchronized PRNG card skipping in [RandomAnswersSource].
 void main() {
   group('RandomAnswersSource card skipping', () {
     late AnswerListModel answerList;

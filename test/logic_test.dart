@@ -5,17 +5,18 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// Runs statistical checks on answer card draws and PRNG seed distribution.
 void main() {
   test(
     'Analize answers drawing',
-    () => _ciapa().then(
+    () => _loadAnswers().then(
       (value) {
         List<String> answers = value
             .map((row) => row.isNotEmpty ? row[0].toString() : '')
             .where((text) => text.trim().isNotEmpty)
             .toList();
         if (answers.isNotEmpty) {
-          _salame(answers);
+          _evalueateDrawFrequency(answers);
         }
       },
     ),
@@ -27,7 +28,7 @@ void main() {
     'Verify seed behavior in Random',
     () {
       // print('Campione seed: 0-1000');
-      lerciume(firstSeed: 0, lastSeed: 1000);
+      simulatesDraws(firstSeed: 0, lastSeed: 1000);
 
       for (var i = 0; i < 10; i++) {
         int lower = pow(10, i + 5).round();
@@ -35,7 +36,7 @@ void main() {
 
         // print('------------------');
         // print('Campione seed: $lower-$higher');
-        lerciume(firstSeed: lower, lastSeed: higher);
+        simulatesDraws(firstSeed: lower, lastSeed: higher);
       }
     },
   );
@@ -43,7 +44,8 @@ void main() {
 
 // ----------- TESTING DRAW -----------------
 
-Future<List<List>> _ciapa() async {
+/// Loads answer CSV rows from disk or the Flutter asset bundle.
+Future<List<List>> _loadAnswers() async {
   final file = File('assets/csv/answers.csv');
   if (file.existsSync()) {
     return const CsvDecoder(fieldDelimiter: ';', dynamicTyping: false)
@@ -51,11 +53,12 @@ Future<List<List>> _ciapa() async {
   }
   // row added to initialize Binding for test pourpose
   WidgetsFlutterBinding.ensureInitialized();
-  return const CsvDecoder(fieldDelimiter: ';', dynamicTyping: false).convert(
-      await rootBundle.loadString("assets/csv/answers.csv"));
+  return const CsvDecoder(fieldDelimiter: ';', dynamicTyping: false)
+      .convert(await rootBundle.loadString("assets/csv/answers.csv"));
 }
 
-void _salame(List<String> list) {
+/// Evaluates positive draw-frequency deviations across repeated seeds for [list].
+void _evalueateDrawFrequency(List<String> list) {
   // print(list.length);
   List<int> numeri = List.filled(list.length, 0);
   for (var i = 1; i < 100000; i++) {
@@ -100,16 +103,12 @@ void _salame(List<String> list) {
       moltoPresenti.add([i + 1, (numeri[i] - avg)]);
     }
   }
-  // for (var element in moltoPresenti) {
-  // print(
-  //     'Pos: ${element[0]} - Occ: ${element[1]} -\tFrase: ${list[element[0] - 1]}');
-  // }
-  // print('tot: ${moltoPresenti.length}');
 }
 
-// ----------- TESTING RANDOM CON SBORRA (SEED) -----------------
+// ----------- TESTING VARIOUS DRAWS PER VARIOUS SEEDS -----------------
 
-void lerciume({
+/// Simulates [drawPerSeed] random draws per seed from [firstSeed] up to [lastSeed] (excluded).
+void simulatesDraws({
   required int firstSeed,
   required int lastSeed,
   int numberOfOutcome = 800,
@@ -123,12 +122,4 @@ void lerciume({
       numeri[Random(i).nextInt(numeri.length)]++;
     }
   }
-
-  // double deviazStd = 0;
-  // for (var element in numeri) {
-  //   deviazStd += pow(element - avg, 2);
-  // }
-
-  // print('varianza: ${(deviazStd / lastSeed).toStringAsFixed(2)}');
-  // print('sqm: ${sqrt(deviazStd / lastSeed).toStringAsFixed(2)}');
 }
