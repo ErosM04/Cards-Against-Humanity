@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import '../test/utils/fake_update_repo.dart';
 import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/features/update/data/datasources/update_local_datasource.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_release.dart';
-import 'package:cards_against_humanity/features/update/domain/repository/update_repository.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
@@ -14,68 +14,22 @@ import 'package:cards_against_humanity/features/update/presentation/widgets/upda
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 
-class _FakeUpdateRepository implements UpdateRepository {
-  Either<Failure, AppRelease?> checkResult = right(null);
-  bool storageGranted = true;
-  bool installGranted = true;
-  Either<Failure, String> downloadResult = right('/tmp/Cards_Against_Humanity.apk');
-  Either<Failure, Unit> installResult = right(unit);
-  Either<Failure, Unit> pickResult = right(unit);
-  List<double> reportedProgress = [0.5, 1.0];
-
-  @override
-  Future<Either<Failure, AppRelease?>> checkForUpdate() async => checkResult;
-
-  @override
-  Future<bool> hasPermission(UpdatePermission permission) async =>
-      permission == UpdatePermission.externalStorage
-          ? storageGranted
-          : installGranted;
-
-  @override
-  Future<Either<Failure, bool>> requestPermission(
-    UpdatePermission permission,
-  ) async =>
-      right(
-        permission == UpdatePermission.externalStorage
-            ? storageGranted
-            : installGranted,
-      );
-
-  @override
-  Future<Either<Failure, String>> downloadApk({
-    required String url,
-    required String fileName,
-    void Function(double progress)? onProgress,
-  }) async {
-    for (final p in reportedProgress) {
-      onProgress?.call(p);
-    }
-    return downloadResult;
-  }
-
-  @override
-  Future<Either<Failure, Unit>> installApk(String apkPath) async =>
-      installResult;
-
-  @override
-  Future<Either<Failure, Unit>> pickAndInstallApk() async => pickResult;
-}
-
+/// Runs unit tests for [UpdateBloc], APK naming, and release markdown parsing.
 void main() {
-  late _FakeUpdateRepository repo;
+  late FakeUpdateRepository repo;
   late UpdateBloc bloc;
 
   const sampleRelease = AppRelease(
     version: '0.3.0',
-    description: '### Funzionalità\n- Nuova grafica\n### Bug fixes\n- Fix crash',
+    description:
+        '### Funzionalità\n- Nuova grafica\n### Bug fixes\n- Fix crash',
     isDraft: false,
     downloadUrl: 'https://example.com/app.apk',
     releaseUrl: 'https://example.com/release',
   );
 
   setUp(() {
-    repo = _FakeUpdateRepository();
+    repo = FakeUpdateRepository();
     bloc = UpdateBloc(
       checkForUpdate: CheckForUpdate(updateRepository: repo),
       downloadApk: DownloadApk(updateRepository: repo),
@@ -131,7 +85,8 @@ void main() {
     );
   });
 
-  test('UpdateInstallRequested emits UpdateInstallFailed then manual pick works',
+  test(
+      'UpdateInstallRequested emits UpdateInstallFailed then manual pick works',
       () async {
     repo.installResult = left(
       UpdateInstallFailure(
