@@ -18,3 +18,19 @@ class DataRangeFailure extends DataFailure {
   DataRangeFailure({required super.dataType})
       : super("Value/s out of range or the container is empty");
 }
+
+/// Failure emitted when launching an APK installer fails, preserving context for manual fallback.
+class UpdateInstallFailure extends Failure {
+  final String errorType;
+  final String apkPath;
+
+  UpdateInstallFailure({
+    required this.errorType,
+    required this.apkPath,
+  }) : super(errorType);
+}
+
+/// Failure emitted when a required OS permission for updating is denied.
+class UpdatePermissionFailure extends Failure {
+  UpdatePermissionFailure(super.message);
+}

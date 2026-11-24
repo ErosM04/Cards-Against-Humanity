@@ -19,6 +19,16 @@ import 'package:cards_against_humanity/features/load/domain/repository/load_repo
 import 'package:cards_against_humanity/features/load/domain/usecases/load_answers.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_questions.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
+import 'package:cards_against_humanity/features/update/data/datasources/update_local_datasource.dart';
+import 'package:cards_against_humanity/features/update/data/datasources/update_remote_datasource.dart';
+import 'package:cards_against_humanity/features/update/data/repository/update_repository_impl.dart';
+import 'package:cards_against_humanity/features/update/domain/repository/update_repository.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/manage_update_permission.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/pick_and_install_apk.dart';
+import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 /// ``[GetIt]`` object used to locate a specific service (dependency).
@@ -43,6 +53,7 @@ Future<void> initDependencies() async {
   // of dependency to share across the app.
   serviceLocator.registerLazySingleton(() => const CsvReader());
   _initLoad();
+  _initUpdate();
 }
 
 /// Initializes all the dependencies (and sub-dependencies) related to the ``load`` feature.
@@ -72,6 +83,47 @@ void _initLoad() {
       () => LoadBloc(
         loadQuestions: serviceLocator(),
         loadAnswers: serviceLocator(),
+      ),
+    );
+}
+
+/// Initializes all dependencies related to the `update` feature.
+void _initUpdate() {
+  serviceLocator
+    ..registerLazySingleton<UpdateRemoteDataSource>(
+      () => UpdateRemoteDataSourceImpl(),
+    )
+    ..registerLazySingleton<UpdateLocalDataSource>(
+      () => const UpdateLocalDataSourceImpl(),
+    )
+    ..registerLazySingleton<UpdateRepository>(
+      () => UpdateRepositoryImpl(
+        remoteDataSource: serviceLocator(),
+        localDataSource: serviceLocator(),
+      ),
+    )
+    ..registerLazySingleton(
+      () => CheckForUpdate(updateRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => DownloadApk(updateRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => InstallApk(updateRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => PickAndInstallApk(updateRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => ManageUpdatePermission(updateRepository: serviceLocator()),
+    )
+    ..registerLazySingleton(
+      () => UpdateBloc(
+        checkForUpdate: serviceLocator(),
+        downloadApk: serviceLocator(),
+        installApk: serviceLocator(),
+        pickAndInstallApk: serviceLocator(),
+        managePermission: serviceLocator(),
       ),
     );
 }

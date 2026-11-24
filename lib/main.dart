@@ -1,4 +1,5 @@
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
+import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/features/load/presentation/page/start_page.dart';
 import 'package:cards_against_humanity/core/theme/theme.dart';
@@ -20,6 +21,9 @@ class CardsAgainstHumanity extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => serviceLocator<LoadBloc>(),
+          ),
+          BlocProvider(
+            create: (context) => serviceLocator<UpdateBloc>(),
           ),
         ],
         child: MaterialApp(

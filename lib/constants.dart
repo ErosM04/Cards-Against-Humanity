@@ -31,3 +31,18 @@ const int minPlayers = 3;
 
 /// The amount of answer card that a plyer must have at the start of every turn.
 const int handLength = 10;
+
+/// Current version of the app, updated on every release build.
+const String appVersion = '0.2.0';
+
+/// GitHub API endpoint for the latest release metadata.
+const String githubLatestReleaseUrl =
+    'https://api.github.com/repos/ErosM04/Cards-Against-Humanity/releases/latest';
+
+/// GitHub Releases page URL shown in update details.
+const String githubReleasesPageUrl =
+    'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest';
+
+/// Direct download URL for the latest release APK.
+const String githubLatestApkUrl =
+    'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest/download/Cards_Against_Humanity.apk';

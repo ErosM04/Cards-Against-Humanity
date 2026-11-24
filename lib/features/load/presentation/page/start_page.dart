@@ -10,7 +10,8 @@ import 'package:cards_against_humanity/core/widgets/info.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
-import 'package:cards_against_humanity/old/updater/updater.dart';
+import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
+import 'package:cards_against_humanity/features/update/presentation/widgets/update_listener.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,14 +72,13 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
-    // Checks if a new version exists and ask for download consent.
-    // The 2 seconds delay is to avoid errors (trust me).
-    var updater = Updater(context);
-
-    Future.delayed(
-      const Duration(seconds: 2),
-      () => updater.updateToNewVersion(),
-    );
+    // Checks if a new version exists and asks for download consent.
+    // The 2 seconds delay avoids showing dialogs before the initial frame settles.
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        context.read<UpdateBloc>().add(const UpdateCheckRequested());
+      }
+    });
 
     // Load data from csv
     context.read<LoadBloc>().add(LoadQuestionsStart());
@@ -96,9 +96,10 @@ class _StartPageState extends State<StartPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: const CustomAppBar(),
-        body: Center(
+  Widget build(BuildContext context) => UpdateListener(
+        child: Scaffold(
+          appBar: const CustomAppBar(),
+          body: Center(
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -177,6 +178,7 @@ class _StartPageState extends State<StartPage> {
               ),
             ),
           ),
+        ),
         ),
       );
 
