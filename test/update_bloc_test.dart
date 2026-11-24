@@ -4,6 +4,7 @@ import '../test/utils/fake_update_repo.dart';
 import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/features/update/data/datasources/update_local_datasource.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_release.dart';
+import 'package:cards_against_humanity/features/update/domain/entities/app_version.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
@@ -20,7 +21,7 @@ void main() {
   late UpdateBloc bloc;
 
   const sampleRelease = AppRelease(
-    version: '0.3.0',
+    version: AppVersion(major: 0, minor: 3, patch: 0),
     description:
         '### Funzionalità\n- Nuova grafica\n### Bug fixes\n- Fix crash',
     isDraft: false,
