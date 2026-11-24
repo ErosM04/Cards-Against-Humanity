@@ -19,7 +19,7 @@ dependencies:
   http: 
   file_picker: 
   flutter_animate: 
-  open_file_plus: 
+  open_filex: 
   permission_handler: 
   path_provider: 
   dio: 

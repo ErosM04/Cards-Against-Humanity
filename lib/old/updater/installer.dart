@@ -6,7 +6,7 @@ import 'package:cards_against_humanity/old/updater/dialog/dialog_contents/error_
 import 'package:material_ui/material_ui.dart';
 import 'package:cards_against_humanity/old/updater/updater.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:open_file_plus/open_file_plus.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:cards_against_humanity/old/updater/dialog/custom_dialog.dart';
 
 /// This class is used by the ``[Updater]`` object in order to install the downloaded apk file.
@@ -29,7 +29,7 @@ class Installer {
   /// #### Parameters
   /// - ``String path`` : the path to the apk file in the device storage.
   void installUpdate(String path) async => _askForInstallationPermission(
-        onGranted: () => OpenFile.open(path).then(
+        onGranted: () => OpenFilex.open(path).then(
           (result) => (result.type != ResultType.done && context.mounted)
               // The package wasn't able to execute the file (probably wrong path)
               ? ErrorDialogBuilder(
@@ -82,12 +82,12 @@ class Installer {
   /// The file type is restricted to **apk**.
   void _manuallySelectAndInstallUpdate() async {
     try {
-      FilePickerResult? pickResult = await FilePicker.platform
-          .pickFiles(type: FileType.custom, allowedExtensions: ['apk']);
+      PlatformFile? pickResult = await FilePicker.pickFile(
+          type: FileType.custom, allowedExtensions: ['apk']);
 
-      if (pickResult != null && pickResult.files.single.path != null) {
-        File file = File(pickResult.files.single.path!);
-        var installResult = await OpenFile.open(file.path);
+      if (pickResult != null && pickResult.path != null) {
+        File file = File(pickResult.path!);
+        var installResult = await OpenFilex.open(file.path);
         if (installResult.type != ResultType.done) {
           throw Exception();
         }
