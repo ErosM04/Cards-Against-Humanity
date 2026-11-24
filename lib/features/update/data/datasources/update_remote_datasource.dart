@@ -49,6 +49,8 @@ class UpdateRemoteDataSourceImpl implements UpdateRemoteDataSource {
       return AppReleaseModel.fromJson(decoded);
     } on UpdateException {
       rethrow;
+    } on VersionParseException {
+      rethrow;
     } catch (_) {
       throw UpdateException(
         "Errore '${statusCode ?? ''}' durante la ricerca dell'aggiornamento",

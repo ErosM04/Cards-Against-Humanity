@@ -212,7 +212,8 @@ lib/
         │       └── update_repository_impl.dart
         ├── domain/
         │   ├── entities/
-        │   │   └── app_release.dart
+        │   │   ├── app_release.dart
+        │   │   └── app_version.dart
         │   ├── repository/
         │   │   └── update_repository.dart
         │   └── usecases/
@@ -259,7 +260,7 @@ lib/
 - [answer_list_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/models/answer_list_model.dart): Model extending `AnswerList`, providing `.fromStrings()` factory parser.
 
 #### Error Handling (`lib/core/errors/`)
-- [exceptions.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/errors/exceptions.dart): Defines runtime exceptions thrown by data providers and sources (e.g. `DataLoadException`).
+- [exceptions.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/errors/exceptions.dart): Defines runtime exceptions thrown by data providers, sources, and parsers (`DataLoadException`, `UpdateException`, `VersionParseException`).
 - [failures.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/errors/failures.dart): Defines failure objects returned across repository/usecase boundaries (`Failure`, `DataFailure`, `DataRangeFailure`).
 
 #### Theme & Widgets (`lib/core/theme/`, `lib/core/widgets/`)
@@ -333,7 +334,8 @@ Responsible for checking GitHub Releases for newer app versions, prompting the u
 - [update_repository_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/repository/update_repository_impl.dart): Implements `UpdateRepository`. Compares release version/draft flags against `appVersion`, coordinates remote/local datasources, and maps exceptions/installer failures into `Either<Failure, ...>` (`UpdateInstallFailure`, `UpdatePermissionFailure`, `Failure`).
 
 #### Domain Layer
-- [app_release.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/entities/app_release.dart): `AppRelease` domain entity holding version, changelog body, draft status, download URL, and release URL.
+- [app_version.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/entities/app_version.dart): `AppVersion` value entity parsing `<major>.<minor>.<patch>[-info]` (splitting on the first two `.` characters and stripping the leading `-`, throwing `VersionParseException` on failure) and implementing `==`, `<`, `>`, `<=`, `>=`, and `Comparable<AppVersion>`.
+- [app_release.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/entities/app_release.dart): `AppRelease` domain entity holding typed `AppVersion`, changelog body, draft status, download URL, and release URL.
 - [update_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/repository/update_repository.dart): Domain contract (`UpdateRepository`) and `UpdatePermission` enum (`externalStorage`, `installPackages`).
 - [check_for_update.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/check_for_update.dart): Use case checking whether a newer non-draft release exists.
 - [download_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/download_apk.dart): Use case downloading the release APK with progress callback via `DownloadApkParams`.

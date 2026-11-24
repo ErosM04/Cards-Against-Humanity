@@ -11,3 +11,13 @@ class UpdateException implements Exception {
 
   const UpdateException(this.message);
 }
+
+/// Exception thrown when parsing a version string fails.
+class VersionParseException implements Exception {
+  final String message;
+
+  const VersionParseException(this.message);
+
+  @override
+  String toString() => 'VersionParseException: $message';
+}

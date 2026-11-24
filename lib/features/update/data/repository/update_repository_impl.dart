@@ -4,6 +4,7 @@ import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/features/update/data/datasources/update_local_datasource.dart';
 import 'package:cards_against_humanity/features/update/data/datasources/update_remote_datasource.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_release.dart';
+import 'package:cards_against_humanity/features/update/domain/entities/app_version.dart';
 import 'package:cards_against_humanity/features/update/domain/repository/update_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:open_filex/open_filex.dart';
@@ -24,11 +25,14 @@ class UpdateRepositoryImpl implements UpdateRepository {
   Future<Either<Failure, AppRelease?>> checkForUpdate() async {
     try {
       final latest = await remoteDataSource.fetchLatestRelease();
-      if (!latest.isDraft && latest.version != currentVersion) {
+      final installed = AppVersion.parse(currentVersion);
+      if (!latest.isDraft && latest.version > installed) {
         return right(latest);
       }
       return right(null);
     } on UpdateException catch (e) {
+      return left(Failure(e.message));
+    } on VersionParseException catch (e) {
       return left(Failure(e.message));
     } catch (e) {
       return left(Failure("Errore durante la ricerca dell'aggiornamento"));

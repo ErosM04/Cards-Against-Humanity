@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_release.dart';
+import 'package:cards_against_humanity/features/update/domain/entities/app_version.dart';
 import 'package:cards_against_humanity/features/update/domain/repository/update_repository.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';

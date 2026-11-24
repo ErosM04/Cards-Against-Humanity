@@ -1,6 +1,8 @@
+import 'package:cards_against_humanity/features/update/domain/entities/app_version.dart';
+
 /// Domain entity representing an application release on GitHub.
 class AppRelease {
-  final String version;
+  final AppVersion version;
   final String description;
   final bool isDraft;
   final String downloadUrl;

@@ -33,7 +33,7 @@ final class UpdateDownloadInProgress extends UpdateState {
 /// APK download finished successfully.
 final class UpdateDownloadCompleted extends UpdateState {
   final String apkPath;
-  final String version;
+  final AppVersion version;
 
   const UpdateDownloadCompleted({
     required this.apkPath,
