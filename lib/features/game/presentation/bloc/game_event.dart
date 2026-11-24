@@ -1,5 +1,6 @@
 part of 'game_bloc.dart';
 
+/// Base event for [GameBloc].
 @immutable
 sealed class GameEvent {
   const GameEvent();
@@ -20,16 +21,19 @@ final class AnswerCardsRequested extends GameEvent {
   const AnswerCardsRequested({required this.ids});
 }
 
+/// Dispatched when the player taps an answer [card] in their hand.
 final class CardClicked extends GameEvent {
   final CardAH card;
 
   const CardClicked(this.card);
 }
 
+/// Records a round win and increments the player's score.
 final class RoundWon extends GameEvent {
   const RoundWon();
 }
 
+/// Records a round loss and clears the current card selection.
 final class RoundLost extends GameEvent {
   const RoundLost();
 }

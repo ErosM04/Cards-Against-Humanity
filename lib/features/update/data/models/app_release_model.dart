@@ -11,6 +11,7 @@ class AppReleaseModel extends AppRelease {
     required super.releaseUrl,
   });
 
+  /// Parses release metadata from a GitHub Releases API JSON map.
   factory AppReleaseModel.fromJson(Map<String, dynamic> json) =>
       AppReleaseModel(
         version: (json['tag_name'] ?? '').toString().replaceAll('v', ''),

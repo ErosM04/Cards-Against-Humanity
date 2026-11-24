@@ -8,20 +8,26 @@ import 'package:permission_handler/permission_handler.dart';
 
 /// Contract for device-local update operations (storage paths, permissions, APK launch, file picker).
 abstract interface class UpdateLocalDataSource {
+  /// Returns whether [permission] is currently granted.
   Future<bool> hasPermission(UpdatePermission permission);
 
+  /// Requests [permission] from the OS and returns whether it was granted.
   Future<bool> requestPermission(UpdatePermission permission);
 
+  /// Builds a collision-free `.apk` destination path inside [preferredDirPath].
   Future<String> buildUniqueApkPath({
     required String baseFileName,
     String? preferredDirPath,
   });
 
+  /// Launches the OS package installer for the APK at [apkPath].
   Future<OpenResult> openApk(String apkPath);
 
+  /// Prompts the user to pick an `.apk` file and returns its path, or `null`.
   Future<String?> pickApkPath();
 }
 
+/// Device-local implementation of [UpdateLocalDataSource] using OS plugins and storage.
 class UpdateLocalDataSourceImpl implements UpdateLocalDataSource {
   static const String _defaultDownloadPath = '/storage/emulated/0/Download';
   static const String _apkExtension = '.apk';
@@ -59,6 +65,7 @@ class UpdateLocalDataSourceImpl implements UpdateLocalDataSource {
     return '${dir.path}${Platform.pathSeparator}$fileName';
   }
 
+  /// Returns [preferredDirPath] if it exists, otherwise falls back to external storage.
   Future<Directory> _resolveDownloadDir(String? preferredDirPath) async {
     if (preferredDirPath != null &&
         preferredDirPath.isNotEmpty &&

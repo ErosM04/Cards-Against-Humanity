@@ -16,6 +16,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Initial screen for configuring match parameters and launching a game.
 class StartPage extends StatefulWidget {
   const StartPage({super.key});
 

@@ -7,12 +7,13 @@ import 'package:cards_against_humanity/init_dependencies.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Initializes dependencies and runs the application.
 void main() async {
   await initDependencies();
   runApp(const CardsAgainstHumanity());
 }
 
-/// Not so politically correct
+/// Android app per giocare alla versione italiana di Cards Against Humanity
 class CardsAgainstHumanity extends StatelessWidget {
   const CardsAgainstHumanity({super.key});
 

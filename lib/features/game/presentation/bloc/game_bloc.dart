@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 part 'game_event.dart';
 part 'game_state.dart';
 
+/// Manages match state, card drawing, hand selections, and player score.
 class GameBloc extends Bloc<GameEvent, GameState> {
   /// Usecase used to retrive a list of answers that correspond to a given id list.
   final RetriveAnswers _retriveAnswers;
@@ -25,6 +26,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
   late GameData _gameData;
 
+  /// Current match state and player hand data.
   GameData get gameData => _gameData;
 
   /// The question card of the current round.
@@ -144,6 +146,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     );
   }
 
+  /// Toggles card selection and finishes the turn once [cardsToClick] cards are chosen.
   void _clickedCard(CardClicked event, Emitter<GameState> emit) {
     final answer = event.card is Answer
         ? event.card as Answer

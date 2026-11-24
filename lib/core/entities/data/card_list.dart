@@ -5,12 +5,16 @@ abstract class CardList<Card> {
 
   const CardList({required List<Card> list}) : _list = list;
 
+  /// Whether this list contains no cards.
   bool get isEmpty => _list.isEmpty;
 
+  /// Number of cards currently stored in this list.
   int get length => _list.length;
 
+  /// Returns the card at [index].
   Card getCardAt(int index) => _list[index];
 
+  /// Removes and returns the card at [index].
   Card removeCardAt(int index) => _list.removeAt(index);
 
   /// Adds a new card in tail.

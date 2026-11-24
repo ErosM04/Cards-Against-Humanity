@@ -1,20 +1,25 @@
 part of 'game_bloc.dart';
 
+/// Base state for [GameBloc].
 @immutable
 sealed class GameState {
   const GameState();
 }
 
+/// Initial state before the first round is prepared.
 final class RoundStart extends GameState {}
 
+/// Round data is loaded and waiting for card selection.
 final class RoundReady extends GameState {}
 
+/// Single-answer turn completed with the selected [card].
 final class FirstCardCliked extends GameState {
   final CardAH card;
 
   const FirstCardCliked({required this.card});
 }
 
+/// Two-answer turn completed with [card1] and [card2].
 final class SecondCardCliked extends GameState {
   final CardAH card1;
   final CardAH card2;

@@ -91,6 +91,7 @@ class _UpdateListenerState extends State<UpdateListener> {
         child: widget.child,
       );
 
+  /// Presents [dialog] with a slide-and-fade entrance transition.
   void _showAnimatedDialog(BuildContext context, Widget dialog) =>
       showGeneralDialog(
         context: context,
@@ -108,6 +109,7 @@ class _UpdateListenerState extends State<UpdateListener> {
         ),
       );
 
+  /// Displays a floating rounded SnackBar containing [message].
   void _showSnackBar(
     BuildContext context,
     String message, {
@@ -138,6 +140,7 @@ class _UpdateListenerState extends State<UpdateListener> {
         ),
       );
 
+  /// Extracts the last two segments of [path] for compact display.
   String _shortPath(String path) {
     final segments = Uri.file(path).pathSegments.where((s) => s.isNotEmpty).toList();
     if (segments.length < 2) return path;

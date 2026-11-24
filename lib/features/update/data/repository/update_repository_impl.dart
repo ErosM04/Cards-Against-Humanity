@@ -8,6 +8,7 @@ import 'package:cards_against_humanity/features/update/domain/repository/update_
 import 'package:fpdart/fpdart.dart';
 import 'package:open_filex/open_filex.dart';
 
+/// Repository coordinating remote release fetches and local APK storage/installation.
 class UpdateRepositoryImpl implements UpdateRepository {
   final UpdateRemoteDataSource remoteDataSource;
   final UpdateLocalDataSource localDataSource;

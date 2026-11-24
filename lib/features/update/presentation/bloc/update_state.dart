@@ -6,10 +6,12 @@ sealed class UpdateState {
   const UpdateState();
 }
 
+/// Initial state before any update check has run.
 final class UpdateInitial extends UpdateState {
   const UpdateInitial();
 }
 
+/// Installed app version matches the latest published release.
 final class UpdateUpToDate extends UpdateState {
   const UpdateUpToDate();
 }

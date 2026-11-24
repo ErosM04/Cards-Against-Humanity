@@ -57,6 +57,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
     );
   }
 
+  /// Requests storage permission and downloads the release APK with live progress updates.
   FutureOr<void> _onDownloadRequested(
     UpdateDownloadRequested event,
     Emitter<UpdateState> emit,
@@ -97,6 +98,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
     );
   }
 
+  /// Requests package-install permission and hands the downloaded APK to the OS installer.
   FutureOr<void> _onInstallRequested(
     UpdateInstallRequested event,
     Emitter<UpdateState> emit,
@@ -142,6 +144,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
     );
   }
 
+  /// Prompts the user if [permission] is missing, then requests it and notifies on denial.
   Future<bool> _ensurePermission({
     required UpdatePermission permission,
     required String promptMessage,

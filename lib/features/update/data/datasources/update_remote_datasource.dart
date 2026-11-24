@@ -7,8 +7,10 @@ import 'package:http/http.dart' as http;
 
 /// Contract for remote update operations (fetching release metadata and downloading APKs).
 abstract interface class UpdateRemoteDataSource {
+  /// Fetches and parses the latest GitHub release metadata.
   Future<AppReleaseModel> fetchLatestRelease();
 
+  /// Downloads [url] to [destinationPath], reporting normalized progress to [onProgress].
   Future<void> downloadFile({
     required String url,
     required String destinationPath,
@@ -16,6 +18,7 @@ abstract interface class UpdateRemoteDataSource {
   });
 }
 
+/// HTTP and Dio implementation of [UpdateRemoteDataSource] for GitHub Releases.
 class UpdateRemoteDataSourceImpl implements UpdateRemoteDataSource {
   final http.Client _httpClient;
   final Dio _dio;
