@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/errors/exceptions.dart';
 import 'package:cards_against_humanity/features/update/data/models/app_release_model.dart';
@@ -75,6 +76,10 @@ class UpdateRemoteDataSourceImpl implements UpdateRemoteDataSource {
         },
       );
     } catch (e) {
+      try {
+        final partial = File(destinationPath);
+        if (await partial.exists()) await partial.delete();
+      } catch (_) {}
       throw UpdateException("Impossibile scaricare l'aggiornamento: $e");
     }
   }

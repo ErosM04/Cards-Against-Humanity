@@ -1,7 +1,9 @@
+import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
 import 'package:cards_against_humanity/features/update/presentation/widgets/update_dialog.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Listens to [UpdateBloc] state changes and presents update dialogs and SnackBars.
 class UpdateListener extends StatefulWidget {
@@ -55,7 +57,7 @@ class _UpdateListenerState extends State<UpdateListener> {
             case UpdateDownloadCompleted(:final apkPath, :final version):
               _showSnackBar(
                 context,
-                'Versione $version scaricata in ${_shortPath(apkPath)}',
+                'Versione $version scaricata, avvio installazione...',
                 durationSeconds: 4,
               );
               Future.delayed(const Duration(seconds: 4), () {
@@ -67,17 +69,32 @@ class _UpdateListenerState extends State<UpdateListener> {
               });
             case UpdateDownloadFailed(:final message):
               _showSnackBar(context, message);
-            case UpdateInstallFailed(:final errorType, :final apkPath):
+            case UpdateInstallFailed(
+                :final errorType,
+                :final apkPath,
+                :final downloadUrl,
+              ):
               _showAnimatedDialog(
                 context,
                 InstallErrorDialog(
                   errorType: errorType,
-                  shortPath: _shortPath(apkPath),
+                  onRetry: () => context
+                      .read<UpdateBloc>()
+                      .add(UpdateInstallRequested(apkPath)),
+                  onBrowserDownload: () {
+                    final target = downloadUrl.isNotEmpty
+                        ? downloadUrl
+                        : githubLatestApkUrl;
+                    launchUrl(
+                      Uri.parse(target),
+                      mode: LaunchMode.externalApplication,
+                    );
+                    context
+                        .read<UpdateBloc>()
+                        .add(const UpdateCacheClearRequested());
+                  },
                   onDeny: () =>
                       context.read<UpdateBloc>().add(const UpdateDeclined()),
-                  onConfirm: () => context
-                      .read<UpdateBloc>()
-                      .add(const UpdateManualInstallRequested()),
                 ),
               );
             case UpdateNotice(:final message, :final durationSeconds):
@@ -139,11 +156,4 @@ class _UpdateListenerState extends State<UpdateListener> {
           ),
         ),
       );
-
-  /// Extracts the last two segments of [path] for compact display.
-  String _shortPath(String path) {
-    final segments = Uri.file(path).pathSegments.where((s) => s.isNotEmpty).toList();
-    if (segments.length < 2) return path;
-    return '${segments[segments.length - 2]}/${segments.last}';
-  }
 }

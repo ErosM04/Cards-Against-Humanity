@@ -61,8 +61,8 @@ class UpdateRepositoryImpl implements UpdateRepository {
     void Function(double progress)? onProgress,
   }) async {
     try {
-      final destinationPath = await localDataSource.buildUniqueApkPath(
-        baseFileName: fileName,
+      final destinationPath = await localDataSource.buildApkPath(
+        fileName: fileName,
       );
       await remoteDataSource.downloadFile(
         url: url,
@@ -74,6 +74,16 @@ class UpdateRepositoryImpl implements UpdateRepository {
       return left(Failure(e.message));
     } catch (_) {
       return left(Failure("Impossibile scaricare l'aggiornamento"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> clearCachedUpdates() async {
+    try {
+      await localDataSource.clearCachedUpdates();
+      return right(unit);
+    } catch (e) {
+      return left(Failure(e.toString()));
     }
   }
 
@@ -92,29 +102,6 @@ class UpdateRepositoryImpl implements UpdateRepository {
       return left(UpdateInstallFailure(
         errorType: e.toString(),
         apkPath: apkPath,
-      ));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> pickAndInstallApk() async {
-    try {
-      final pickedPath = await localDataSource.pickApkPath();
-      if (pickedPath == null) {
-        return left(Failure(
-          "Si è verificato un errore durante l'installazione manuale dell'aggiornamento :(",
-        ));
-      }
-      final result = await localDataSource.openApk(pickedPath);
-      if (result.type != ResultType.done) {
-        return left(Failure(
-          "Si è verificato un errore durante l'installazione manuale dell'aggiornamento :(",
-        ));
-      }
-      return right(unit);
-    } catch (_) {
-      return left(Failure(
-        "Si è verificato un errore durante l'installazione manuale dell'aggiornamento :(",
       ));
     }
   }

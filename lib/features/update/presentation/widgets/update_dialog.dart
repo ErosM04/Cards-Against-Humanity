@@ -14,8 +14,9 @@ class AppAlertDialog extends StatelessWidget {
   final Widget child;
   final String denyButtonText;
   final String confirmButtonText;
-  final VoidCallback onDeny;
-  final VoidCallback onConfirm;
+  final VoidCallback? onDeny;
+  final VoidCallback? onConfirm;
+  final Widget? actions;
 
   const AppAlertDialog({
     super.key,
@@ -24,8 +25,9 @@ class AppAlertDialog extends StatelessWidget {
     required this.child,
     this.denyButtonText = 'No',
     this.confirmButtonText = 'Sì',
-    required this.onDeny,
-    required this.onConfirm,
+    this.onDeny,
+    this.onConfirm,
+    this.actions,
   });
 
   @override
@@ -81,14 +83,19 @@ class AppAlertDialog extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _actionButton(context, denyButtonText, onDeny),
-                  _actionButton(context, confirmButtonText, onConfirm),
-                ],
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              child: actions ??
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _actionButton(context, denyButtonText, onDeny ?? () {}),
+                      _actionButton(
+                        context,
+                        confirmButtonText,
+                        onConfirm ?? () {},
+                      ),
+                    ],
+                  ),
             ),
           ],
         ),
@@ -286,18 +293,18 @@ class DownloadProgressDialog extends StatelessWidget {
       );
 }
 
-/// Dialog displayed when automatic APK installation fails, offering manual APK selection.
+/// Dialog displayed when APK installation fails, offering retry or browser download.
 class InstallErrorDialog extends StatelessWidget {
   final String errorType;
-  final String shortPath;
-  final VoidCallback onConfirm;
+  final VoidCallback onRetry;
+  final VoidCallback onBrowserDownload;
   final VoidCallback onDeny;
 
   const InstallErrorDialog({
     super.key,
     required this.errorType,
-    required this.shortPath,
-    required this.onConfirm,
+    required this.onRetry,
+    required this.onBrowserDownload,
     required this.onDeny,
   });
 
@@ -309,14 +316,22 @@ class InstallErrorDialog extends StatelessWidget {
           color: Theme.of(context).colorScheme.tertiary,
         ),
         title: "Errore durante l'installazione dell'aggiornamento",
-        onDeny: onDeny,
-        onConfirm: onConfirm,
+        actions: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 8,
+          children: [
+            _dialogButton(context, 'Riprova', onRetry),
+            _dialogButton(context, 'Scarica dal browser', onBrowserDownload),
+            _dialogButton(context, 'Annulla', onDeny),
+          ],
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Vuoi installare manualmente l'aggiornamento?",
+              "Vuoi riprovare l'installazione o scaricare l'aggiornamento dal browser?",
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
@@ -328,19 +343,24 @@ class InstallErrorDialog extends StatelessWidget {
             const SizedBox(height: 3),
             if (errorType.isNotEmpty)
               Text(errorType.trim(), style: const TextStyle(color: Colors.red)),
-            const SizedBox(height: 10),
-            const Text(
-              'Verrai ora rediretto al file manager per eseguire il file di aggiornamento che si trova in:',
-            ),
-            const SizedBox(height: 5),
-            if (shortPath.isNotEmpty)
-              Text(
-                shortPath.trim(),
-                style: const TextStyle(color: Colors.blue),
-              ),
             const SizedBox(height: 5),
             const Divider(),
           ],
         ),
+      );
+
+  Widget _dialogButton(
+    BuildContext context,
+    String text,
+    VoidCallback action,
+  ) =>
+      CustomButton(
+        text: text,
+        fontSize: 16,
+        horizontalInternalPadding: 10,
+        onPressed: () {
+          Navigator.pop(context);
+          action();
+        },
       );
 }

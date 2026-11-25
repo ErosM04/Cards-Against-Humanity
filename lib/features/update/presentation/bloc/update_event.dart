@@ -6,17 +6,22 @@ sealed class UpdateEvent {
   const UpdateEvent();
 }
 
+/// Clears any leftover update APKs from app-internal cache storage.
+final class UpdateCacheClearRequested extends UpdateEvent {
+  const UpdateCacheClearRequested();
+}
+
 /// Checks GitHub for a newer release.
 final class UpdateCheckRequested extends UpdateEvent {
   const UpdateCheckRequested();
 }
 
-/// User declined the available update or manual fallback.
+/// User declined the available update or installation fallback.
 final class UpdateDeclined extends UpdateEvent {
   const UpdateDeclined();
 }
 
-/// User accepted the update prompt; starts permission check and APK download.
+/// User accepted the update prompt; starts APK download into internal cache.
 final class UpdateDownloadRequested extends UpdateEvent {
   final AppRelease release;
 
@@ -28,9 +33,4 @@ final class UpdateInstallRequested extends UpdateEvent {
   final String apkPath;
 
   const UpdateInstallRequested(this.apkPath);
-}
-
-/// Opens the system file picker so the user can manually select and install an `.apk`.
-final class UpdateManualInstallRequested extends UpdateEvent {
-  const UpdateManualInstallRequested();
 }

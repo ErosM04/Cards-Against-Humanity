@@ -53,14 +53,16 @@ final class UpdateInstallCompleted extends UpdateState {
   const UpdateInstallCompleted();
 }
 
-/// Launching the OS package installer failed; UI should offer manual file picking.
+/// Launching the OS package installer failed; UI offers retry or browser download.
 final class UpdateInstallFailed extends UpdateState {
   final String errorType;
   final String apkPath;
+  final String downloadUrl;
 
   const UpdateInstallFailed({
     required this.errorType,
     required this.apkPath,
+    required this.downloadUrl,
   });
 }
 

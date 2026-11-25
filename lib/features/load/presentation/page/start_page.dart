@@ -73,6 +73,8 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
+    context.read<UpdateBloc>().add(const UpdateCacheClearRequested());
+
     // Checks if a new version exists and asks for download consent.
     // The 2 seconds delay avoids showing dialogs before the initial frame settles.
     Future.delayed(const Duration(seconds: 2), () {

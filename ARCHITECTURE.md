@@ -216,12 +216,12 @@ lib/
         │   │   └── app_version.dart
         │   ├── repository/
         │   │   └── update_repository.dart
-        │   └── usecases/
-        │       ├── check_for_update.dart
-        │       ├── download_apk.dart
-        │       ├── install_apk.dart
-        │       ├── manage_update_permission.dart
-        │       └── pick_and_install_apk.dart
+    │       └── usecases/
+    │           ├── check_for_update.dart
+    │           ├── clear_cached_updates.dart
+    │           ├── download_apk.dart
+    │           ├── install_apk.dart
+    │           └── manage_update_permission.dart
         └── presentation/
             ├── bloc/
             │   ├── update_bloc.dart
@@ -325,30 +325,30 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 ---
 
 ### Feature 3: Update (`lib/features/update/`)
-Responsible for checking GitHub Releases for newer app versions, prompting the user, requesting required Android storage/install permissions, downloading the APK with live progress, launching package installation, and offering manual `.apk` file picking if installation fails.
+Responsible for clearing cached update APKs on startup, checking GitHub Releases for newer app versions, prompting the user, requesting Android install permission, downloading the APK into private internal cache with live progress, launching package installation, and offering retry or browser download if installation fails.
 
 #### Data Layer
 - [app_release_model.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/models/app_release_model.dart): `AppReleaseModel` extending `AppRelease` with `.fromJson()` deserialization for GitHub's latest release JSON payload.
-- [update_remote_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/datasources/update_remote_datasource.dart): `UpdateRemoteDataSource` interface and `UpdateRemoteDataSourceImpl` fetching release metadata via `http.Client` and streaming APK downloads via `Dio` with progress callbacks.
-- [update_local_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/datasources/update_local_datasource.dart): `UpdateLocalDataSource` interface and `UpdateLocalDataSourceImpl` handling download directory resolution, collision-safe `.apk` naming, `permission_handler` checks/requests (`manageExternalStorage`, `requestInstallPackages`), `OpenFilex.open()` APK launching, and `FilePicker.pickFile()` manual `.apk` selection.
+- [update_remote_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/datasources/update_remote_datasource.dart): `UpdateRemoteDataSource` interface and `UpdateRemoteDataSourceImpl` fetching release metadata via `http.Client` and streaming APK downloads via `Dio` with progress callbacks and partial-file cleanup on failure.
+- [update_local_datasource.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/datasources/update_local_datasource.dart): `UpdateLocalDataSource` interface and `UpdateLocalDataSourceImpl` handling app-internal `updates/` path resolution (`getTemporaryDirectory()` with fallback to `getApplicationSupportDirectory()` and `getExternalStorageDirectory()`), cache cleanup, `permission_handler` checks/requests (`requestInstallPackages`), and `OpenFilex.open()` APK launching.
 - [update_repository_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/data/repository/update_repository_impl.dart): Implements `UpdateRepository`. Compares release version/draft flags against `appVersion`, coordinates remote/local datasources, and maps exceptions/installer failures into `Either<Failure, ...>` (`UpdateInstallFailure`, `UpdatePermissionFailure`, `Failure`).
 
 #### Domain Layer
 - [app_version.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/entities/app_version.dart): `AppVersion` value entity parsing `<major>.<minor>.<patch>[-info]` (splitting on the first two `.` characters and stripping the leading `-`, throwing `VersionParseException` on failure) and implementing `==`, `<`, `>`, `<=`, `>=`, and `Comparable<AppVersion>`.
 - [app_release.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/entities/app_release.dart): `AppRelease` domain entity holding typed `AppVersion`, changelog body, draft status, download URL, and release URL.
-- [update_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/repository/update_repository.dart): Domain contract (`UpdateRepository`) and `UpdatePermission` enum (`externalStorage`, `installPackages`).
+- [update_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/repository/update_repository.dart): Domain contract (`UpdateRepository`) and `UpdatePermission` enum (`installPackages`).
 - [check_for_update.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/check_for_update.dart): Use case checking whether a newer non-draft release exists.
+- [clear_cached_updates.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/clear_cached_updates.dart): Use case deleting previously downloaded APK files from internal cache/fallback folders.
 - [download_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/download_apk.dart): Use case downloading the release APK with progress callback via `DownloadApkParams`.
 - [install_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/install_apk.dart): Use case launching the OS package installer for a downloaded APK path.
 - [manage_update_permission.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/manage_update_permission.dart): Use case checking and requesting `UpdatePermission` grants.
-- [pick_and_install_apk.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/domain/usecases/pick_and_install_apk.dart): Use case triggering the manual `.apk` file picker fallback and installer.
 
 #### Presentation Layer
-- [update_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_bloc.dart): `UpdateBloc` orchestrating check, permission prompt delays, download progress emissions, automatic install handoff, and manual APK fallback.
-- [update_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_event.dart): Sealed events (`UpdateCheckRequested`, `UpdateDeclined`, `UpdateDownloadRequested`, `UpdateInstallRequested`, `UpdateManualInstallRequested`).
+- [update_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_bloc.dart): `UpdateBloc` orchestrating startup cache cleanup, release checks, download progress emissions, install permission prompts, automatic install handoff, and cleanup on decline/failure.
+- [update_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_event.dart): Sealed events (`UpdateCacheClearRequested`, `UpdateCheckRequested`, `UpdateDeclined`, `UpdateDownloadRequested`, `UpdateInstallRequested`).
 - [update_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_state.dart): Sealed states (`UpdateInitial`, `UpdateUpToDate`, `UpdateAvailable`, `UpdateDownloadInProgress`, `UpdateDownloadCompleted`, `UpdateDownloadFailed`, `UpdateInstallCompleted`, `UpdateInstallFailed`, `UpdateNotice`).
-- [update_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_dialog.dart): Shared `AppAlertDialog`, `UpdatePromptDialog` (with safe GitHub release notes parsing), `DownloadProgressDialog` (reactive via `BlocBuilder<UpdateBloc, UpdateState>`), and `InstallErrorDialog`.
-- [update_listener.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_listener.dart): `UpdateListener` wrapping `StartPage` to present animated update/error dialogs, live download modal, and SnackBars from `UpdateBloc` states without leaking `BuildContext` into BLoC.
+- [update_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_dialog.dart): Shared `AppAlertDialog`, `UpdatePromptDialog` (with safe GitHub release notes parsing), `DownloadProgressDialog` (reactive via `BlocBuilder<UpdateBloc, UpdateState>`), and `InstallErrorDialog` (with `"Riprova"` and `"Scarica dal browser"` actions).
+- [update_listener.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_listener.dart): `UpdateListener` wrapping `StartPage` to present animated update/error dialogs, launch external browser fallback downloads, show live download modals, and display SnackBars without leaking `BuildContext` into BLoC.
 
 ---
 
@@ -390,5 +390,5 @@ To facilitate subsequent refactoring steps, be aware of the following transition
     - Resolved merge conflict markers in [gradle-wrapper.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle/wrapper/gradle-wrapper.properties) and disabled deprecated `android.enableJetifier` in [gradle.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle.properties).
 12. **GitHub Auto-Updater Refactoring (`lib/old/updater` -> `lib/features/update`) [RESOLVED]**:
     - Refactored legacy `Updater`, `DownloadManager`, `Installer`, `PermissionManager`, `SnackBarMessage`, and the 7-class `DialogBuilder`/`DialogContent` hierarchy into Clean Architecture layers + `UpdateBloc` under `lib/features/update/`.
-    - Replaced `open_file_plus` with `open_filex` and updated `file_picker` calls to `FilePicker.pickFile(...)` (`file_picker` v13+).
-    - Fixed edge cases in safe GitHub markdown link stripping and collision-free `.apk` filename resolution, wired `UpdateBloc` via `initDependencies()` / `MultiBlocProvider` / `UpdateListener` on `StartPage`, and deleted `lib/old/` completely.
+    - Replaced `open_file_plus` with `open_filex`, switched APK downloads to app-internal cache (`getTemporaryDirectory()` with fallback to `getApplicationSupportDirectory()` / `getExternalStorageDirectory()`), added startup `clearCachedUpdates()`, dropped `MANAGE_EXTERNAL_STORAGE`, and replaced file-picker fallback with `"Riprova"` and `"Scarica dal browser"` actions on `InstallErrorDialog`.
+    - Fixed edge cases in safe GitHub markdown link stripping, wired `UpdateBloc` via `initDependencies()` / `MultiBlocProvider` / `UpdateListener` on `StartPage`, and deleted `lib/old/` completely.

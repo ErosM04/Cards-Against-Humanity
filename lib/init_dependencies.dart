@@ -24,10 +24,10 @@ import 'package:cards_against_humanity/features/update/data/datasources/update_r
 import 'package:cards_against_humanity/features/update/data/repository/update_repository_impl.dart';
 import 'package:cards_against_humanity/features/update/domain/repository/update_repository.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/clear_cached_updates.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/manage_update_permission.dart';
-import 'package:cards_against_humanity/features/update/domain/usecases/pick_and_install_apk.dart';
 import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
 import 'package:get_it/get_it.dart';
 
@@ -112,7 +112,7 @@ void _initUpdate() {
       () => InstallApk(updateRepository: serviceLocator()),
     )
     ..registerLazySingleton(
-      () => PickAndInstallApk(updateRepository: serviceLocator()),
+      () => ClearCachedUpdates(updateRepository: serviceLocator()),
     )
     ..registerLazySingleton(
       () => ManageUpdatePermission(updateRepository: serviceLocator()),
@@ -122,7 +122,7 @@ void _initUpdate() {
         checkForUpdate: serviceLocator(),
         downloadApk: serviceLocator(),
         installApk: serviceLocator(),
-        pickAndInstallApk: serviceLocator(),
+        clearCachedUpdates: serviceLocator(),
         managePermission: serviceLocator(),
       ),
     );

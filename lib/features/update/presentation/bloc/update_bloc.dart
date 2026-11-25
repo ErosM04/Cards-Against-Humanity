@@ -1,48 +1,51 @@
 import 'dart:async';
 
+import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_release.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_version.dart';
 import 'package:cards_against_humanity/features/update/domain/repository/update_repository.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/clear_cached_updates.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/manage_update_permission.dart';
-import 'package:cards_against_humanity/features/update/domain/usecases/pick_and_install_apk.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'update_event.dart';
 part 'update_state.dart';
 
-/// Orchestrates app update checks, APK downloads, OS permission prompts, and APK installation.
+/// Orchestrates app update checks, internal APK downloads, cache cleanup, and installation.
 class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
   final CheckForUpdate _checkForUpdate;
   final DownloadApk _downloadApk;
   final InstallApk _installApk;
-  final PickAndInstallApk _pickAndInstallApk;
+  final ClearCachedUpdates _clearCachedUpdates;
   final ManageUpdatePermission _managePermission;
   final Duration _permissionPromptDelay;
+
+  String _lastDownloadUrl = githubLatestApkUrl;
 
   UpdateBloc({
     required CheckForUpdate checkForUpdate,
     required DownloadApk downloadApk,
     required InstallApk installApk,
-    required PickAndInstallApk pickAndInstallApk,
+    required ClearCachedUpdates clearCachedUpdates,
     required ManageUpdatePermission managePermission,
     Duration permissionPromptDelay = const Duration(seconds: 5),
   })  : _checkForUpdate = checkForUpdate,
         _downloadApk = downloadApk,
         _installApk = installApk,
-        _pickAndInstallApk = pickAndInstallApk,
+        _clearCachedUpdates = clearCachedUpdates,
         _managePermission = managePermission,
         _permissionPromptDelay = permissionPromptDelay,
         super(const UpdateInitial()) {
+    on<UpdateCacheClearRequested>((_, __) => _clearCachedUpdates());
     on<UpdateCheckRequested>(_onCheckRequested);
-    on<UpdateDeclined>((_, emit) => emit(const UpdateNotice(':(')));
+    on<UpdateDeclined>(_onDeclined);
     on<UpdateDownloadRequested>(_onDownloadRequested);
     on<UpdateInstallRequested>(_onInstallRequested);
-    on<UpdateManualInstallRequested>(_onManualInstallRequested);
   }
 
   FutureOr<void> _onCheckRequested(
@@ -58,21 +61,20 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
     );
   }
 
-  /// Requests storage permission and downloads the release APK with live progress updates.
+  FutureOr<void> _onDeclined(
+    UpdateDeclined event,
+    Emitter<UpdateState> emit,
+  ) async {
+    await _clearCachedUpdates();
+    emit(const UpdateNotice(':('));
+  }
+
+  /// Downloads the release APK into internal cache with live progress updates.
   FutureOr<void> _onDownloadRequested(
     UpdateDownloadRequested event,
     Emitter<UpdateState> emit,
   ) async {
-    final granted = await _ensurePermission(
-      permission: UpdatePermission.externalStorage,
-      promptMessage:
-          'Ti verrà ora chiesto di dare il permesso per accedere ai file del dispositivo',
-      deniedMessage: 'Fottiti',
-      deniedDurationSeconds: 2,
-      emit: emit,
-    );
-    if (!granted) return;
-
+    _lastDownloadUrl = event.release.downloadUrl;
     emit(const UpdateDownloadInProgress(0));
 
     final result = await _downloadApk(
@@ -86,20 +88,28 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
       ),
     );
 
-    result.fold(
-      (_) => emit(
-        const UpdateDownloadFailed("Impossibile scaricare l'aggiornamento"),
-      ),
-      (apkPath) => emit(
+    if (result.isLeft()) {
+      await _clearCachedUpdates();
+      if (!emit.isDone) {
+        emit(
+          const UpdateDownloadFailed("Impossibile scaricare l'aggiornamento"),
+        );
+      }
+      return;
+    }
+
+    final apkPath = result.getOrElse((_) => '');
+    if (!emit.isDone) {
+      emit(
         UpdateDownloadCompleted(
           apkPath: apkPath,
           version: event.release.version,
         ),
-      ),
-    );
+      );
+    }
   }
 
-  /// Requests package-install permission and hands the downloaded APK to the OS installer.
+  /// Requests package-install permission and hands the cached APK to the OS installer.
   FutureOr<void> _onInstallRequested(
     UpdateInstallRequested event,
     Emitter<UpdateState> emit,
@@ -109,38 +119,28 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
       promptMessage:
           'Ti verrà ora chiesto di dare il permesso per installare il pacchetto di aggiornamento',
       deniedMessage:
-          "Ma come no? Cattivo! Vatti a installare l'update nella cartella Download",
+          "Ma come no? Cattivo! Devi consentire l'installazione del pacchetto per aggiornare l'app",
       deniedDurationSeconds: 5,
       emit: emit,
     );
-    if (!granted) return;
+    if (!granted) {
+      await _clearCachedUpdates();
+      return;
+    }
 
     final result = await _installApk(event.apkPath);
     result.fold(
       (failure) {
-        if (failure is UpdateInstallFailure) {
-          emit(UpdateInstallFailed(
-            errorType: failure.errorType,
-            apkPath: failure.apkPath,
-          ));
-        } else {
-          emit(UpdateInstallFailed(
-            errorType: failure.message,
-            apkPath: event.apkPath,
-          ));
-        }
+        final failedPath =
+            failure is UpdateInstallFailure ? failure.apkPath : event.apkPath;
+        final errorType =
+            failure is UpdateInstallFailure ? failure.errorType : failure.message;
+        emit(UpdateInstallFailed(
+          errorType: errorType,
+          apkPath: failedPath,
+          downloadUrl: _lastDownloadUrl,
+        ));
       },
-      (_) => emit(const UpdateInstallCompleted()),
-    );
-  }
-
-  FutureOr<void> _onManualInstallRequested(
-    UpdateManualInstallRequested event,
-    Emitter<UpdateState> emit,
-  ) async {
-    final result = await _pickAndInstallApk();
-    result.fold(
-      (failure) => emit(UpdateNotice(failure.message, durationSeconds: 5)),
       (_) => emit(const UpdateInstallCompleted()),
     );
   }
