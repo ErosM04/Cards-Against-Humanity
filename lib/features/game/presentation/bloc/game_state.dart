@@ -37,5 +37,10 @@ final class AnswerCardsLoaded extends GameState {
   const AnswerCardsLoaded({required this.answers});
 }
 
-/// The operation of accessing a card returned a failure
-final class LoadFailure extends GameState {}
+/// The operation of accessing or validating cards returned a failure.
+final class LoadFailure extends GameState {
+  /// Error description explaining why loading or validation failed.
+  final String message;
+
+  const LoadFailure([this.message = '']);
+}

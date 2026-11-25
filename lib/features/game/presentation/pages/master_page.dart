@@ -64,6 +64,10 @@ class _MasterGamePageState extends State<MasterGamePage> {
                 setState(() => answerCardList = resultList);
               }
             }
+          } else if (state is LoadFailure && state.message.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
           }
         },
         builder: (context, state) {

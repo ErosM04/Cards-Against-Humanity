@@ -304,23 +304,23 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 #### Data Layer
 - [rand_card_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_card_source.dart): Interface `RandomCardSource<Card>` for drawing random cards, removing them, or getting cards by index.
 - [rand_question_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_question_source.dart): `RandomQuestionsSource` implementation managing deterministic card draws from `QuestionListModel` using `Random(seed + 1)`.
-- [rand_answer_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_answer_source.dart): `RandomAnswersSource` implementation managing answer selection and card skipping from `AnswerListModel` using `Random(seed)`.
+- [rand_answer_source.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/datasources/rand_answer_source.dart): `RandomAnswersSource` implementation managing per-player deterministic answer selection and card skipping from `AnswerListModel` using `Random(seed)`.
 - [game_repo_impl.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/data/repository/game_repo_impl.dart): Implements `GameRepository`. Bridges random card data sources with domain use cases.
 
 #### Domain Layer
 - [game_repository.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/repository/game_repository.dart): Interface defining operations `drawQuestionCard()`, `drawAnswerCard(totalPlayers, playerNumber)`, `drawAnswerCards(amount)`, and `retriveAnswers(ids)`.
 - [draw_next_question.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/draw_next_question.dart): Use case to pull the current round's question card.
 - [draw_next_answer.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/draw_next_answer.dart): Use case to pull player-specific answer card delegating directly to `drawAnswerCard` with deterministic card skipping.
-- [retrive_answers.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/retrive_answers.dart): Use case to look up answer cards by their integer IDs.
+- [retrive_answers.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/domain/usecases/retrive_answers.dart): Use case validating submitted Master answer IDs against `eligibleIds` via `RetriveAnswersParams` and fetching matching `AnswerList`.
 
 #### Presentation Layer
-- [game_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_bloc.dart): BLoC for game orchestration. Manages initial hand generation, round starts, multi-card click tracking (`FirstCardCliked`, `SecondCardCliked`), and answer card lookups (`AnswerCardsLoaded`).
-- [game_data.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_data.dart): Singleton state holder for game round counters, score, active player hand, and Master turn rotation helper `isMasterForRound(round)`.
+- [game_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_bloc.dart): BLoC for game orchestration. Manages initial hands and tracked other-player eligible IDs, round refills, multi-card click tracking (`FirstCardCliked`, `SecondCardCliked`), and validated answer card lookups (`AnswerCardsLoaded` / `LoadFailure`).
+- [game_data.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_data.dart): Singleton state holder for game round counters, score, active player hand, tracked `otherPlayersCardIds`, and Master turn rotation helpers (`masterForRound`, `isMasterRound`).
 - [game_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_event.dart): Sealed game events (`StartRound`, `AnswerCardsRequested`, `CardClicked`, `RoundWon`, `RoundLost`).
 - [game_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_state.dart): Sealed game states (`RoundStart`, `RoundReady`, `FirstCardCliked`, `SecondCardCliked`, `AnswerCardsLoaded`, `LoadFailure`).
 - [game_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/game_page.dart): Normal player UI displaying current question, hand carousel, and card selection logic via `BlocConsumer<GameBloc, GameState>`.
 - [card_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/card_page.dart): Displays the completed question with chosen answer(s) and card IDs from `GameBloc`, along with "Ho vinto" and "Ho perso" outcome buttons dispatching `RoundWon` / `RoundLost` and `StartRound`.
-- [master_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/master_page.dart): Master UI displaying current question, text input for card IDs, and randomized card carousel for selecting the winner via `BlocConsumer<GameBloc, GameState>`.
+- [master_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/master_page.dart): Master UI displaying current question, text input for card IDs, error feedback on `LoadFailure`, and randomized card carousel for selecting the winner via `BlocConsumer<GameBloc, GameState>`.
 
 ---
 

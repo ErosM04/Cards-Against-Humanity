@@ -22,6 +22,9 @@ class GameData {
   /// The score of the player.
   int _score = 0;
 
+  /// Pool of answer card IDs held by the other players (minus those played in Master turns).
+  final List<int> _otherPlayersCardIds = [];
+
   /// The unique instance of the class.
   static GameData? _instance;
 
@@ -39,6 +42,9 @@ class GameData {
 
   /// The score of the player.
   int get score => _score;
+
+  /// Eligible answer card IDs tracked across the other players' hands.
+  List<int> get otherPlayersCardIds => List.unmodifiable(_otherPlayersCardIds);
 
   /// THe number of card in the hand.
   int get hand => _hand.length;
@@ -106,9 +112,21 @@ class GameData {
   /// Removes an Answer card from the hand.
   bool removeAnswerCard(Answer answer) => _hand.removeCard(answer);
 
+  /// Returns the 1-based Master player number for [round].
+  int masterForRound(int round) => ((round - 1) % _totalPlayers) + 1;
+
   /// Checks whether a given round is played as Master by this player.
-  bool isMasterRound(int round) =>
-      ((round - 1) % _totalPlayers) + 1 == _playerNumber;
+  bool isMasterRound(int round) => masterForRound(round) == _playerNumber;
+
+  /// Adds an answer card [id] to the tracked eligible IDs of other players.
+  void addOtherPlayerCardId(int id) => _otherPlayersCardIds.add(id);
+
+  /// Removes played answer card [ids] from the tracked eligible IDs of other players.
+  void removeOtherPlayerCardIds(Iterable<int> ids) {
+    for (final id in ids) {
+      _otherPlayersCardIds.remove(id);
+    }
+  }
 
   /// Records a completed non-Master round and increments [score] when [won].
   void recordPlayerRound({required bool won}) {

@@ -56,7 +56,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   /// The variable used to save the first card clicked, in case 2 cards are required ([_cardsToClick] = 2).
   CardAH? _firstCard;
 
-  /// Draws the starting hand.
+  /// Draws the starting hand and seeds the tracked answer IDs of the other players.
   GameBloc({
     required RetriveAnswers retriveAnswers,
     required DrawNextQuestion drawNextQuestion,
@@ -69,12 +69,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         super(RoundStart()) {
     /// Creates the starting hand
     AnswerList hand = AnswerList(answers: []);
-    for (var i = 0; i < handLength; i++) {
-      final res = _drawNextAnswer(DrawAnswerParams(
-          totalPlayers: totalPlayers, playerNumber: playerNumber));
-      res.fold((fail) => throw Exception(fail.message),
-          (answer) => hand.addCard(answer));
-    }
+    _drawCards(
+      playerNumber: playerNumber,
+      totalPlayers: totalPlayers,
+      count: handLength,
+      onCard: hand.addCard,
+    );
 
     GameData.resetState(
       playerNumber: playerNumber,
@@ -87,6 +87,16 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       hand: hand,
     );
 
+    for (var p = 1; p <= totalPlayers; p++) {
+      if (p == playerNumber) continue;
+      _drawCards(
+        playerNumber: p,
+        totalPlayers: totalPlayers,
+        count: handLength,
+        onCard: (answer) => _gameData.addOtherPlayerCardId(answer.id),
+      );
+    }
+
     /// Events definition
     on<StartRound>(_roundStart);
     on<AnswerCardsRequested>(_answerCardRequested);
@@ -95,17 +105,48 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<RoundLost>(_roundLost);
   }
 
+  /// Draws [count] answer cards for [playerNumber] and forwards each to [onCard].
+  void _drawCards({
+    required int playerNumber,
+    required int totalPlayers,
+    required int count,
+    required void Function(Answer) onCard,
+  }) {
+    for (var i = 0; i < count; i++) {
+      final res = _drawNextAnswer(
+        DrawAnswerParams(totalPlayers: totalPlayers, playerNumber: playerNumber),
+      );
+      res.fold((fail) => throw Exception(fail.message), onCard);
+    }
+  }
+
   /// Draws missing cards to complete hand until it contains [handLength] cards.
   void _roundStart(StartRound event, Emitter<GameState> emit) {
+    final prevRound = _gameData.totalRounds;
+    final prevCardsToClick = _cardsToClick;
+
     _selectedCards.clear();
     _clickedCards = 0;
     _firstCard = null;
 
     _gameData.newRound();
 
+    if (prevRound > 0) {
+      final prevMaster = _gameData.masterForRound(prevRound);
+      for (var p = 1; p <= _gameData.totalPlayers; p++) {
+        if (p == _gameData.playerNumber || p == prevMaster) continue;
+        _drawCards(
+          playerNumber: p,
+          totalPlayers: _gameData.totalPlayers,
+          count: prevCardsToClick,
+          onCard: (answer) => _gameData.addOtherPlayerCardId(answer.id),
+        );
+      }
+    }
+
     final questionRes = _drawNextQuestion();
     questionRes.fold(
-      (fail) => emit(LoadFailure()),
+      (fail) => emit(const LoadFailure()),
       (question) {
         _currentQuestion = question;
         _cardsToClick = question.answerNeeded;
@@ -114,26 +155,30 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
     // Refill hand up to handLength (10)
     final missingCards = handLength - _gameData.handList.length;
-    for (var i = 0; i < missingCards; i++) {
-      final res = _drawNextAnswer(DrawAnswerParams(
-        totalPlayers: _gameData.totalPlayers,
-        playerNumber: _gameData.playerNumber,
-      ));
-      res.fold(
-        (fail) => throw Exception(fail.message),
-        (answer) => _gameData.addAnswerCard(answer),
-      );
-    }
+    _drawCards(
+      playerNumber: _gameData.playerNumber,
+      totalPlayers: _gameData.totalPlayers,
+      count: missingCards,
+      onCard: _gameData.addAnswerCard,
+    );
 
     emit(RoundReady());
   }
 
   void _answerCardRequested(
       AnswerCardsRequested event, Emitter<GameState> emit) {
-    final res = _retriveAnswers(event.ids);
+    final res = _retriveAnswers(
+      RetriveAnswersParams(
+        ids: event.ids,
+        eligibleIds: _gameData.otherPlayersCardIds,
+      ),
+    );
     res.fold(
-      (fail) => emit(LoadFailure()),
-      (answers) => emit(AnswerCardsLoaded(answers: answers)),
+      (fail) => emit(LoadFailure(fail.message)),
+      (answers) {
+        _gameData.removeOtherPlayerCardIds(event.ids);
+        emit(AnswerCardsLoaded(answers: answers));
+      },
     );
   }
 
