@@ -92,21 +92,88 @@ void main() {
     }
   });
 
-  test('AnswerCardsRequested emits AnswerCardsLoaded with correct cards',
+  test('AnswerCardsRequested emits AnswerCardsLoaded for eligible IDs and removes them',
       () async {
-    bloc.add(const AnswerCardsRequested(ids: [5, 10, 15]));
+    final validIds = bloc.gameData.otherPlayersCardIds.take(3).toList();
+    final initialCount = bloc.gameData.otherPlayersCardIds.length;
+
+    bloc.add(AnswerCardsRequested(ids: validIds));
     await expectLater(
       bloc.stream,
       emits(predicate<GameState>((state) {
         if (state is AnswerCardsLoaded) {
           return state.answers.length == 3 &&
-              state.answers.getCardAt(0).id == 5 &&
-              state.answers.getCardAt(1).id == 10 &&
-              state.answers.getCardAt(2).id == 15;
+              state.answers.getCardAt(0).id == validIds[0] &&
+              state.answers.getCardAt(1).id == validIds[1] &&
+              state.answers.getCardAt(2).id == validIds[2];
         }
         return false;
       })),
     );
+
+    expect(bloc.gameData.otherPlayersCardIds.length, equals(initialCount - 3));
+  });
+
+  test('AnswerCardsRequested rejects ineligible, already-played, and duplicate IDs',
+      () async {
+    // Pick an ID not present in any other player's tracked deck
+    final missingId = List.generate(100, (i) => i).firstWhere(
+      (id) => !bloc.gameData.otherPlayersCardIds.contains(id),
+    );
+    final initialIds = List<int>.from(bloc.gameData.otherPlayersCardIds);
+
+    bloc.add(AnswerCardsRequested(ids: [missingId]));
+    await expectLater(
+      bloc.stream,
+      emits(predicate<GameState>(
+        (s) => s is LoadFailure && s.message.isNotEmpty,
+      )),
+    );
+    expect(bloc.gameData.otherPlayersCardIds, equals(initialIds));
+
+    // Over-duplicating an ID that appears once is rejected cleanly
+    final uniqueId = initialIds.firstWhere(
+      (id) => initialIds.where((e) => e == id).length == 1,
+    );
+    bloc.add(AnswerCardsRequested(ids: [uniqueId, uniqueId]));
+    await expectLater(bloc.stream, emits(isA<LoadFailure>()));
+    expect(bloc.gameData.otherPlayersCardIds, equals(initialIds));
+
+    // Valid play removes the ID so re-using it without a redraw fails
+    bloc.add(AnswerCardsRequested(ids: [uniqueId]));
+    await expectLater(bloc.stream, emits(isA<AnswerCardsLoaded>()));
+
+    bloc.add(AnswerCardsRequested(ids: [uniqueId]));
+    await expectLater(bloc.stream, emits(isA<LoadFailure>()));
+  });
+
+  test('Other players eligible IDs track initial hands and non-Master refills',
+      () async {
+    // Player 2 of 4 starts with 3 * 10 = 30 tracked IDs from players 1, 3, 4
+    expect(bloc.gameData.otherPlayersCardIds.length, equals(3 * handLength));
+
+    // Round 1 (Master = Player 1): no refills yet
+    bloc.add(const StartRound(isMaster: false));
+    await expectLater(bloc.stream, emits(isA<RoundReady>()));
+    expect(bloc.gameData.otherPlayersCardIds.length, equals(3 * handLength));
+    final q1Needed = bloc.cardsToClick;
+
+    // Round 2 (Master = Player 2): only players 3 and 4 refill q1Needed cards
+    bloc.add(const StartRound(isMaster: true));
+    await expectLater(bloc.stream, emits(isA<RoundReady>()));
+    expect(
+      bloc.gameData.otherPlayersCardIds.length,
+      equals(3 * handLength + 2 * q1Needed),
+    );
+
+    // Verify independent Player 3 device draws are all eligible on Player 2
+    final p3Source =
+        RandomAnswersSource(seed: 1234567890, answerList: answers);
+    for (var i = 0; i < handLength + q1Needed; i++) {
+      final card =
+          p3Source.getRandomCardWithSkip(totalPlayers: 4, playerNumber: 3);
+      expect(bloc.gameData.otherPlayersCardIds, contains(card.id));
+    }
   });
 
   test('GameData.isMasterForRound calculates round rotation accurately', () {
