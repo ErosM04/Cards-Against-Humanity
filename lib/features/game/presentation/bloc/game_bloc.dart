@@ -87,17 +87,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       hand: hand,
     );
 
-    /// events definition
+    /// Events definition
     on<StartRound>(_roundStart);
     on<AnswerCardsRequested>(_answerCardRequested);
     on<CardClicked>(_clickedCard);
-    on<RoundWon>((event, emit) {
-      _gameData.incrementScore();
-      _selectedCards.clear();
-    });
-    on<RoundLost>((event, emit) {
-      _selectedCards.clear();
-    });
+    on<RoundWon>(_roundWon);
+    on<RoundLost>(_roundLost);
   }
 
   /// Draws missing cards to complete hand until it contains [handLength] cards.
@@ -106,11 +101,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     _clickedCards = 0;
     _firstCard = null;
 
-    if (event.isMaster) {
-      _gameData.newRoundAsMaster();
-    } else {
-      _gameData.newRoundAsPlayer();
-    }
+    _gameData.newRound();
 
     final questionRes = _drawNextQuestion();
     questionRes.fold(
@@ -181,5 +172,17 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     } else {
       emit(RoundReady());
     }
+  }
+
+  // Records a won round and clears the selected cards.
+  void _roundWon(RoundWon event, Emitter<GameState> emit) {
+    _gameData.recordPlayerRound(won: true);
+    _selectedCards.clear();
+  }
+
+  // Records a lost round without increasing the score and clears the selected cards.
+  void _roundLost(RoundLost event, Emitter<GameState> emit) {
+    _gameData.recordPlayerRound(won: false);
+    _selectedCards.clear();
   }
 }

@@ -103,7 +103,7 @@ class CardPage extends StatelessWidget {
   void _goToNewRound(BuildContext context) {
     final gameBloc = context.read<GameBloc>();
     final nextRound = gameBloc.gameData.totalRounds + 1;
-    final isNextMaster = gameBloc.gameData.isMasterForRound(nextRound);
+    final isNextMaster = gameBloc.gameData.isMasterRound(nextRound);
 
     gameBloc.add(StartRound(isMaster: isNextMaster));
 

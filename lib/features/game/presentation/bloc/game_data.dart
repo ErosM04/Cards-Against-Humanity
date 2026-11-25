@@ -20,7 +20,7 @@ class GameData {
   int _playerRounds;
 
   /// The score of the player.
-  int _score;
+  int _score = 0;
 
   /// The unique instance of the class.
   static GameData? _instance;
@@ -56,19 +56,18 @@ class GameData {
         _totalPlayers = totalPlayers,
         _hand = hand,
         _totalRounds = 0,
-        _playerRounds = -1,
-        _score = 0 {
+        _playerRounds = 0 {
     if (_totalPlayers < minPlayers || _totalPlayers > maxPlayers) {
       throw RangeError(
-          'Total players must be between $minPlayers and $maxPlayers');
+          'Il numero massimo di giocatori deve essere tra $minPlayers e $maxPlayers');
     }
     if (_hand.length != 10) {
       throw FormatException(
-          'The amount of cards contained in a hand must be $handLength');
+          'Il numero di carte nella mano deve essere $handLength');
     }
   }
 
-  /// Constructor that stores data ralated to the current state of the game.
+  /// Constructor that stores data related to the current state of the game.
   /// This is a factory constructor used to implement a Singleton.
   factory GameData({
     required int playerNumber,
@@ -94,15 +93,8 @@ class GameData {
     );
   }
 
-  /// Counts this round as one played as a normal Player and increments both the player
-  /// and the total round counters.
-  void newRoundAsPlayer() {
-    _playerRounds++;
-    _totalRounds++;
-  }
-
-  /// Counts this round as one played as a Master and increments only the total round counter.
-  void newRoundAsMaster() {
+  /// Increments the total rounds counter when a round starts.
+  void newRound() {
     _totalRounds++;
   }
 
@@ -115,16 +107,12 @@ class GameData {
   bool removeAnswerCard(Answer answer) => _hand.removeCard(answer);
 
   /// Checks whether a given round is played as Master by this player.
-  bool isMasterForRound(int round) =>
+  bool isMasterRound(int round) =>
       ((round - 1) % _totalPlayers) + 1 == _playerNumber;
 
-  /// Increments the player's score.
-  void incrementScore() {
-    _score++;
+  /// Records a completed non-Master round and increments [score] when [won].
+  void recordPlayerRound({required bool won}) {
+    _playerRounds++;
+    if (won) _score++;
   }
-
-  /// Returns the amount of answer cards that must be skipped when drawing.
-  /// This happens in order to avoid drawing the same cards of other players.
-  /// The skip operation is based on the [totalPlayers].
-  // int getAnswerSkip() =>
 }
