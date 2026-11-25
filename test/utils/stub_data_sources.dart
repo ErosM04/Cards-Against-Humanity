@@ -24,20 +24,17 @@ class StubRemoteDataSource implements UpdateRemoteDataSource {
 /// No-op local datasource stub for unit testing [UpdateRepositoryImpl].
 class StubLocalDataSource implements UpdateLocalDataSource {
   @override
-  Future<String> buildUniqueApkPath({
-    required String baseFileName,
-    String? preferredDirPath,
-  }) =>
+  Future<String> buildApkPath({required String fileName}) =>
       throw UnimplementedError();
+
+  @override
+  Future<void> clearCachedUpdates() async {}
 
   @override
   Future<bool> hasPermission(permission) => throw UnimplementedError();
 
   @override
   Future<OpenResult> openApk(String apkPath) => throw UnimplementedError();
-
-  @override
-  Future<String?> pickApkPath() => throw UnimplementedError();
 
   @override
   Future<bool> requestPermission(permission) => throw UnimplementedError();

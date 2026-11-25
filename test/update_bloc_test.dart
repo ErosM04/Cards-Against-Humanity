@@ -6,16 +6,17 @@ import 'package:cards_against_humanity/features/update/data/datasources/update_l
 import 'package:cards_against_humanity/features/update/domain/entities/app_release.dart';
 import 'package:cards_against_humanity/features/update/domain/entities/app_version.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/check_for_update.dart';
+import 'package:cards_against_humanity/features/update/domain/usecases/clear_cached_updates.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/download_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/manage_update_permission.dart';
-import 'package:cards_against_humanity/features/update/domain/usecases/pick_and_install_apk.dart';
 import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
 import 'package:cards_against_humanity/features/update/presentation/widgets/update_dialog.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:material_ui/material_ui.dart';
 
-/// Runs unit tests for [UpdateBloc], APK naming, and release markdown parsing.
+/// Runs unit and widget tests for [UpdateBloc], internal cache fallback, and dialog controls.
 void main() {
   late FakeUpdateRepository repo;
   late UpdateBloc bloc;
@@ -35,13 +36,19 @@ void main() {
       checkForUpdate: CheckForUpdate(updateRepository: repo),
       downloadApk: DownloadApk(updateRepository: repo),
       installApk: InstallApk(updateRepository: repo),
-      pickAndInstallApk: PickAndInstallApk(updateRepository: repo),
+      clearCachedUpdates: ClearCachedUpdates(updateRepository: repo),
       managePermission: ManageUpdatePermission(updateRepository: repo),
       permissionPromptDelay: Duration.zero,
     );
   });
 
   tearDown(() => bloc.close());
+
+  test('UpdateCacheClearRequested clears previously cached updates', () async {
+    bloc.add(const UpdateCacheClearRequested());
+    await Future<void>.delayed(Duration.zero);
+    expect(repo.clearCacheCalls, equals(1));
+  });
 
   test('UpdateCheckRequested emits UpdateAvailable when newer release exists',
       () async {
@@ -71,34 +78,21 @@ void main() {
     );
   });
 
-  test('UpdateDownloadRequested emits notice when storage permission is denied',
-      () async {
-    repo.storageGranted = false;
-    bloc.add(const UpdateDownloadRequested(sampleRelease));
-    await expectLater(
-      bloc.stream,
-      emitsInOrder([
-        isA<UpdateNotice>(),
-        predicate<UpdateState>(
-          (s) => s is UpdateNotice && s.message == 'Fottiti',
-        ),
-      ]),
-    );
-  });
-
   test(
-      'UpdateInstallRequested emits UpdateInstallFailed then manual pick works',
+      'UpdateInstallRequested emits UpdateInstallFailed then retry succeeds',
       () async {
+    repo.downloadResult = right('/tmp/updates/Cards_Against_Humanity.apk');
+    bloc.add(const UpdateDownloadRequested(sampleRelease));
+    await expectLater(bloc.stream, emitsThrough(isA<UpdateDownloadCompleted>()));
+
     repo.installResult = left(
       UpdateInstallFailure(
         errorType: 'File not found',
-        apkPath: '/storage/emulated/0/Download/Cards_Against_Humanity.apk',
+        apkPath: '/tmp/updates/Cards_Against_Humanity.apk',
       ),
     );
     bloc.add(
-      const UpdateInstallRequested(
-        '/storage/emulated/0/Download/Cards_Against_Humanity.apk',
-      ),
+      const UpdateInstallRequested('/tmp/updates/Cards_Against_Humanity.apk'),
     );
     await expectLater(
       bloc.stream,
@@ -106,27 +100,54 @@ void main() {
         (s) =>
             s is UpdateInstallFailed &&
             s.errorType == 'File not found' &&
-            s.apkPath.endsWith('Cards_Against_Humanity.apk'),
+            s.apkPath.endsWith('Cards_Against_Humanity.apk') &&
+            s.downloadUrl == sampleRelease.downloadUrl,
       )),
     );
 
-    bloc.add(const UpdateManualInstallRequested());
+    repo.installResult = right(unit);
+    bloc.add(
+      const UpdateInstallRequested('/tmp/updates/Cards_Against_Humanity.apk'),
+    );
     await expectLater(bloc.stream, emits(isA<UpdateInstallCompleted>()));
   });
 
-  test('resolveAvailableFileName increments suffix and ignores malformed names',
-      () {
-    const local = UpdateLocalDataSourceImpl();
-    final name = local.resolveAvailableFileName(
-      entries: [
-        File('/tmp/Cards_Against_Humanity.apk'),
-        File('/tmp/Cards_Against_Humanity-2.apk'),
-        File('/tmp/Cards_Against_Humanity-backup.apk'),
-      ],
-      baseFileName: 'Cards_Against_Humanity',
-      extension: '.apk',
+  test('buildApkPath falls back from tempDir and clearCachedUpdates deletes all',
+      () async {
+    final sandbox = await Directory.systemTemp.createTemp('cah_update_test_');
+    addTearDown(() async {
+      if (await sandbox.exists()) await sandbox.delete(recursive: true);
+    });
+
+    final supportDir = Directory('${sandbox.path}${Platform.pathSeparator}support');
+    final externalDir =
+        Directory('${sandbox.path}${Platform.pathSeparator}external');
+
+    final local = UpdateLocalDataSourceImpl(
+      getTempDir: () async => throw const FileSystemException('no temp'),
+      getSupportDir: () async => supportDir,
+      getExternalDir: () async => externalDir,
     );
-    expect(name, equals('Cards_Against_Humanity-3.apk'));
+
+    final apkPath = await local.buildApkPath(fileName: 'Cards_Against_Humanity');
+    expect(apkPath, startsWith('${supportDir.path}${Platform.pathSeparator}updates'));
+    await File(apkPath).writeAsString('apk-bytes');
+    expect(await File(apkPath).exists(), isTrue);
+
+    final extUpdates = Directory(
+      '${externalDir.path}${Platform.pathSeparator}updates',
+    );
+    await extUpdates.create(recursive: true);
+    await File('${extUpdates.path}${Platform.pathSeparator}old.apk')
+        .writeAsString('stale');
+
+    await local.clearCachedUpdates();
+    expect(
+      await Directory('${supportDir.path}${Platform.pathSeparator}updates')
+          .exists(),
+      isFalse,
+    );
+    expect(await extUpdates.exists(), isFalse);
   });
 
   test('parseReleaseSections safely strips markdown links without hanging', () {
@@ -135,5 +156,51 @@ void main() {
     );
     expect(sections['Funzionalità']?.first, contains('https://example.com'));
     expect(sections['Bug fixes'], equals(['Alcuni bug fixes']));
+  });
+
+  testWidgets(
+      'InstallErrorDialog renders Riprova and Scarica dal browser buttons',
+      (tester) async {
+    bool retried = false;
+    bool openedBrowser = false;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => InstallErrorDialog(
+                    errorType: 'Installer error',
+                    onRetry: () => retried = true,
+                    onBrowserDownload: () => openedBrowser = true,
+                    onDeny: () {},
+                  ),
+                ),
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Riprova'), findsOneWidget);
+    expect(find.text('Scarica dal browser'), findsOneWidget);
+
+    await tester.tap(find.text('Riprova'));
+    await tester.pumpAndSettle();
+    expect(retried, isTrue);
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Scarica dal browser'));
+    await tester.pumpAndSettle();
+    expect(openedBrowser, isTrue);
   });
 }

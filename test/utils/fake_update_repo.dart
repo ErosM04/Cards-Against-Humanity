@@ -6,32 +6,25 @@ import 'package:fpdart/fpdart.dart';
 /// In-memory [UpdateRepository] fake used to drive [UpdateBloc] unit tests.
 class FakeUpdateRepository implements UpdateRepository {
   Either<Failure, AppRelease?> checkResult = right(null);
-  bool storageGranted = true;
   bool installGranted = true;
   Either<Failure, String> downloadResult =
-      right('/tmp/Cards_Against_Humanity.apk');
+      right('/tmp/updates/Cards_Against_Humanity.apk');
   Either<Failure, Unit> installResult = right(unit);
-  Either<Failure, Unit> pickResult = right(unit);
+  Either<Failure, Unit> clearCacheResult = right(unit);
+  int clearCacheCalls = 0;
   List<double> reportedProgress = [0.5, 1.0];
 
   @override
   Future<Either<Failure, AppRelease?>> checkForUpdate() async => checkResult;
 
   @override
-  Future<bool> hasPermission(UpdatePermission permission) async =>
-      permission == UpdatePermission.externalStorage
-          ? storageGranted
-          : installGranted;
+  Future<bool> hasPermission(UpdatePermission permission) async => installGranted;
 
   @override
   Future<Either<Failure, bool>> requestPermission(
     UpdatePermission permission,
   ) async =>
-      right(
-        permission == UpdatePermission.externalStorage
-            ? storageGranted
-            : installGranted,
-      );
+      right(installGranted);
 
   @override
   Future<Either<Failure, String>> downloadApk({
@@ -46,9 +39,12 @@ class FakeUpdateRepository implements UpdateRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> installApk(String apkPath) async =>
-      installResult;
+  Future<Either<Failure, Unit>> clearCachedUpdates() async {
+    clearCacheCalls++;
+    return clearCacheResult;
+  }
 
   @override
-  Future<Either<Failure, Unit>> pickAndInstallApk() async => pickResult;
+  Future<Either<Failure, Unit>> installApk(String apkPath) async =>
+      installResult;
 }
