@@ -230,7 +230,11 @@ class _StartPageState extends State<StartPage> {
           Text(
             '$subTitle:',
             textAlign: TextAlign.start,
-            style: const TextStyle(fontSize: 20),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
           ),
           GameInfo(infoText: infoText),
         ],
