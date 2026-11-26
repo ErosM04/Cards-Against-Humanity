@@ -269,7 +269,7 @@ lib/
 - [button.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/button.dart): `CustomButton` styled `ElevatedButton` wrapper with typed `VoidCallback onPressed` and preset typography and padding.
 - [card.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/card.dart): `CardAHW` question and answer card widget supporting selection highlights, text scroll, and inline blank replacement.
 - [info.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/info.dart): `GameInfo` popup widget displaying contextual information tooltips via `InfoPopupWidget`.
-- [textfield.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/textfield.dart): `CustomTextField` wrapper for `TextFormField` configured with `TextInputType.phone`, non-empty guard, custom `validator` hook, and external `errorText` support.
+- [textfield.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/textfield.dart): `CustomTextField` detached white-bordered input box wrapping `FormField`/`TextField` configured with `TextInputType.phone`, non-empty guard, custom `validator` hook, and external `errorText` support.
 
 #### Use Cases Abstraction (`lib/core/usecases/`)
 - [usecase.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/usecases/usecase.dart): Interfaces for parameterless operations: `UseCase<SuccessType>` (synchronous) and `UseCaseAsync<SuccessType>` (asynchronous).
