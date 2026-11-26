@@ -89,7 +89,7 @@ void main() {
       ),
     );
 
-    final fields = find.byType(TextFormField);
+    final fields = find.byType(TextField);
     await tester.enterText(fields.at(0), 'abc');
     await tester.enterText(fields.at(1), '25');
     await tester.enterText(fields.at(2), '2');
@@ -142,7 +142,7 @@ void main() {
       ),
     );
 
-    final input = find.byType(TextFormField);
+    final input = find.byType(TextField);
     await tester.enterText(input, '12a.34');
     await tester.tap(find.text('Mostra carte'));
     await tester.pump();
