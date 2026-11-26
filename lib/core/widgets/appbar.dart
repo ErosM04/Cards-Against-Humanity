@@ -1,4 +1,3 @@
-import 'package:cards_against_humanity/constants.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Customized [AppBar] for Cards Against Humanity.
@@ -23,33 +22,59 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 
   @override
-  Widget build(BuildContext context) => AppBar(
-        centerTitle: true,
-        leading: leading,
-        titleSpacing: 0,
-        title: Text(
-          appName,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.secondary,
-            fontWeight: FontWeight.bold,
-          ),
+  Widget build(BuildContext context) {
+    final accentColor = Theme.of(context).colorScheme.secondary;
+    return AppBar(
+      centerTitle: true,
+      leading: leading,
+      titleSpacing: 0,
+      title: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Cards Against',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: const Text(
+                'Humanity',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
-        actions: (score > -1 && maxPoints >= score)
-            ? [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      '$score/$maxPoints',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
+      ),
+      actions: (score > -1 && maxPoints >= score)
+          ? [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    '$score/$maxPoints',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: accentColor,
                     ),
                   ),
                 ),
-              ]
-            : null,
-      );
+              ),
+            ]
+          : null,
+    );
+  }
 }
