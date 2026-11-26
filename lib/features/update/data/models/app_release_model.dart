@@ -15,16 +15,16 @@ class AppReleaseModel extends AppRelease {
   /// Parses release metadata from a GitHub Releases API JSON map.
   factory AppReleaseModel.fromJson(Map<String, dynamic> json) {
     final rawTag = (json['tag_name'] ?? '').toString().trim();
-    final normalizedTag =
-        rawTag.startsWith('v') || rawTag.startsWith('V')
-            ? rawTag.substring(1)
-            : rawTag;
+    final normalizedTag = rawTag.startsWith('v') || rawTag.startsWith('V')
+        ? rawTag.substring(1)
+        : rawTag;
 
     return AppReleaseModel(
       version: AppVersion.parse(normalizedTag),
       description: (json['body'] ?? '').toString(),
       isDraft: json['draft'] == true,
-      downloadUrl: githubLatestApkUrl,
+      // downloadUrl: githubLatestApkUrl,
+      downloadUrl: githubReleaseFolderApkUrl,
       releaseUrl: (json['html_url'] ?? githubReleasesPageUrl).toString(),
     );
   }

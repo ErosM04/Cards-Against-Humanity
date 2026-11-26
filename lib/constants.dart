@@ -46,3 +46,7 @@ const String githubReleasesPageUrl =
 /// Direct download URL for the latest release APK.
 const String githubLatestApkUrl =
     'https://github.com/ErosM04/Cards-Against-Humanity/releases/latest/download/Cards_Against_Humanity.apk';
+
+/// Direct download URL for the APK saved in the repository inside the `release_apk/` folder
+const String githubReleaseFolderApkUrl =
+    'https://raw.githubusercontent.com/ErosM04/Cards-Against-Humanity/bloc/release_apk/Cards_Against_Humanity.apk';
