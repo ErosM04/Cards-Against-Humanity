@@ -1,7 +1,7 @@
 # TODO
 - [X] Improve background update
 - [ ] Improve background update graphics
-- [ ] Improve game data imput fields
+- [X] Improve game data imput fields
 - [X] Master can only insert the allowed cards (check that are 1 from each player hand)
 - [X] Improve app version handling and fix version comparison bug
 - [X] Fix score in AppBar
@@ -9,3 +9,4 @@
 - [ ] Sistema SnackBar pk si adatti a lunghezza messaggio
 - [X] Genera un keystore per firmare l'app
 - [X] Rimuovi i TODO in [android/app/build.gradle](android/app/build.gradle)
+- [ ] Check Update failure fallbacks functionalities and graphics
