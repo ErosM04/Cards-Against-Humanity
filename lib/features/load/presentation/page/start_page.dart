@@ -123,7 +123,12 @@ class _StartPageState extends State<StartPage> {
                         ),
                       ],
                     ),
-                    CustomTextField(controller: seedController),
+                    CustomTextField(
+                      controller: seedController,
+                      validator: (value) => _tryParseText(value!) == null
+                          ? 'Cazzo hai scritto?!'
+                          : null,
+                    ),
                     const SizedBox(height: 100),
 
                     // Total players
@@ -131,7 +136,20 @@ class _StartPageState extends State<StartPage> {
                       subTitle: 'Totale giocatori',
                       infoText: totalPlayersInfo,
                     ),
-                    CustomTextField(controller: playerAmountController),
+                    CustomTextField(
+                      controller: playerAmountController,
+                      validator: (value) {
+                        final amount = _tryParseText(value!);
+                        if (amount == null) return 'Cazzo hai scritto?!';
+                        if (amount < minPlayers) {
+                          return 'Minimo $minPlayers giocatori!';
+                        }
+                        if (amount > maxPlayers) {
+                          return 'Massimo $maxPlayers giocatori!';
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 100),
 
                     // Player number
@@ -139,7 +157,23 @@ class _StartPageState extends State<StartPage> {
                       subTitle: 'Numero giocatore',
                       infoText: playerNumberInfo,
                     ),
-                    CustomTextField(controller: playerNumberController),
+                    CustomTextField(
+                      controller: playerNumberController,
+                      validator: (value) {
+                        final number = _tryParseText(value!);
+                        if (number == null) return 'Cazzo hai scritto?!';
+                        final amount =
+                            _tryParseText(playerAmountController.text);
+                        final hasValidAmount = amount != null &&
+                            amount >= minPlayers &&
+                            amount <= maxPlayers;
+                        if (number <= 0 ||
+                            (hasValidAmount && number > amount)) {
+                          return 'Il valore $number è fuori dal range!';
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 50),
 
                     // Link guide
@@ -202,31 +236,19 @@ class _StartPageState extends State<StartPage> {
         ],
       );
 
-  /// Read the data from the [TextField] and tries to convert them into numbers. If these data are in the correct format
-  /// proceeds to redirect the user either to the **Game** or o the **Master** page.
+  /// Validates the form fields and redirects to [MasterGamePage] or [GamePage].
   void _startGame() {
-    // Checks if the content of the text fields is empty.
     if (!formKey.currentState!.validate()) return;
 
-    // Tries to convert the input to int
-    int? seed = _tryParseInput(seedController);
-    int? playerAmount = _tryParseInput(playerAmountController);
-    int? playerNumber = _tryParseInput(playerNumberController);
-
-    // Checks if the data are in the correct format, otherwise displays an error message
-    if (!_validateInputValues(
-      seed: seed,
-      playerAmount: playerAmount,
-      playerNumber: playerNumber,
-    )) {
-      return;
-    }
+    final seed = _tryParseText(seedController.text)!;
+    final playerAmount = _tryParseText(playerAmountController.text)!;
+    final playerNumber = _tryParseText(playerNumberController.text)!;
 
     // Initialize game session dependencies for BLoC
     initGameDependencies(
-      seed: seed!,
-      playerNumber: playerNumber!,
-      totalPlayers: playerAmount!,
+      seed: seed,
+      playerNumber: playerNumber,
+      totalPlayers: playerAmount,
       questionList: questionList,
       answerList: answerList,
     );
@@ -243,39 +265,8 @@ class _StartPageState extends State<StartPage> {
     }
   }
 
-  /// Tryes parsing the string inside the ``[TextField]`` associated with the given ``[controller]`` into an [int].
-  /// If something goes wrong a null is returned.
-  int? _tryParseInput(TextEditingController controller) =>
-      int.tryParse(controller.text
-          .replaceAll(' ', '')
-          .replaceAll('.', '')
-          .replaceAll('-', ''));
-
-  /// Controls the values passed, which should be the input from the text fields, and if verifies there is any problem.
-  /// For each problem the respective field's text is set to a message describes the error.
-  ///
-  /// Returns `true` there are no problems, or `flase` otherwise.
-  bool _validateInputValues({
-    required int? seed,
-    required int? playerAmount,
-    required int? playerNumber,
-  }) {
-    if (seed == null || playerAmount == null || playerNumber == null) {
-      seedController.text = 'Cazzo hai scritto?!';
-      playerAmountController.text = 'Cazzo hai scritto?!';
-      playerNumberController.text = 'Cazzo hai scritto?!';
-      return false;
-    } else if (playerAmount < 3) {
-      playerAmountController.text = 'Minimo $minPlayers giocatori!';
-      return false;
-    } else if (playerAmount > 20) {
-      playerAmountController.text = 'Massimo $maxPlayers giocatori!';
-      return false;
-    } else if (playerNumber <= 0 || playerNumber > playerAmount) {
-      playerNumberController.text =
-          'Il valore $playerNumber è fuori dal range!';
-      return false;
-    }
-    return true;
-  }
+  /// Parses integer input after stripping spaces, dots, and dashes.
+  int? _tryParseText(String text) => int.tryParse(
+        text.replaceAll(' ', '').replaceAll('.', '').replaceAll('-', ''),
+      );
 }

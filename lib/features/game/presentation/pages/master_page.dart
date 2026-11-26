@@ -26,6 +26,12 @@ class _MasterGamePageState extends State<MasterGamePage> {
   /// The controller of the [TextField] where the players inserts the ids of the answer cards.
   final textController = TextEditingController();
 
+  /// Form key used to validate the entered card IDs.
+  final _formKey = GlobalKey<FormState>();
+
+  /// Async error message returned by [GameBloc] when IDs fail eligibility checks.
+  String? _inputError;
+
   @override
   void dispose() {
     textController.dispose();
@@ -65,9 +71,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
               }
             }
           } else if (state is LoadFailure && state.message.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
-            );
+            setState(() => _inputError = state.message);
           }
         },
         builder: (context, state) {
@@ -102,30 +106,44 @@ class _MasterGamePageState extends State<MasterGamePage> {
         },
       );
 
-  /// Read the data from the textfield, converts it into a list of numbers and then use these ids to get the answers.
-  void _getAnswerCards(GameBloc gameBloc) {
-    String str = textController.text
-        .replaceAll(' ', '')
-        .replaceAll(',', '')
-        .replaceAll('-', '');
+  static final RegExp _allowedCharsPattern = RegExp(r'^[0-9.,-]+$');
+  static final RegExp _separatorPattern = RegExp(r'[.,-]');
 
-    final expectedCount =
-        gameBloc.cardsToClick * (gameBloc.gameData.totalPlayers - 1);
-
-    if (str.contains('.') && (str.split('.').length == expectedCount)) {
-      final splitArr = str.split('.');
-
-      // If data inserted aren't numbers the function stops
-      for (var element in splitArr) {
-        if (int.tryParse(element) == null) return;
-      }
-
-      final cardIds = List<int>.generate(
-          splitArr.length, (index) => int.parse(splitArr[index]));
-
-      // Notify BLoC of requested answer card IDs
-      context.read<GameBloc>().add(AnswerCardsRequested(ids: cardIds));
+  /// Validates [raw] card ID input syntax and expected count, returning an error message or `null`.
+  static String? validateCardIdsInput(String raw, int expectedCount) {
+    final cleaned = raw.replaceAll(' ', '');
+    if (!_allowedCharsPattern.hasMatch(cleaned)) {
+      return 'Caratteri non validi: usa solo numeri e ".", "," o "-"';
     }
+
+    final parts = cleaned.split(_separatorPattern);
+    if (parts.any((part) => part.isEmpty)) {
+      return 'Formato non valido: usa numeri separati da ".", "," o "-"';
+    }
+    if (parts.length != expectedCount) {
+      return 'Inserisci $expectedCount numeri separati da ".", "," o "-"';
+    }
+
+    for (final part in parts) {
+      if (int.tryParse(part) == null) {
+        return 'Uno o più numeri non sono validi';
+      }
+    }
+    return null;
+  }
+
+  /// Validates the input field, parses card IDs, and dispatches [AnswerCardsRequested].
+  void _getAnswerCards(GameBloc gameBloc) {
+    if (_inputError != null) {
+      setState(() => _inputError = null);
+    }
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final parts =
+        textController.text.replaceAll(' ', '').split(_separatorPattern);
+    final cardIds =
+        List<int>.generate(parts.length, (index) => int.parse(parts[index]));
+    context.read<GameBloc>().add(AnswerCardsRequested(ids: cardIds));
   }
 
   /// Goes to the next round.
@@ -147,7 +165,12 @@ class _MasterGamePageState extends State<MasterGamePage> {
   }
 
   /// Builds the set of widgets used to take the cards id as input, to later save them into ``[answerCardList]``.
-  Widget _buildCardInputWidgets(GameBloc gameBloc) => Column(
+  Widget _buildCardInputWidgets(GameBloc gameBloc) {
+    final expectedCount =
+        gameBloc.cardsToClick * (gameBloc.gameData.totalPlayers - 1);
+    return Form(
+      key: _formKey,
+      child: Column(
         children: [
           _buildSubTitle('Inserisci i numeri delle carte:', fontSize: 22),
           _buildSubTitle(
@@ -158,14 +181,26 @@ class _MasterGamePageState extends State<MasterGamePage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: CustomTextField(controller: textController),
+            child: CustomTextField(
+              controller: textController,
+              errorText: _inputError,
+              onChanged: (_) {
+                if (_inputError != null) {
+                  setState(() => _inputError = null);
+                }
+              },
+              validator: (value) =>
+                  validateCardIdsInput(value!, expectedCount),
+            ),
           ),
           _buildButton(
             text: 'Mostra carte',
             onPressed: () => _getAnswerCards(gameBloc),
           ),
         ],
-      );
+      ),
+    );
+  }
 
   /// Builds the set of widgets used to show the differents answer cards (one per player), with each card containg
   /// the answer/s to the question card.

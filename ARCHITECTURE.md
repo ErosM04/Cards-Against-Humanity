@@ -33,8 +33,8 @@ Rounds rotate sequentially among players from Player 1 to Player $N$:
   - The Master does not submit an answer card and does not earn score points during this round.
   - The Master screen displays the question card and a text input field.
   - Normal players verbally communicate their chosen card ID(s) to the Master.
-  - The Master inputs the IDs separated by dots (`.`), e.g.:
-    - Single-answer question: `96.445.237`
+  - The Master inputs the IDs separated by `.`, `,`, or `-`, e.g.:
+    - Single-answer question: `96.445.237` (or `96,445,237` / `96-445-237`)
     - Two-answer question: `55.24.7.255.743.112` (subsequent numbers from the same player).
   - Tapping **"Mostra carte"** parses the IDs, looks up the card texts, and displays them in a randomized (shuffled) carousel to preserve player anonymity.
   - The Master picks the funniest completion, announces the winner, and taps **"Prossimo round"** to advance the game.
@@ -269,7 +269,7 @@ lib/
 - [button.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/button.dart): `CustomButton` styled `ElevatedButton` wrapper with typed `VoidCallback onPressed` and preset typography and padding.
 - [card.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/card.dart): `CardAHW` question and answer card widget supporting selection highlights, text scroll, and inline blank replacement.
 - [info.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/info.dart): `GameInfo` popup widget displaying contextual information tooltips via `InfoPopupWidget`.
-- [textfield.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/textfield.dart): `CustomTextField` wrapper for `TextFormField` configured with `TextInputType.phone` (optimized for digits and dots `.`) and basic validation.
+- [textfield.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/textfield.dart): `CustomTextField` wrapper for `TextFormField` configured with `TextInputType.phone`, non-empty guard, custom `validator` hook, and external `errorText` support.
 
 #### Use Cases Abstraction (`lib/core/usecases/`)
 - [usecase.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/usecases/usecase.dart): Interfaces for parameterless operations: `UseCase<SuccessType>` (synchronous) and `UseCaseAsync<SuccessType>` (asynchronous).
@@ -320,7 +320,7 @@ Responsible for game rounds, card drawing via PRNG, card selection, Master answe
 - [game_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/bloc/game_state.dart): Sealed game states (`RoundStart`, `RoundReady`, `FirstCardCliked`, `SecondCardCliked`, `AnswerCardsLoaded`, `LoadFailure`).
 - [game_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/game_page.dart): Normal player UI displaying current question, hand carousel, and card selection logic via `BlocConsumer<GameBloc, GameState>`.
 - [card_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/card_page.dart): Displays the completed question with chosen answer(s) and card IDs from `GameBloc`, along with "Ho vinto" and "Ho perso" outcome buttons dispatching `RoundWon` / `RoundLost` and `StartRound`.
-- [master_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/master_page.dart): Master UI displaying current question, text input for card IDs, error feedback on `LoadFailure`, and randomized card carousel for selecting the winner via `BlocConsumer<GameBloc, GameState>`.
+- [master_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/game/presentation/pages/master_page.dart): Master UI displaying current question, validated text input for card IDs, inline field error feedback on syntax errors or `LoadFailure`, and randomized card carousel for selecting the winner via `BlocConsumer<GameBloc, GameState>`.
 
 ---
 
