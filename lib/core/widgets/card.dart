@@ -92,23 +92,64 @@ class _CardAHWState extends State<CardAHW>
   /// Otherwise returns a ``[Text]`` using the text parameter.
   ///
   /// Both cases the widget is enclosed in a ``[SingleChildScrollView]`` to scroll the text if it's too long.
-  Widget _buildCustomText(bool isCardActive) => SingleChildScrollView(
-        child: (widget.answersList.isEmpty)
-            ? Text(widget.text,
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                  fontSize: (widget.isMainCard) ? 20 : 17,
-                  color: isCardActive
-                      ? Theme.of(context).colorScheme.tertiary
-                      : Colors.white,
-                ))
-            : RichText(
-                textAlign: TextAlign.start,
-                text: TextSpan(
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
-                    children: _buildTextList()),
+  Widget _buildCustomText(bool isCardActive) {
+    final textColor = isCardActive
+        ? Theme.of(context).colorScheme.tertiary
+        : Colors.white;
+    final fontSize = widget.isMainCard ? 20.0 : 17.0;
+    final textStyle = TextStyle(fontSize: fontSize, color: textColor);
+
+    return SingleChildScrollView(
+      child: (widget.answersList.isEmpty)
+          ? (widget.text.contains('________'))
+              ? Text.rich(
+                  TextSpan(
+                    style: textStyle,
+                    children: _buildQuestionBlankSpans(textColor, fontSize),
+                  ),
+                  textAlign: TextAlign.start,
+                )
+              : Text(
+                  widget.text,
+                  textAlign: TextAlign.start,
+                  style: textStyle,
+                )
+          : RichText(
+              textAlign: TextAlign.start,
+              text: TextSpan(
+                  style: const TextStyle(fontSize: 20, color: Colors.white),
+                  children: _buildTextList()),
+            ),
+    );
+  }
+
+  /// Replaces each `'________'` placeholder in a question with a baseline [WidgetSpan] scaled to [fontSize].
+  List<InlineSpan> _buildQuestionBlankSpans(Color lineColor, double fontSize) {
+    final parts = widget.text.split('________');
+    final spans = <InlineSpan>[];
+    for (var i = 0; i < parts.length; i++) {
+      if (parts[i].isNotEmpty) {
+        spans.add(TextSpan(text: parts[i]));
+      }
+      if (i < parts.length - 1) {
+        spans.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: Container(
+              width: fontSize * 4.25,
+              height: fontSize * 0.1,
+              decoration: BoxDecoration(
+                color: lineColor,
+                borderRadius: BorderRadius.circular(1),
               ),
-      );
+            ),
+          ),
+        );
+      }
+    }
+    return spans;
+  }
 
   /// Builds a list of ``[TextSpan]`` where the question (text parameter) is white and the answers (taken by the list
   /// of answers) use a color of the theme and are substituted to the '_____' contained in the question string.

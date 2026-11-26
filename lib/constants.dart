@@ -13,15 +13,15 @@ const String totalPlayersInfo =
 const String playerNumberInfo =
     "Il tuo numero, che identifica il tuo turno.\n E' un numero da 1 fino al numero totale di giocatori";
 
-/// The instructions to help the user, playing Master turn, select the seed.
+/// The instructions to help the user, playing Master turn, insert card IDs.
 const String cardsIdInput =
-    """Inserire i numeri delle carte scelte dagli altri giocatori.
+    """Inserire i numeri delle carte scelte dagli altri giocatori, separati da ".", "," o "-".
 
 Esempio con 3 giocatori che scelgono le risposte:
 
-Nel caso di una sola risposta per giocatore mettere i due numeri distanziati da un punto: 30.40.50
+Nel caso di una sola risposta per giocatore mettere i numeri separati da ".", "," o "-": 30.40.50 (oppure 30,40,50 o 30-40-50)
 
-Nel caso di 2 risposte per giocatore mettere i due numeri di ogni giocatore distanziati da un punto e uno dopo l'altro: 30.31.40.41.50.51""";
+Nel caso di 2 risposte per giocatore mettere i due numeri di ogni giocatore uno dopo l'altro separati da ".", "," o "-": 30.31.40.41.50.51""";
 
 /// The maximum number of players that can play in a single match.
 const int maxPlayers = 20;
@@ -33,7 +33,7 @@ const int minPlayers = 3;
 const int handLength = 10;
 
 /// Current version of the app, updated on every release build.
-const String appVersion = '0.2.0';
+const String appVersion = '0.1.0';
 
 /// GitHub API endpoint for the latest release metadata.
 const String githubLatestReleaseUrl =
