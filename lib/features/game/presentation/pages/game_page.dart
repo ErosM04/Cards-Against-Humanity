@@ -97,6 +97,7 @@ class _GamePageState extends State<GamePage> {
       child: ListView.builder(
         itemCount: hand.length,
         shrinkWrap: true,
+        clipBehavior: Clip.none,
         controller: ScrollController(),
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {

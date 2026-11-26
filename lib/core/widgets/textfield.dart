@@ -45,7 +45,7 @@ class CustomTextField extends StatelessWidget {
           final effectiveError = errorText ?? field.errorText;
           final hasError = effectiveError != null && effectiveError.isNotEmpty;
           final idleBorderColor =
-              hasError ? errorColor : Colors.white.withAlpha(180);
+              hasError ? errorColor : Colors.white.withAlpha(220);
           final activeBorderColor = hasError ? errorColor : Colors.white;
           final glowColor = hasError ? errorColor : Colors.white;
 
@@ -58,15 +58,15 @@ class CustomTextField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: glowColor.withAlpha(55),
-                      blurRadius: 8,
+                      color: glowColor.withAlpha(95),
+                      blurRadius: 10,
                       spreadRadius: 0,
                       offset: const Offset(0, 2),
                     ),
                     BoxShadow(
-                      color: Colors.black.withAlpha(150),
-                      blurRadius: 8,
-                      offset: const Offset(0, 5),
+                      color: Colors.black.withAlpha(200),
+                      blurRadius: 10,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),
@@ -83,7 +83,7 @@ class CustomTextField extends StatelessWidget {
                   },
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF1C1C1E),
+                    fillColor: const Color(0xFF232327),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 14,

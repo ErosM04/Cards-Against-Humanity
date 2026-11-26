@@ -44,30 +44,36 @@ class _CardAHWState extends State<CardAHW>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final colorScheme = Theme.of(context).colorScheme;
     final isCardActive = widget.isClickable && widget.isSelected;
+    final borderColor = isCardActive
+        ? colorScheme.secondary
+        : widget.isMainCard
+            ? colorScheme.primary
+            : Colors.white;
+
     return Padding(
       padding: EdgeInsets.symmetric(
-          vertical: 10, horizontal: (widget.isMainCard) ? 30 : 10),
+          vertical: 14, horizontal: (widget.isMainCard) ? 30 : 12),
       child: Container(
         width: (widget.isMainCard) ? double.infinity : 200,
         decoration: BoxDecoration(
-          color: isCardActive
-              ? Theme.of(context).colorScheme.primary
-              : Colors.transparent,
-          border: Border.all(
-            color: (widget.isMainCard)
-                ? (widget.isClickable)
-                    ? (isCardActive)
-                        ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.primary
-                : (widget.isClickable)
-                    ? (isCardActive)
-                        ? Theme.of(context).colorScheme.secondary
-                        : Colors.white
-                    : Colors.white,
-          ),
+          color: isCardActive ? colorScheme.primary : const Color(0xFF232327),
+          border: Border.all(color: borderColor, width: 1.5),
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: borderColor.withAlpha(95),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: const Offset(0, 2),
+            ),
+            BoxShadow(
+              color: Colors.black.withAlpha(200),
+              blurRadius: 10,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: GestureDetector(
           onTap: () => widget.isClickable ? widget.onClicked?.call() : null,

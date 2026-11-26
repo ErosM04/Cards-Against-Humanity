@@ -231,6 +231,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
         child: ListView.builder(
             itemCount: list.length,
             shrinkWrap: true,
+            clipBehavior: Clip.none,
             controller: ScrollController(),
             scrollDirection: Axis.horizontal,
             itemBuilder: (context, index) => CardAHW(
