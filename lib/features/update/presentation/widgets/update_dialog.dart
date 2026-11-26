@@ -109,7 +109,7 @@ class AppAlertDialog extends StatelessWidget {
       CustomButton(
         text: text,
         fontSize: 16,
-        horizontalInternalPadding: 5,
+        horizontalInternalPadding: 18,
         onPressed: () {
           action();
           Navigator.pop(context);
@@ -357,7 +357,7 @@ class InstallErrorDialog extends StatelessWidget {
       CustomButton(
         text: text,
         fontSize: 16,
-        horizontalInternalPadding: 10,
+        horizontalInternalPadding: 18,
         onPressed: () {
           Navigator.pop(context);
           action();

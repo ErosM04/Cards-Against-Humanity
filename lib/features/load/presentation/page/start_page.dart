@@ -171,7 +171,6 @@ class _StartPageState extends State<StartPage> {
                         child: CustomButton(
                           text: 'Gioca',
                           onPressed: () => _startGame(),
-                          horizontalInternalPadding: 80,
                           verticalInternalPadding: 15,
                         ),
                       ),

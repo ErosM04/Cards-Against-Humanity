@@ -15,9 +15,27 @@ ThemeData appTheme = ThemeData(
       style: ButtonStyle(
         backgroundColor:
             const WidgetStatePropertyAll(Color.fromARGB(255, 242, 135, 5)),
+        foregroundColor: const WidgetStatePropertyAll(Colors.black),
+        shadowColor: const WidgetStatePropertyAll(
+          Color.fromARGB(160, 242, 135, 5),
+        ),
+        surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+        elevation: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.pressed) ? 2 : 8,
+        ),
         shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: Colors.white.withAlpha(70),
+              width: 1.5,
+            ),
+          ),
+        ),
         textStyle: const WidgetStatePropertyAll(TextStyle(
-            fontSize: 25, fontWeight: FontWeight.bold, color: Colors.black)),
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        )),
       ),
     ));
