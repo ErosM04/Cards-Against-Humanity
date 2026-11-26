@@ -295,6 +295,8 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(appBar: CustomAppBar())),
     );
+    expect(find.text('Cards Against'), findsOneWidget);
+    expect(find.text('Humanity'), findsOneWidget);
     expect(find.textContaining('/'), findsNothing);
   });
 }
