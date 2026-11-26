@@ -14,10 +14,10 @@ ThemeData appTheme = ThemeData(
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor:
-            const WidgetStatePropertyAll(Color.fromARGB(255, 242, 135, 5)),
+            const WidgetStatePropertyAll(Color.fromARGB(255, 208, 116, 4)),
         foregroundColor: const WidgetStatePropertyAll(Colors.black),
         shadowColor: const WidgetStatePropertyAll(
-          Color.fromARGB(160, 242, 135, 5),
+          Color.fromARGB(130, 208, 116, 4),
         ),
         surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
         elevation: WidgetStateProperty.resolveWith(

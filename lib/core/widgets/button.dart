@@ -36,16 +36,17 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
+    final baseColor = color ?? Theme.of(context).colorScheme.primary;
+    final effectiveColor = Color.lerp(baseColor, Colors.black, 0.14)!;
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: effectiveColor.withAlpha(90),
-            blurRadius: 14,
-            spreadRadius: 1,
-            offset: const Offset(0, 4),
+            color: effectiveColor.withAlpha(70),
+            blurRadius: 8,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
           ),
           BoxShadow(
             color: Colors.black.withAlpha(150),
