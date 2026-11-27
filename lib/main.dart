@@ -30,7 +30,10 @@ class CardsAgainstHumanity extends StatelessWidget {
         child: MaterialApp(
           title: appName,
           theme: appTheme,
-          home: const StartPage(checkForUpdate: true),
+          home: const StartPage(
+            checkForUpdate: true,
+            showExplicitContentWarning: true,
+          ),
           debugShowCheckedModeBanner: false,
         ),
       );

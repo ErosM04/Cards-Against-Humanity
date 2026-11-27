@@ -7,6 +7,7 @@ import 'package:cards_against_humanity/init_dependencies.dart';
 import 'package:cards_against_humanity/core/widgets/appbar.dart';
 import 'package:cards_against_humanity/core/widgets/button.dart';
 import 'package:cards_against_humanity/core/widgets/info.dart';
+import 'package:cards_against_humanity/core/widgets/snackbar.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/game_page.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
@@ -21,7 +22,14 @@ class StartPage extends StatefulWidget {
   /// Whether to clear cached APKs and check GitHub Releases for updates on open.
   final bool checkForUpdate;
 
-  const StartPage({super.key, this.checkForUpdate = false});
+  /// Whether to show the explicit-language warning SnackBar once after launch.
+  final bool showExplicitContentWarning;
+
+  const StartPage({
+    super.key,
+    this.checkForUpdate = false,
+    this.showExplicitContentWarning = false,
+  });
 
   @override
   State<StartPage> createState() => _StartPageState();
@@ -76,6 +84,18 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
+    if (widget.showExplicitContentWarning) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showCustomSnackBar(
+            context,
+            explicitContentWarning,
+            durationSeconds: 5,
+          );
+        }
+      });
+    }
+
     if (widget.checkForUpdate) {
       context.read<UpdateBloc>().add(const UpdateCacheClearRequested());
 

@@ -1,6 +1,10 @@
 /// Full extended name of the app.
 const String appName = 'Cards Against Humanity';
 
+/// Warning notice shown once at startup regarding explicit card content.
+const String explicitContentWarning =
+    '⚠️ Attenzione: questa app contiene termini espliciti e linguaggio scurrile.';
+
 /// The instructions to help the user to insert the seed.
 const String seedInfo =
     'Il numero usato per pescare randomicamente le carte domanda e risposta di ogni giocatore. Questo numero dovrà essere uguale per tutti i giocatori.\n\n Si consiglia di usare numeri da almeno 10 cifre per rendere il gioco più casuale.';
