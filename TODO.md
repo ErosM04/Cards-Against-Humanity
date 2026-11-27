@@ -5,8 +5,7 @@
 - [X] Master can only insert the allowed cards (check that are 1 from each player hand)
 - [X] Improve app version handling and fix version comparison bug
 - [X] Fix score in AppBar
-- [ ] Improve Material 3 use
-- [ ] Sistema SnackBar pk si adatti a lunghezza messaggio
-- [X] Genera un keystore per firmare l'app
-- [X] Rimuovi i TODO in [android/app/build.gradle](android/app/build.gradle)
+- [ ] Improve Material 3 use (restiled buttons, text fields, appbar and card boxes, unite questions's whitespaces, move "Mostra carte" button)
+- [ ] Make SnackBar width resize based on the text
+- [X] Generate a new keystore to sign the app
 - [ ] Check Update failure fallbacks functionalities and graphics
