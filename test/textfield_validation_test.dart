@@ -117,9 +117,69 @@ void main() {
     await tester.pump();
 
     expect(find.text('Il valore 5 è fuori dal range!'), findsOneWidget);
+  });
 
-    // Flush the 2s delayed update check timer in StartPage.initState.
-    await tester.pump(const Duration(seconds: 3));
+  testWidgets('StartPage runs update check only when checkForUpdate is true',
+      (tester) async {
+    Future<void> pumpStartPage({
+      required bool checkForUpdate,
+      required UpdateBloc updateBloc,
+      required LoadBloc loadBloc,
+    }) async {
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: loadBloc),
+            BlocProvider.value(value: updateBloc),
+          ],
+          child: MaterialApp(
+            key: ValueKey(checkForUpdate),
+            home: StartPage(checkForUpdate: checkForUpdate),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(seconds: 3));
+    }
+
+    UpdateBloc makeUpdateBloc(FakeUpdateRepository repo) => UpdateBloc(
+          checkForUpdate: CheckForUpdate(updateRepository: repo),
+          downloadApk: DownloadApk(updateRepository: repo),
+          installApk: InstallApk(updateRepository: repo),
+          clearCachedUpdates: ClearCachedUpdates(updateRepository: repo),
+          managePermission: ManageUpdatePermission(updateRepository: repo),
+          permissionPromptDelay: Duration.zero,
+        );
+
+    final loadRepo = _StubLoadRepo(makeQuestions(), makeAnswers());
+    final loadBloc = LoadBloc(
+      loadQuestions: LoadQuestions(loadRepository: loadRepo),
+      loadAnswers: LoadAnswers(loadRepository: loadRepo),
+    );
+    final skippedRepo = FakeUpdateRepository();
+    final skippedUpdateBloc = makeUpdateBloc(skippedRepo);
+    final bootRepo = FakeUpdateRepository();
+    final bootUpdateBloc = makeUpdateBloc(bootRepo);
+    addTearDown(() async {
+      await loadBloc.close();
+      await skippedUpdateBloc.close();
+      await bootUpdateBloc.close();
+    });
+
+    await pumpStartPage(
+      checkForUpdate: false,
+      updateBloc: skippedUpdateBloc,
+      loadBloc: loadBloc,
+    );
+    expect(skippedUpdateBloc.state, isA<UpdateInitial>());
+    expect(skippedRepo.clearCacheCalls, equals(0));
+
+    await pumpStartPage(
+      checkForUpdate: true,
+      updateBloc: bootUpdateBloc,
+      loadBloc: loadBloc,
+    );
+    expect(bootUpdateBloc.state, isA<UpdateUpToDate>());
+    expect(bootRepo.clearCacheCalls, equals(1));
   });
 
   testWidgets(
