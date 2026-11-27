@@ -149,6 +149,7 @@ lib/
 │       ├── button.dart
 │       ├── card.dart
 │       ├── info.dart
+│       ├── snackbar.dart
 │       └── textfield.dart
 │
 └── features/
@@ -269,6 +270,7 @@ lib/
 - [button.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/button.dart): `CustomButton` styled `ElevatedButton` wrapper with typed `VoidCallback onPressed` and preset typography and padding.
 - [card.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/card.dart): `CardAHW` question and answer card widget supporting selection highlights, text scroll, and inline blank replacement.
 - [info.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/info.dart): `GameInfo` popup widget displaying contextual information tooltips via `InfoPopupWidget`.
+- [snackbar.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/snackbar.dart): `showCustomSnackBar` shared floating rounded SnackBar sized dynamically to message length, font size/text scaler, and screen-responsive minimum dimensions.
 - [textfield.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/textfield.dart): `CustomTextField` detached white-bordered input box wrapping `FormField`/`TextField` configured with `TextInputType.phone`, non-empty guard, custom `validator` hook, and external `errorText` support.
 
 #### Use Cases Abstraction (`lib/core/usecases/`)
@@ -294,7 +296,7 @@ Responsible for reading raw CSV cards from app assets on startup and making them
 - [load_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/bloc/load_bloc.dart): Handles `LoadQuestionsStart` and `LoadAnswersStart` events, emits `LoadInProgress`, `LoadQuestionsCompleted`, `LoadAnswersCompleted`, or error states.
 - [load_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/bloc/load_event.dart): Sealed event hierarchy for card loading.
 - [load_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/bloc/load_state.dart): Sealed state hierarchy for card loading.
-- [start_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/page/start_page.dart): Entry screen where players input game seed, total players, and player number. Dispatches loading events to `LoadBloc`, listens for completed card lists, validates inputs, initializes `GameBloc`, and routes to `MasterGamePage` or `GamePage`.
+- [start_page.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/presentation/page/start_page.dart): Entry screen where players input game seed, total players, and player number. Accepts `checkForUpdate` and `showExplicitContentWarning` flags (enabled on app boot in [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart), `false` by default when returning from a game), dispatches loading events to `LoadBloc`, listens for completed card lists, validates inputs, initializes `GameBloc`, and routes to `MasterGamePage` or `GamePage`.
 
 ---
 
@@ -348,47 +350,4 @@ Responsible for clearing cached update APKs on startup, checking GitHub Releases
 - [update_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_event.dart): Sealed events (`UpdateCacheClearRequested`, `UpdateCheckRequested`, `UpdateDeclined`, `UpdateDownloadRequested`, `UpdateInstallRequested`).
 - [update_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_state.dart): Sealed states (`UpdateInitial`, `UpdateUpToDate`, `UpdateAvailable`, `UpdateDownloadInProgress`, `UpdateDownloadCompleted`, `UpdateDownloadFailed`, `UpdateInstallCompleted`, `UpdateInstallFailed`, `UpdateNotice`).
 - [update_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_dialog.dart): Shared `AppAlertDialog`, `UpdatePromptDialog` (with safe GitHub release notes parsing), `DownloadProgressDialog` (reactive via `BlocBuilder<UpdateBloc, UpdateState>`), and `InstallErrorDialog` (with `"Riprova"` and `"Scarica dal browser"` actions).
-- [update_listener.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_listener.dart): `UpdateListener` wrapping `StartPage` to present animated update/error dialogs, launch external browser fallback downloads, show live download modals, and display SnackBars without leaking `BuildContext` into BLoC.
-
----
-
-## 5. Current Refactoring State & Known Technical Debt
-
-To facilitate subsequent refactoring steps, be aware of the following transitional state:
-
-1. **GameBloc Registration & Presentation Provider Integration [RESOLVED]**:
-   - `initGameDependencies()` in `init_dependencies.dart` dynamically registers `GameBloc`, `GameRepository`, use cases, and PRNG card data sources in `GetIt` when a match begins on `StartPage`.
-   - Connected `GameBloc` across presentation routes (`StartPage`, `GamePage`, `CardPage`, `MasterGamePage`) via `BlocProvider.value`, dispatching `StartRound`, `RoundWon`, `RoundLost`, and `AnswerCardsRequested`.
-2. **Duplicated Models in `load` and `game` [RESOLVED]**:
-   - Consolidated into shared models in `lib/core/models/` (`question_model.dart`, `question_list_model.dart`, `answer_model.dart`, `answer_list_model.dart`). The redundant feature-local model folders were deleted.
-3. **Card Lookup Index Bug in `GameRepositoryImpl` [RESOLVED]**:
-   - Fixed in `lib/features/game/data/repository/game_repo_impl.dart`: `randAnswersSource.getCardAt(ids[index])` properly accesses the passed card ID instead of the loop index.
-4. **Seed Stride Synchronization & GameManager Elimination [RESOLVED]**:
-   - Synchronized PRNG seed stride across devices via `getRandomCardWithSkip()` in `RandomAnswersSource`. `GameManager` and `lib/core/gamelogic/logic.dart` have been completely removed.
-5. **Seed Offset in RandomQuestionsSource [RESOLVED]**:
-   - Fixed in `features/game/data/datasources/rand_question_source.dart`: `Random(seed + 1)` is used for question PRNG sequencing. Renamed internal field `_answerList` to `_questionList`.
-6. **Interleaved Drawing & Card Skipping in RandomAnswersSource [RESOLVED]**:
-   - Implemented `skipCards(amount)` and `getRandomCardWithSkip(totalPlayers, playerNumber)` in `features/game/data/datasources/rand_answer_source.dart` to advance the PRNG stream deterministically and deal player-specific cards.
-7. **GameManager Removal & Full Presentation BLoC Integration [RESOLVED]**:
-   - Fully eliminated `GameManager` and deleted `lib/core/gamelogic/logic.dart`.
-   - Decoupled `CardAHW` in `lib/old/view/components/card.dart` from global static selection state; it now receives `isSelected` and invokes `onClicked` callbacks.
-   - Refactored `GamePage`, `CardPage`, `MasterGamePage`, and `StartPage` to use `GameBloc`, `BlocConsumer`, and `GameState` for round starts, hand rendering, card selection, Master answer collection, and winner declarations.
-8. **CSV Decoder API Migration for csv: ^8.0.0 [RESOLVED]**:
-   - Migrated [csv_reader.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/load/data/provider/csv_reader.dart) from deprecated/removed `CsvToListConverter` to modern `const CsvDecoder(fieldDelimiter: ';', dynamicTyping: true)` matching `csv: 8.0.0`.
-9. **Legacy UI View Components Refactoring & Migration [RESOLVED]**:
-   - Refactored all view components from `lib/old/view/components/` into `lib/core/widgets/`:
-     - [appbar.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/appbar.dart): Converted to a clean `StatelessWidget` implementing `PreferredSizeWidget`.
-     - [button.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/button.dart): Converted raw `Function onPressed` to typed `VoidCallback onPressed`.
-     - [card.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/card.dart): Decoupled from legacy global state, taking `isSelected` and invoking `onClicked`.
-     - [info.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/core/widgets/info.dart): Moved to core widgets.
-   - Deleted `lib/old/view/` completely and updated all page and dialog imports.
-10. **main.dart ThemeData Alignment [RESOLVED]**:
-    - Aligned `core/theme/theme.dart` with `material_ui` to ensure consistent `ThemeData` typing for `MaterialApp` in [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart), resolving the analyzer error.
-11. **Gradle 9+ Configuration & Project Dependency Notation [RESOLVED]**:
-    - Solved the Gradle deprecation warning reported in `android/build/reports/problems/problems-report.html` (`using-a-project-object-as-a-dependency-notation` scheduled to fail in Gradle 10) by updating plugin dependency injection in the Flutter Gradle tool to use `project.dependencies.project(mapOf("path" to pluginProject.path))` instead of passing raw `Project` objects.
-    - Updated [build.gradle](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/app/build.gradle) to modern AGP properties (`compileSdk`, `minSdk`, `targetSdk`, and Java 17 compatibility).
-    - Resolved merge conflict markers in [gradle-wrapper.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle/wrapper/gradle-wrapper.properties) and disabled deprecated `android.enableJetifier` in [gradle.properties](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/android/gradle.properties).
-12. **GitHub Auto-Updater Refactoring (`lib/old/updater` -> `lib/features/update`) [RESOLVED]**:
-    - Refactored legacy `Updater`, `DownloadManager`, `Installer`, `PermissionManager`, `SnackBarMessage`, and the 7-class `DialogBuilder`/`DialogContent` hierarchy into Clean Architecture layers + `UpdateBloc` under `lib/features/update/`.
-    - Replaced `open_file_plus` with `open_filex`, switched APK downloads to app-internal cache (`getTemporaryDirectory()` with fallback to `getApplicationSupportDirectory()` / `getExternalStorageDirectory()`), added startup `clearCachedUpdates()`, dropped `MANAGE_EXTERNAL_STORAGE`, and replaced file-picker fallback with `"Riprova"` and `"Scarica dal browser"` actions on `InstallErrorDialog`.
-    - Fixed edge cases in safe GitHub markdown link stripping, wired `UpdateBloc` via `initDependencies()` / `MultiBlocProvider` / `UpdateListener` on `StartPage`, and deleted `lib/old/` completely.
+- [update_listener.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_listener.dart): `UpdateListener` wrapping `StartPage` to present animated update/error dialogs, launch external browser fallback downloads, show live download modals, and present dynamically sized SnackBars via `showCustomSnackBar` without leaking `BuildContext` into BLoC.
