@@ -18,7 +18,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Initial screen for configuring match parameters and launching a game.
 class StartPage extends StatefulWidget {
-  const StartPage({super.key});
+  /// Whether to clear cached APKs and check GitHub Releases for updates on open.
+  final bool checkForUpdate;
+
+  const StartPage({super.key, this.checkForUpdate = false});
 
   @override
   State<StartPage> createState() => _StartPageState();
@@ -73,15 +76,17 @@ class _StartPageState extends State<StartPage> {
 
   @override
   void initState() {
-    context.read<UpdateBloc>().add(const UpdateCacheClearRequested());
+    if (widget.checkForUpdate) {
+      context.read<UpdateBloc>().add(const UpdateCacheClearRequested());
 
-    // Checks if a new version exists and asks for download consent.
-    // The 2 seconds delay avoids showing dialogs before the initial frame settles.
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        context.read<UpdateBloc>().add(const UpdateCheckRequested());
-      }
-    });
+      // Checks if a new version exists and asks for download consent.
+      // The 2 seconds delay avoids showing dialogs before the initial frame settles.
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          context.read<UpdateBloc>().add(const UpdateCheckRequested());
+        }
+      });
+    }
 
     // Load data from csv
     context.read<LoadBloc>().add(LoadQuestionsStart());
