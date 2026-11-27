@@ -49,21 +49,25 @@ class _StubLoadRepo implements LoadRepository {
 
 /// Runs widget tests for [StartPage] and [MasterGamePage] text-field validators.
 void main() {
-  final questions = QuestionListModel(
-    questions: [
-      const QuestionModel(id: 0, text: 'Domanda ________.', answerNeeded: 1),
-    ],
-  );
-  final answers = AnswerListModel(
-    answers: List.generate(
-      40,
-      (i) => AnswerModel(id: i, text: 'Risposta $i'),
-    ),
-  );
+  QuestionListModel makeQuestions() => QuestionListModel(
+        questions: [
+          const QuestionModel(
+            id: 0,
+            text: 'Domanda ________.',
+            answerNeeded: 1,
+          ),
+        ],
+      );
+  AnswerListModel makeAnswers() => AnswerListModel(
+        answers: List.generate(
+          40,
+          (i) => AnswerModel(id: i, text: 'Risposta $i'),
+        ),
+      );
 
   testWidgets('StartPage displays validator errors below fields without clearing text',
       (tester) async {
-    final loadRepo = _StubLoadRepo(questions, answers);
+    final loadRepo = _StubLoadRepo(makeQuestions(), makeAnswers());
     final loadBloc = LoadBloc(
       loadQuestions: LoadQuestions(loadRepository: loadRepo),
       loadAnswers: LoadAnswers(loadRepository: loadRepo),
@@ -123,8 +127,9 @@ void main() {
       (tester) async {
     final repo = GameRepositoryImpl(
       randQuestionsSource:
-          RandomQuestionsSource(seed: 123, questionList: questions),
-      randAnswersSource: RandomAnswersSource(seed: 123, answerList: answers),
+          RandomQuestionsSource(seed: 123, questionList: makeQuestions()),
+      randAnswersSource:
+          RandomAnswersSource(seed: 123, answerList: makeAnswers()),
     );
     final gameBloc = GameBloc(
       retriveAnswers: RetriveAnswers(gameRepository: repo),
@@ -203,8 +208,9 @@ void main() {
 
       final repo = GameRepositoryImpl(
         randQuestionsSource:
-            RandomQuestionsSource(seed: 123, questionList: questions),
-        randAnswersSource: RandomAnswersSource(seed: 123, answerList: answers),
+            RandomQuestionsSource(seed: 123, questionList: makeQuestions()),
+        randAnswersSource:
+            RandomAnswersSource(seed: 123, answerList: makeAnswers()),
       );
       final gameBloc = GameBloc(
         retriveAnswers: RetriveAnswers(gameRepository: repo),
@@ -213,6 +219,8 @@ void main() {
         playerNumber: 1,
         totalPlayers: 3,
       );
+      addTearDown(gameBloc.close);
+
       gameBloc.add(const StartRound(isMaster: true));
       await expectLater(gameBloc.stream, emits(isA<RoundReady>()));
 
@@ -222,7 +230,6 @@ void main() {
           child: const MaterialApp(home: MasterGamePage()),
         ),
       );
-      await gameBloc.close();
 
       final scaffoldRect = tester.getRect(find.byType(LayoutBuilder));
       final cardContainerRect = tester.getRect(
