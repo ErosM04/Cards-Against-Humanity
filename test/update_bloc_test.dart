@@ -154,10 +154,67 @@ void main() {
 
   test('parseReleaseSections safely strips markdown links without hanging', () {
     final sections = UpdatePromptDialog.parseReleaseSections(
-      '### Funzionalità\n- Vedi [qui](https://example.com) e [dangling bracket\n### Bug fixes\n- Fix',
+      '### Funzionalità\n- Vedi [qui](https://example.com) e [dangling bracket\n### Bug fixes\n- Fix 1\n- Fix 2\n- Fix 3\n- Fix 4',
     );
     expect(sections['Funzionalità']?.first, contains('https://example.com'));
-    expect(sections['Bug fixes'], equals(['Alcuni bug fixes']));
+    expect(sections['Bug fixes'], equals(['Fix 1', 'Fix 2', 'Fix 3', 'Fix 4']));
+  });
+
+  testWidgets(
+      'UpdatePromptDialog styles headings orange and puts unlimited items in scrollable detached boxes',
+      (tester) async {
+    const richRelease = AppRelease(
+      version: AppVersion(major: 0, minor: 4, patch: 0),
+      description:
+          '### Funzionalità\n- Feature 1\n- Feature 2\n- Feature 3\n- Feature 4\n### Bug fixes\n- Fix 1\n- Fix 2\n- Fix 3\n- Fix 4',
+      isDraft: false,
+      downloadUrl: 'https://example.com/app.apk',
+      releaseUrl: 'https://example.com/release',
+    );
+
+    const orange = Color.fromARGB(255, 242, 116, 5);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark().copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: Color.fromARGB(255, 242, 135, 5),
+            secondary: orange,
+          ),
+        ),
+        home: Scaffold(
+          body: Center(
+            child: UpdatePromptDialog(
+              release: richRelease,
+              onConfirm: () {},
+              onDeny: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Text>(find.text('Nuova versione disponibile!')).style?.color,
+      equals(orange),
+    );
+    expect(
+      tester.widget<Text>(find.text('Funzionalità')).style?.color,
+      equals(orange),
+    );
+    expect(
+      tester.widget<Text>(find.text('Bug fixes')).style?.color,
+      equals(orange),
+    );
+    for (final divider in tester.widgetList<Divider>(find.byType(Divider))) {
+      expect(divider.color, equals(orange));
+    }
+
+    // 1 outer scrollable list between the 2 dividers + 1 ListView per section.
+    expect(find.byType(ListView), findsNWidgets(3));
+    expect(find.text('. . .'), findsNothing);
+    expect(find.text('Feature 4'), findsOneWidget);
+    expect(find.text('Fix 4'), findsOneWidget);
   });
 
   testWidgets(
