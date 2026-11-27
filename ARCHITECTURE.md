@@ -229,8 +229,13 @@ lib/
             │   ├── update_event.dart
             │   └── update_state.dart
             └── widgets/
+                ├── app_alert_dialog.dart
+                ├── download_progress_dialog.dart
+                ├── install_error_dialog.dart
+                ├── release_section_box.dart
                 ├── update_dialog.dart
-                └── update_listener.dart
+                ├── update_listener.dart
+                └── update_prompt_dialog.dart
 ```
 
 ---
@@ -349,5 +354,10 @@ Responsible for clearing cached update APKs on startup, checking GitHub Releases
 - [update_bloc.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_bloc.dart): `UpdateBloc` orchestrating startup cache cleanup, release checks, download progress emissions, install permission prompts, automatic install handoff, and cleanup on decline/failure.
 - [update_event.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_event.dart): Sealed events (`UpdateCacheClearRequested`, `UpdateCheckRequested`, `UpdateDeclined`, `UpdateDownloadRequested`, `UpdateInstallRequested`).
 - [update_state.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/bloc/update_state.dart): Sealed states (`UpdateInitial`, `UpdateUpToDate`, `UpdateAvailable`, `UpdateDownloadInProgress`, `UpdateDownloadCompleted`, `UpdateDownloadFailed`, `UpdateInstallCompleted`, `UpdateInstallFailed`, `UpdateNotice`).
-- [update_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_dialog.dart): Shared `AppAlertDialog`, `UpdatePromptDialog` (with safe GitHub release notes parsing), `DownloadProgressDialog` (reactive via `BlocBuilder<UpdateBloc, UpdateState>`), and `InstallErrorDialog` (with `"Riprova"` and `"Scarica dal browser"` actions).
+- [app_alert_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/app_alert_dialog.dart): Shared animated confirmation dialog (`AppAlertDialog`) with scrollable content area and accent-colored headers.
+- [release_section_box.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/release_section_box.dart): `ReleaseSectionBox` detached, bordered scrollable box rendering a release-note section.
+- [update_prompt_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_prompt_dialog.dart): `UpdatePromptDialog` parsing release sections and rendering scrollable `ReleaseSectionBox` lists.
+- [download_progress_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/download_progress_dialog.dart): `DownloadProgressDialog` showing live APK download progress via `BlocBuilder<UpdateBloc, UpdateState>`.
+- [install_error_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/install_error_dialog.dart): `InstallErrorDialog` presenting installer errors with `"Riprova"` and `"Scarica dal browser"` actions.
+- [update_dialog.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_dialog.dart): Barrel export re-exporting all update dialog widgets.
 - [update_listener.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/features/update/presentation/widgets/update_listener.dart): `UpdateListener` wrapping `StartPage` to present animated update/error dialogs, launch external browser fallback downloads, show live download modals, and present dynamically sized SnackBars via `showCustomSnackBar` without leaking `BuildContext` into BLoC.
