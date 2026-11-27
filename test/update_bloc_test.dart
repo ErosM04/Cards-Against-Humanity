@@ -12,6 +12,8 @@ import 'package:cards_against_humanity/features/update/domain/usecases/install_a
 import 'package:cards_against_humanity/features/update/domain/usecases/manage_update_permission.dart';
 import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
 import 'package:cards_against_humanity/features/update/presentation/widgets/update_dialog.dart';
+import 'package:cards_against_humanity/features/update/presentation/widgets/update_listener.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:material_ui/material_ui.dart';
@@ -202,5 +204,90 @@ void main() {
     await tester.tap(find.text('Scarica dal browser'));
     await tester.pumpAndSettle();
     expect(openedBrowser, isTrue);
+  });
+
+  testWidgets(
+      'UpdateListener SnackBar adapts min size to screen and resizes with text & font size',
+      (tester) async {
+    final widgetBloc = UpdateBloc(
+      checkForUpdate: CheckForUpdate(updateRepository: repo),
+      downloadApk: DownloadApk(updateRepository: repo),
+      installApk: InstallApk(updateRepository: repo),
+      clearCachedUpdates: ClearCachedUpdates(updateRepository: repo),
+      managePermission: ManageUpdatePermission(updateRepository: repo),
+      permissionPromptDelay: Duration.zero,
+    );
+    addTearDown(widgetBloc.close);
+
+    Future<Size> measureSnackBar({
+      required Size screenSize,
+      required String message,
+      double fontSize = 14,
+    }) async {
+      tester.view.physicalSize = screenSize;
+      tester.view.devicePixelRatio = 1.0;
+
+      repo.checkResult = left(Failure(message));
+      await tester.pumpWidget(
+        MaterialApp(
+          key: UniqueKey(),
+          theme: ThemeData(
+            textTheme: TextTheme(bodyMedium: TextStyle(fontSize: fontSize)),
+          ),
+          home: BlocProvider<UpdateBloc>.value(
+            value: widgetBloc,
+            child: const Scaffold(
+              body: UpdateListener(child: SizedBox.expand()),
+            ),
+          ),
+        ),
+      );
+
+      widgetBloc.add(const UpdateCheckRequested());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(find.text(message), findsOneWidget);
+      final pill = find.ancestor(
+        of: find.text(message),
+        matching: find.byType(Container),
+      );
+      final size = tester.getSize(pill.first);
+      await tester.pump(const Duration(seconds: 3));
+      await tester.pumpAndSettle();
+      return size;
+    }
+
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final smallShort = await measureSnackBar(
+      screenSize: const Size(320, 568),
+      message: ':(',
+    );
+    final phoneShort = await measureSnackBar(
+      screenSize: const Size(400, 800),
+      message: ':(',
+    );
+    final tabletShort = await measureSnackBar(
+      screenSize: const Size(900, 1280),
+      message: ':(',
+    );
+    expect(smallShort.width, lessThan(phoneShort.width));
+    expect(phoneShort.width, lessThan(tabletShort.width));
+    expect(smallShort.height, lessThanOrEqualTo(phoneShort.height));
+    expect(phoneShort.height, lessThan(tabletShort.height));
+
+    final phoneMedium = await measureSnackBar(
+      screenSize: const Size(400, 800),
+      message: 'Aggiornamento non riuscito oggi',
+    );
+    final phoneLargeFont = await measureSnackBar(
+      screenSize: const Size(400, 800),
+      message: 'Aggiornamento non riuscito oggi',
+      fontSize: 26,
+    );
+    expect(phoneMedium.width, greaterThan(phoneShort.width));
+    expect(phoneLargeFont.height, greaterThan(phoneMedium.height));
   });
 }
