@@ -1,6 +1,9 @@
 # Cards-Against-Humanity
 Quest'app :iphone: non così politicamente corretta può essere usata per giocare a ``Cards Against Humanity`` fino ad una massimo di 20 giocatori, **senza una connessione ad Internet**. Al momento è fruibile solo su dispositivi **Android**!
 
+> [!WARNING]
+Attenzione: questa app contiene termini espliciti e linguaggio scurrile.
+
 ![CAH](readme_images/CAH.gif)
 
 ### Indice
