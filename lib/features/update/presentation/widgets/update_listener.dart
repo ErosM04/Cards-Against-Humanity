@@ -126,27 +126,39 @@ class _UpdateListenerState extends State<UpdateListener> {
         ),
       );
 
-  /// Displays a floating rounded SnackBar containing [message].
+  /// Displays a floating rounded SnackBar sized to [message] and screen dimensions.
   void _showSnackBar(
     BuildContext context,
     String message, {
     int durationSeconds = 2,
-  }) =>
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          width: double.infinity,
-          duration: Duration(seconds: durationSeconds),
-          backgroundColor: Colors.transparent,
-          content: Container(
-            height: message.length <= 40 ? 45 : 70,
+  }) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final minWidth = (screenSize.width * 0.35).clamp(110.0, 260.0);
+    final minHeight = (screenSize.height * 0.055).clamp(40.0, 64.0);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.zero,
+        duration: Duration(seconds: durationSeconds),
+        backgroundColor: Colors.transparent,
+        content: Center(
+          heightFactor: 1,
+          child: Container(
+            constraints: BoxConstraints(
+              minWidth: minWidth,
+              minHeight: minHeight,
+            ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
               color: Colors.black,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Center(
+              widthFactor: 1,
+              heightFactor: 1,
               child: Text(
                 message,
                 textAlign: TextAlign.center,
@@ -155,5 +167,7 @@ class _UpdateListenerState extends State<UpdateListener> {
             ),
           ),
         ),
-      );
+      ),
+    );
+  }
 }
