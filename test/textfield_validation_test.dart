@@ -1,4 +1,5 @@
 import '../test/utils/fake_update_repo.dart';
+import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
 import 'package:cards_against_humanity/core/entities/data/question_list.dart';
 import 'package:cards_against_humanity/core/errors/failures.dart';
@@ -119,10 +120,12 @@ void main() {
     expect(find.text('Il valore 5 è fuori dal range!'), findsOneWidget);
   });
 
-  testWidgets('StartPage runs update check only when checkForUpdate is true',
+  testWidgets(
+      'StartPage runs update check and explicit warning only when enabled on launch',
       (tester) async {
     Future<void> pumpStartPage({
       required bool checkForUpdate,
+      required bool showExplicitContentWarning,
       required UpdateBloc updateBloc,
       required LoadBloc loadBloc,
     }) async {
@@ -133,12 +136,16 @@ void main() {
             BlocProvider.value(value: updateBloc),
           ],
           child: MaterialApp(
-            key: ValueKey(checkForUpdate),
-            home: StartPage(checkForUpdate: checkForUpdate),
+            key: ValueKey((checkForUpdate, showExplicitContentWarning)),
+            home: StartPage(
+              checkForUpdate: checkForUpdate,
+              showExplicitContentWarning: showExplicitContentWarning,
+            ),
           ),
         ),
       );
-      await tester.pump(const Duration(seconds: 3));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
     }
 
     UpdateBloc makeUpdateBloc(FakeUpdateRepository repo) => UpdateBloc(
@@ -167,17 +174,26 @@ void main() {
 
     await pumpStartPage(
       checkForUpdate: false,
+      showExplicitContentWarning: false,
       updateBloc: skippedUpdateBloc,
       loadBloc: loadBloc,
     );
+    await tester.pump(const Duration(seconds: 3));
     expect(skippedUpdateBloc.state, isA<UpdateInitial>());
     expect(skippedRepo.clearCacheCalls, equals(0));
+    expect(find.text(explicitContentWarning), findsNothing);
 
     await pumpStartPage(
       checkForUpdate: true,
+      showExplicitContentWarning: true,
       updateBloc: bootUpdateBloc,
       loadBloc: loadBloc,
     );
+    expect(find.text(explicitContentWarning), findsOneWidget);
+    expect(explicitContentWarning, contains('⚠️'));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
     expect(bootUpdateBloc.state, isA<UpdateUpToDate>());
     expect(bootRepo.clearCacheCalls, equals(1));
   });
