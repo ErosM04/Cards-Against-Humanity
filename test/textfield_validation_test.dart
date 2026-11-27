@@ -25,6 +25,9 @@ import 'package:cards_against_humanity/features/update/domain/usecases/download_
 import 'package:cards_against_humanity/features/update/domain/usecases/install_apk.dart';
 import 'package:cards_against_humanity/features/update/domain/usecases/manage_update_permission.dart';
 import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
+import 'package:cards_against_humanity/core/widgets/button.dart';
+import 'package:cards_against_humanity/core/widgets/card.dart';
+import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -181,5 +184,83 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets(
+      'MasterGamePage locks input under top card with responsive spacing and keeps button at bottom',
+      (tester) async {
+    Future<
+        ({
+          double topGap,
+          double cardToFormGap,
+          double formToButtonGap,
+          double bottomGap,
+        })> measureLayout(
+      Size screenSize,
+    ) async {
+      tester.view.physicalSize = screenSize;
+      tester.view.devicePixelRatio = 1.0;
+
+      final repo = GameRepositoryImpl(
+        randQuestionsSource:
+            RandomQuestionsSource(seed: 123, questionList: questions),
+        randAnswersSource: RandomAnswersSource(seed: 123, answerList: answers),
+      );
+      final gameBloc = GameBloc(
+        retriveAnswers: RetriveAnswers(gameRepository: repo),
+        drawNextQuestion: DrawNextQuestion(gameRepository: repo),
+        drawNextAnswer: DrawNextAnswer(gameRepository: repo),
+        playerNumber: 1,
+        totalPlayers: 3,
+      );
+      gameBloc.add(const StartRound(isMaster: true));
+      await expectLater(gameBloc.stream, emits(isA<RoundReady>()));
+
+      await tester.pumpWidget(
+        BlocProvider.value(
+          value: gameBloc,
+          child: const MaterialApp(home: MasterGamePage()),
+        ),
+      );
+      await gameBloc.close();
+
+      final scaffoldRect = tester.getRect(find.byType(LayoutBuilder));
+      final cardContainerRect = tester.getRect(
+        find.descendant(
+          of: find.byType(CardAHW),
+          matching: find.byType(Container),
+        ).first,
+      );
+      final formRect = tester.getRect(find.byType(Form));
+      final buttonRect = tester.getRect(find.byType(CustomButton));
+
+      return (
+        topGap: cardContainerRect.top - scaffoldRect.top,
+        cardToFormGap: formRect.top - cardContainerRect.bottom,
+        formToButtonGap: buttonRect.top - formRect.bottom,
+        bottomGap: scaffoldRect.bottom - buttonRect.bottom,
+      );
+    }
+
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final phone = await measureLayout(const Size(400, 800));
+    final tablet = await measureLayout(const Size(900, 1280));
+
+    // Equal responsive gaps at top, between card & input, and at bottom (larger on tablet).
+    expect(phone.topGap, closeTo(phone.bottomGap, 1.0));
+    expect(phone.cardToFormGap, closeTo(phone.topGap, 1.0));
+    expect(tablet.topGap, closeTo(tablet.bottomGap, 1.0));
+    expect(tablet.cardToFormGap, closeTo(tablet.topGap, 1.0));
+    expect(tablet.topGap, greaterThan(phone.topGap));
+    expect(tablet.cardToFormGap, greaterThan(phone.cardToFormGap));
+
+    // Remaining space pushes the button to the bottom while locking input under the card.
+    expect(phone.formToButtonGap, greaterThan(phone.cardToFormGap));
+    expect(tablet.formToButtonGap, greaterThan(tablet.cardToFormGap));
+    expect(find.byType(CustomTextField), findsOneWidget);
   });
 }
