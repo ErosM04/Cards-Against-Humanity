@@ -86,21 +86,60 @@ class _MasterGamePageState extends State<MasterGamePage> {
               score: gameBloc.gameData.score,
               maxPoints: gameBloc.gameData.playerRounds,
             ),
-            body: SingleChildScrollView(
-              child: Center(
-                child: Column(children: [
-                  const SizedBox(height: 30),
-                  CardAHW(
-                    text: gameBloc.currentQuestion?.text ?? '',
-                    isClickable: false,
-                    isMainCard: true,
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                final screenHeight = MediaQuery.sizeOf(context).height;
+                final edgeSpacing = (screenHeight * 0.05).clamp(24.0, 72.0);
+                final isInputPhase = answerCardList.isEmpty;
+
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        // Compensate CardAHW's 14px outer margin so top/bottom edge gaps match.
+                        top: (edgeSpacing - 14).clamp(6.0, 72.0),
+                        bottom: edgeSpacing,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CardAHW(
+                                text: gameBloc.currentQuestion?.text ?? '',
+                                isClickable: false,
+                                isMainCard: true,
+                              ),
+                              SizedBox(
+                                // Compensate CardAHW's 14px bottom margin so gap matches edgeSpacing.
+                                height: (edgeSpacing - 14).clamp(10.0, 72.0),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: isInputPhase
+                                    ? _buildCardInputWidgets(gameBloc)
+                                    : _buildCardCarousel(answerCardList),
+                              ),
+                            ],
+                          ),
+                          CustomButton(
+                            text: isInputPhase
+                                ? 'Mostra carte'
+                                : 'Prossimo round',
+                            onPressed: isInputPhase
+                                ? () => _getAnswerCards(gameBloc)
+                                : _goToNewRound,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 50),
-                  (answerCardList.isEmpty)
-                      ? _buildCardInputWidgets(gameBloc)
-                      : _buildCardsListWidgets(),
-                ]),
-              ),
+                );
+              },
             ),
           );
         },
@@ -171,6 +210,7 @@ class _MasterGamePageState extends State<MasterGamePage> {
     return Form(
       key: _formKey,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildSubTitle('Inserisci i numeri delle carte:', fontSize: 22),
           _buildSubTitle(
@@ -193,36 +233,10 @@ class _MasterGamePageState extends State<MasterGamePage> {
                   validateCardIdsInput(value!, expectedCount),
             ),
           ),
-          _buildButton(
-            text: 'Mostra carte',
-            onPressed: () => _getAnswerCards(gameBloc),
-          ),
         ],
       ),
     );
   }
-
-  /// Builds the set of widgets used to show the differents answer cards (one per player), with each card containg
-  /// the answer/s to the question card.
-  Widget _buildCardsListWidgets() => Column(
-        children: [
-          _buildCardCarousel(answerCardList),
-          _buildButton(
-              text: 'Prossimo round', onPressed: () => _goToNewRound()),
-        ],
-      );
-
-  /// Builds a [CustomButton] to reveal the answer cards or to move to the next page.
-  Widget _buildButton({
-    required String text,
-    required void Function() onPressed,
-  }) =>
-      Padding(
-          padding: const EdgeInsets.symmetric(vertical: 50),
-          child: CustomButton(
-            text: text,
-            onPressed: onPressed,
-          ));
 
   /// Takes a list of answers and build a horizontal list of [CardAHW] containg the different answers of the different
   /// players (shuffled).
