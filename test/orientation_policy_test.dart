@@ -1,12 +1,4 @@
 import '../test/utils/fake_update_repo.dart';
-import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
-import 'package:cards_against_humanity/core/entities/data/question_list.dart';
-import 'package:cards_against_humanity/core/errors/failures.dart';
-import 'package:cards_against_humanity/core/models/answer_list_model.dart';
-import 'package:cards_against_humanity/core/models/answer_model.dart';
-import 'package:cards_against_humanity/core/models/question_list_model.dart';
-import 'package:cards_against_humanity/core/models/question_model.dart';
-import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_answers.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_questions.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
@@ -20,23 +12,8 @@ import 'package:cards_against_humanity/init_dependencies.dart';
 import 'package:cards_against_humanity/main.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
 
-class _StubLoadRepo implements LoadRepository {
-  @override
-  Future<Either<DataFailure, QuestionList>> getQuestions() async => right(
-        QuestionListModel(
-          questions: [QuestionModel(id: 1, text: 'Q', answerNeeded: 1)],
-        ),
-      );
-
-  @override
-  Future<Either<DataFailure, AnswerList>> getAnswers() async => right(
-        AnswerListModel(
-          answers: [AnswerModel(id: 1, text: 'A')],
-        ),
-      );
-}
+import 'utils/orientation_stub_load_repo.dart';
 
 /// Runs unit and widget tests for portrait lock vs foldable/tablet rotation policy.
 void main() {
@@ -79,7 +56,7 @@ void main() {
           .setMockMethodCallHandler(SystemChannels.platform, null),
     );
 
-    final loadRepo = _StubLoadRepo();
+    final loadRepo = OrientationStubLoadRepo();
     final updateRepo = FakeUpdateRepository();
     serviceLocator.registerFactory<LoadBloc>(
       () => LoadBloc(

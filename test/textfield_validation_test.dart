@@ -1,8 +1,5 @@
 import '../test/utils/fake_update_repo.dart';
 import 'package:cards_against_humanity/constants.dart';
-import 'package:cards_against_humanity/core/entities/data/answer_list.dart';
-import 'package:cards_against_humanity/core/entities/data/question_list.dart';
-import 'package:cards_against_humanity/core/errors/failures.dart';
 import 'package:cards_against_humanity/core/models/answer_list_model.dart';
 import 'package:cards_against_humanity/core/models/answer_model.dart';
 import 'package:cards_against_humanity/core/models/question_list_model.dart';
@@ -15,7 +12,6 @@ import 'package:cards_against_humanity/features/game/domain/usecases/draw_next_q
 import 'package:cards_against_humanity/features/game/domain/usecases/retrive_answers.dart';
 import 'package:cards_against_humanity/features/game/presentation/bloc/game_bloc.dart';
 import 'package:cards_against_humanity/features/game/presentation/pages/master_page.dart';
-import 'package:cards_against_humanity/features/load/domain/repository/load_repository.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_answers.dart';
 import 'package:cards_against_humanity/features/load/domain/usecases/load_questions.dart';
 import 'package:cards_against_humanity/features/load/presentation/bloc/load_bloc.dart';
@@ -31,22 +27,9 @@ import 'package:cards_against_humanity/core/widgets/card.dart';
 import 'package:cards_against_humanity/core/widgets/textfield.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fpdart/fpdart.dart';
 import 'package:material_ui/material_ui.dart';
 
-class _StubLoadRepo implements LoadRepository {
-  final QuestionListModel questions;
-  final AnswerListModel answers;
-
-  _StubLoadRepo(this.questions, this.answers);
-
-  @override
-  Future<Either<DataFailure, QuestionList>> getQuestions() async =>
-      right(questions);
-
-  @override
-  Future<Either<DataFailure, AnswerList>> getAnswers() async => right(answers);
-}
+import 'utils/textfield_stub_load_repo.dart';
 
 /// Runs widget tests for [StartPage] and [MasterGamePage] text-field validators.
 void main() {
@@ -66,9 +49,10 @@ void main() {
         ),
       );
 
-  testWidgets('StartPage displays validator errors below fields without clearing text',
+  testWidgets(
+      'StartPage displays validator errors below fields without clearing text',
       (tester) async {
-    final loadRepo = _StubLoadRepo(makeQuestions(), makeAnswers());
+    final loadRepo = TextFieldStubLoadRepo(makeQuestions(), makeAnswers());
     final loadBloc = LoadBloc(
       loadQuestions: LoadQuestions(loadRepository: loadRepo),
       loadAnswers: LoadAnswers(loadRepository: loadRepo),
@@ -157,7 +141,7 @@ void main() {
           permissionPromptDelay: Duration.zero,
         );
 
-    final loadRepo = _StubLoadRepo(makeQuestions(), makeAnswers());
+    final loadRepo = TextFieldStubLoadRepo(makeQuestions(), makeAnswers());
     final loadBloc = LoadBloc(
       loadQuestions: LoadQuestions(loadRepository: loadRepo),
       loadAnswers: LoadAnswers(loadRepository: loadRepo),
@@ -309,10 +293,12 @@ void main() {
 
       final scaffoldRect = tester.getRect(find.byType(LayoutBuilder));
       final cardContainerRect = tester.getRect(
-        find.descendant(
-          of: find.byType(CardAHW),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(CardAHW),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       final formRect = tester.getRect(find.byType(Form));
       final buttonRect = tester.getRect(find.byType(CustomButton));

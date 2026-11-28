@@ -1,12 +1,14 @@
 # TODO
 - [X] Moved update download to app folder and added update apk cleaning
-- [ ] Improve update graphics
+- [X] Improve update graphics
 - [X] Improve game data imput fields
 - [X] Master can only insert the allowed cards (check that are 1 from each player hand)
 - [X] Improve app version handling and fix version comparison bug
 - [X] Fix score in AppBar
 - [X] Improve Material 3 use (restiled buttons, text fields, appbar and card boxes, unite questions's whitespaces, move "Mostra carte" button)
-- [ ] Make SnackBar width resize based on the text
+- [X] Make SnackBar width resize based on the text
 - [X] Generate a new keystore to sign the app
-- [ ] Check Update failure fallbacks functionalities and graphics
-- [ ] Add warning SnackBar for explicit content
+- [X] Check Update failure fallbacks functionalities and graphics
+- [X] Add warning SnackBar for explicit content
+- [X] Restricted update check to boot only
+- [X] Lock landscape mode in small devices
