@@ -96,7 +96,7 @@ class UpdatePromptDialog extends StatelessWidget {
     if (rawBody.trim().isEmpty) return const {};
 
     final cleaned =
-        rawBody.replaceAll('\r', '').replaceAll('``', '').replaceAllMapped(
+        rawBody.replaceAll('\r', '').replaceAll('`', '').replaceAllMapped(
               RegExp(r'\[[^\]]*\]\(([^)]+)\)'),
               (m) => m.group(1) ?? '',
             );
