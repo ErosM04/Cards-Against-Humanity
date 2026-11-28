@@ -347,4 +347,68 @@ void main() {
     expect(phoneMedium.width, greaterThan(phoneShort.width));
     expect(phoneLargeFont.height, greaterThan(phoneMedium.height));
   });
+
+  testWidgets(
+      'DownloadProgressDialog scales dialog, ring indicator, and percentage text by screen size',
+      (tester) async {
+    Future<({Size dialog, Size ring, double percentFontSize})> measureDialog(
+      Size screenSize,
+    ) async {
+      tester.view.physicalSize = screenSize;
+      tester.view.devicePixelRatio = 1.0;
+
+      final localBloc = UpdateBloc(
+        checkForUpdate: CheckForUpdate(updateRepository: repo),
+        downloadApk: DownloadApk(updateRepository: repo),
+        installApk: InstallApk(updateRepository: repo),
+        clearCachedUpdates: ClearCachedUpdates(updateRepository: repo),
+        managePermission: ManageUpdatePermission(updateRepository: repo),
+        permissionPromptDelay: Duration.zero,
+      );
+      addTearDown(localBloc.close);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          key: ValueKey(screenSize),
+          home: BlocProvider<UpdateBloc>.value(
+            value: localBloc,
+            child: const Scaffold(
+              body: Center(child: DownloadProgressDialog()),
+            ),
+          ),
+        ),
+      );
+      localBloc.add(const UpdateDownloadRequested(sampleRelease));
+      await tester.pump();
+      await tester.pump();
+
+      final dialogSize = tester.getSize(find.byType(Dialog));
+      final ringSize = tester.getSize(find.byType(CircularProgressIndicator));
+      final percentText = tester.widget<Text>(find.textContaining('%'));
+      return (
+        dialog: dialogSize,
+        ring: ringSize,
+        percentFontSize: percentText.style?.fontSize ?? 0,
+      );
+    }
+
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final small = await measureDialog(const Size(320, 568));
+    final phone = await measureDialog(const Size(400, 800));
+    final tablet = await measureDialog(const Size(900, 1280));
+
+    expect(small.ring.width, greaterThanOrEqualTo(84));
+    expect(phone.ring.width, greaterThan(small.ring.width));
+    expect(tablet.ring.width, greaterThan(phone.ring.width));
+    expect(phone.percentFontSize, greaterThan(small.percentFontSize));
+    expect(tablet.percentFontSize, greaterThan(phone.percentFontSize));
+    expect(phone.dialog.width, greaterThan(small.dialog.width));
+    expect(tablet.dialog.width, greaterThan(phone.dialog.width));
+
+    // Confirm short landscape viewport renders without overflow.
+    final landscape = await measureDialog(const Size(568, 320));
+    expect(landscape.ring.width, equals(small.ring.width));
+  });
 }
