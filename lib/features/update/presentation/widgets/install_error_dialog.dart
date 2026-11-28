@@ -28,6 +28,7 @@ class InstallErrorDialog extends StatelessWidget {
         color: Theme.of(context).colorScheme.tertiary,
       ),
       title: "Errore durante l'installazione dell'aggiornamento",
+      isError: true,
       actions: Wrap(
         alignment: WrapAlignment.center,
         spacing: 10,

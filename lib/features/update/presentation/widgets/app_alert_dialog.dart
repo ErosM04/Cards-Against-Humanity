@@ -12,6 +12,7 @@ class AppAlertDialog extends StatelessWidget {
   final VoidCallback? onDeny;
   final VoidCallback? onConfirm;
   final Widget? actions;
+  final bool isError;
 
   const AppAlertDialog({
     super.key,
@@ -23,12 +24,14 @@ class AppAlertDialog extends StatelessWidget {
     this.onDeny,
     this.onConfirm,
     this.actions,
+    this.isError = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final accentColor = Theme.of(context).colorScheme.secondary;
-    final headerColor = Theme.of(context).colorScheme.primary;
+    final headerColor =
+        (isError) ? Colors.red : Theme.of(context).colorScheme.primary;
 
     return Dialog(
       child: Column(

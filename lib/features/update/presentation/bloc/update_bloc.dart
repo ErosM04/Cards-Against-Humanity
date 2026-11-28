@@ -119,7 +119,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
       promptMessage:
           'Ti verrà ora chiesto di dare il permesso per installare il pacchetto di aggiornamento',
       deniedMessage:
-          "Ma come no? Cattivo! Devi consentire l'installazione del pacchetto per aggiornare l'app",
+          "Ma come no?! Mi serve il permesso per installare il pacchetto e aggiornare l'app",
       deniedDurationSeconds: 5,
       emit: emit,
     );
@@ -133,8 +133,9 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
       (failure) {
         final failedPath =
             failure is UpdateInstallFailure ? failure.apkPath : event.apkPath;
-        final errorType =
-            failure is UpdateInstallFailure ? failure.errorType : failure.message;
+        final errorType = failure is UpdateInstallFailure
+            ? failure.errorType
+            : failure.message;
         emit(UpdateInstallFailed(
           errorType: errorType,
           apkPath: failedPath,
