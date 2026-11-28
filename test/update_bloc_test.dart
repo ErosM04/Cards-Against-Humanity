@@ -177,6 +177,11 @@ void main() {
       releaseUrl: 'https://example.com/release',
     );
 
+    tester.view.physicalSize = const Size(900, 1280);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     const orange = Color.fromARGB(255, 242, 116, 5);
     await tester.pumpWidget(
       MaterialApp(
@@ -223,6 +228,13 @@ void main() {
     expect(find.text('. . .'), findsNothing);
     expect(find.text('Feature 4'), findsOneWidget);
     expect(find.text('Fix 4'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Maggiori informazioni '));
+    await tester.pumpAndSettle();
+    final infoRect = tester.getRect(find.text('Maggiori informazioni '));
+    final linkRect = tester.getRect(find.text('qui'));
+    expect(linkRect.top, equals(infoRect.top));
+    expect(linkRect.left, greaterThanOrEqualTo(infoRect.right));
   });
 
   testWidgets(

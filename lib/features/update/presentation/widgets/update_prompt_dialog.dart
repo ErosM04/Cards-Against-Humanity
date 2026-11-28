@@ -58,8 +58,8 @@ class UpdatePromptDialog extends StatelessWidget {
                       accentColor: accentColor,
                     ),
                   const SizedBox(height: 4),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text('Maggiori informazioni '),
                       GestureDetector(
