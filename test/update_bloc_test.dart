@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import '../test/utils/fake_update_repo.dart';
@@ -477,4 +478,79 @@ void main() {
     expect(tabletPortraitWidth, lessThanOrEqualTo(800 * 0.5));
     expect(tabletLandscapeWidth, lessThanOrEqualTo(1280 * 0.5));
   });
+
+  testWidgets(
+      'UpdateListener blurs backdrop for update, progress, and install error dialogs',
+      (tester) async {
+    final downloadGate = Completer<Either<Failure, String>>();
+    final pausedRepo = _PausedDownloadRepo(downloadGate)
+      ..checkResult = right(sampleRelease);
+    final widgetBloc = UpdateBloc(
+      checkForUpdate: CheckForUpdate(updateRepository: pausedRepo),
+      downloadApk: DownloadApk(updateRepository: pausedRepo),
+      installApk: InstallApk(updateRepository: pausedRepo),
+      clearCachedUpdates: ClearCachedUpdates(updateRepository: pausedRepo),
+      managePermission: ManageUpdatePermission(updateRepository: pausedRepo),
+      permissionPromptDelay: Duration.zero,
+    );
+    addTearDown(widgetBloc.close);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<UpdateBloc>.value(
+          value: widgetBloc,
+          child: const Scaffold(
+            body: UpdateListener(child: SizedBox.expand()),
+          ),
+        ),
+      ),
+    );
+
+    // 1. UpdatePromptDialog shows blurred backdrop.
+    widgetBloc.add(const UpdateCheckRequested());
+    await tester.pumpAndSettle();
+    expect(find.byType(UpdatePromptDialog), findsOneWidget);
+    expect(find.byType(BackdropFilter), findsOneWidget);
+
+    // 2. DownloadProgressDialog shows blurred backdrop while download is pending.
+    await tester.tap(find.text('Sì'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.byType(DownloadProgressDialog), findsOneWidget);
+    expect(find.byType(BackdropFilter), findsOneWidget);
+
+    // Complete download with failure so Snackbar clears cleanly, then verify InstallErrorDialog.
+    downloadGate.complete(left(Failure('Download failed')));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
+    pausedRepo.installResult = left(
+      UpdateInstallFailure(
+          errorType: 'Installer error', apkPath: '/tmp/app.apk'),
+    );
+    widgetBloc.add(const UpdateInstallRequested('/tmp/app.apk'));
+    await tester.pumpAndSettle();
+    expect(find.byType(InstallErrorDialog), findsOneWidget);
+    expect(find.byType(BackdropFilter), findsOneWidget);
+
+    await tester.tap(find.text('Annulla'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+  });
+}
+
+class _PausedDownloadRepo extends FakeUpdateRepository {
+  final Completer<Either<Failure, String>> gate;
+
+  _PausedDownloadRepo(this.gate);
+
+  @override
+  Future<Either<Failure, String>> downloadApk({
+    required String url,
+    required String fileName,
+    void Function(double progress)? onProgress,
+  }) =>
+      gate.future;
 }

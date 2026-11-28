@@ -66,7 +66,7 @@ class UpdateBloc extends Bloc<UpdateEvent, UpdateState> {
     Emitter<UpdateState> emit,
   ) async {
     await _clearCachedUpdates();
-    emit(const UpdateNotice(':('));
+    emit(const UpdateNotice('No cattivo! 😭'));
   }
 
   /// Downloads the release APK into internal cache with live progress updates.

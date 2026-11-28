@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:cards_against_humanity/constants.dart';
 import 'package:cards_against_humanity/core/widgets/snackbar.dart';
 import 'package:cards_against_humanity/features/update/presentation/bloc/update_bloc.dart';
@@ -29,7 +31,7 @@ class _UpdateListenerState extends State<UpdateListener> {
 
           switch (state) {
             case UpdateAvailable(:final release):
-              _showAnimatedDialog(
+              _showBlurredDialog(
                 context,
                 UpdatePromptDialog(
                   release: release,
@@ -44,15 +46,13 @@ class _UpdateListenerState extends State<UpdateListener> {
               if (!_isDownloadDialogOpen) {
                 _isDownloadDialogOpen = true;
                 final updateBloc = context.read<UpdateBloc>();
-                showGeneralDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  pageBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  transitionDuration: const Duration(milliseconds: 180),
-                  transitionBuilder: (_, __, ___, ____) => BlocProvider.value(
+                _showBlurredDialog(
+                  context,
+                  BlocProvider.value(
                     value: updateBloc,
                     child: const DownloadProgressDialog(),
                   ),
+                  animate: false,
                 );
               }
             case UpdateDownloadCompleted(:final apkPath, :final version):
@@ -75,7 +75,7 @@ class _UpdateListenerState extends State<UpdateListener> {
                 :final apkPath,
                 :final downloadUrl,
               ):
-              _showAnimatedDialog(
+              _showBlurredDialog(
                 context,
                 InstallErrorDialog(
                   errorType: errorType,
@@ -113,21 +113,41 @@ class _UpdateListenerState extends State<UpdateListener> {
         child: widget.child,
       );
 
-  /// Presents [dialog] with a slide-and-fade entrance transition.
-  void _showAnimatedDialog(BuildContext context, Widget dialog) =>
+  /// Presents [dialog] over a slightly blurred backdrop, optionally sliding and fading in.
+  void _showBlurredDialog(
+    BuildContext context,
+    Widget dialog, {
+    bool animate = true,
+  }) =>
       showGeneralDialog(
         context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.black54,
         pageBuilder: (_, __, ___) => const SizedBox.shrink(),
         transitionDuration: const Duration(milliseconds: 180),
-        transitionBuilder: (_, animation, __, ___) => SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0.0, 0.5),
-            end: Offset.zero,
-          ).animate(animation),
-          child: FadeTransition(
-            opacity: Tween<double>(begin: 0.5, end: 1).animate(animation),
-            child: dialog,
-          ),
-        ),
+        transitionBuilder: (_, animation, __, ___) {
+          final child = animate
+              ? SlideTransition(
+                  position: Tween<Offset>(
+                    begin: const Offset(0.0, 0.5),
+                    end: Offset.zero,
+                  ).animate(animation),
+                  child: FadeTransition(
+                    opacity: Tween<double>(begin: 0.5, end: 1).animate(
+                      animation,
+                    ),
+                    child: dialog,
+                  ),
+                )
+              : dialog;
+
+          return BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 4 * animation.value,
+              sigmaY: 4 * animation.value,
+            ),
+            child: child,
+          );
+        },
       );
 }
