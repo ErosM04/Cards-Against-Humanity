@@ -245,7 +245,7 @@ lib/
 ### Root Directory
 - [constants.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/constants.dart): Application-wide constants including strings (name, UI instructions/hints and startup `explicitContentWarning` notice in Italian), boundaries (`minPlayers = 3`, `maxPlayers = 20`), rule parameters (`handLength = 10`), and release/update endpoints (`appVersion`, `githubLatestReleaseUrl`, `githubReleasesPageUrl`, `githubLatestApkUrl`).
 - [init_dependencies.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/init_dependencies.dart): Dependency injection registry using `GetIt`. Registers data providers, data sources, repositories, use cases, and BLoC singletons (`LoadBloc`, `UpdateBloc`, and session-scoped `GameBloc`).
-- [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart): Application entry point. Invokes `initDependencies()`, sets up `MultiBlocProvider` (providing `LoadBloc` and `UpdateBloc`), sets `appTheme`, and boots to `StartPage`.
+- [main.dart](file:///C:/Users/erosm/Desktop/Cards-Against-Humanity/lib/main.dart): Application entry point. Initializes dependencies, dynamically enforces portrait orientation lock on tall/narrow phones (`shortestSide < 600` and `longestSide / shortestSide > 1.65`) while permitting rotation on foldables and tablets via `WidgetsBindingObserver`, sets up `MultiBlocProvider` (`LoadBloc`, `UpdateBloc`), applies `appTheme`, and boots to `StartPage`.
 
 ---
 

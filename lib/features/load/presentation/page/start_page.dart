@@ -143,9 +143,11 @@ class _StartPageState extends State<StartPage> {
                       // Tip
                       Row(
                         children: [
-                          Text(
-                            'Inserire un numero di almeno 10 cifre',
-                            style: TextStyle(color: Colors.grey.shade600),
+                          Flexible(
+                            child: Text(
+                              'Inserire un numero di almeno 10 cifre',
+                              style: TextStyle(color: Colors.grey.shade600),
+                            ),
                           ),
                         ],
                       ),
@@ -253,13 +255,15 @@ class _StartPageState extends State<StartPage> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            '$subTitle:',
-            textAlign: TextAlign.start,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.secondary,
+          Flexible(
+            child: Text(
+              '$subTitle:',
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
             ),
           ),
           GameInfo(infoText: infoText),
