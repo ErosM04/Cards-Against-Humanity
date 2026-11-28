@@ -9,24 +9,47 @@ class DownloadProgressDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    // Screen size adaptive fields
+    final screenSize = MediaQuery.sizeOf(context);
+    final baseSide = screenSize.shortestSide;
+    final horizontalPadding = (baseSide * 0.06).clamp(18.0, 36.0);
+    final verticalPadding = (baseSide * 0.06).clamp(18.0, 36.0);
+    final spacing = (baseSide * 0.055).clamp(16.0, 30.0);
+    final titleFontSize = (baseSide * 0.055).clamp(18.0, 28.0);
+    final indicatorSize = (baseSide * 0.24).clamp(84.0, 148.0);
+    final strokeWidth = (indicatorSize * 0.13).clamp(10.0, 18.0);
+    final percentFontSize = (indicatorSize * 0.21).clamp(16.0, 29.0);
+    final maxDialogWidth = (baseSide * 0.78).clamp(260.0, 440.0);
+    final minDialogWidth = (baseSide * 0.65).clamp(220.0, 360.0);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Dialog(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+    return Dialog(
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: (screenSize.width * 0.08).clamp(16.0, 48.0),
+        vertical: 24,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: minDialogWidth,
+          maxWidth: maxDialogWidth,
+        ),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Download in corso',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: titleFontSize,
                   fontWeight: FontWeight.bold,
                   color: colorScheme.secondary,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: spacing),
               BlocBuilder<UpdateBloc, UpdateState>(
                 builder: (context, state) {
                   final progress = state is UpdateDownloadInProgress
@@ -36,25 +59,33 @@ class DownloadProgressDialog extends StatelessWidget {
                     alignment: AlignmentDirectional.center,
                     children: [
                       SizedBox(
-                        height: 55,
-                        width: 55,
+                        height: indicatorSize,
+                        width: indicatorSize,
                         child: CircularProgressIndicator(
                           value: progress,
                           color: colorScheme.primary,
                           backgroundColor: colorScheme.tertiary,
-                          strokeWidth: 6.5,
+                          strokeWidth: strokeWidth,
                           strokeCap: StrokeCap.round,
                         ),
                       ),
-                      Text(
-                        '${(progress * 100).toStringAsFixed(1)}%',
-                        style: const TextStyle(fontSize: 13),
+                      SizedBox(
+                        width: indicatorSize - strokeWidth * 2 - 8,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '${(progress * 100).toStringAsFixed(1)}%',
+                            style: TextStyle(
+                              fontSize: percentFontSize,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   );
                 },
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
