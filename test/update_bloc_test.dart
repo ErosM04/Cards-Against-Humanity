@@ -80,12 +80,12 @@ void main() {
     );
   });
 
-  test(
-      'UpdateInstallRequested emits UpdateInstallFailed then retry succeeds',
+  test('UpdateInstallRequested emits UpdateInstallFailed then retry succeeds',
       () async {
     repo.downloadResult = right('/tmp/updates/Cards_Against_Humanity.apk');
     bloc.add(const UpdateDownloadRequested(sampleRelease));
-    await expectLater(bloc.stream, emitsThrough(isA<UpdateDownloadCompleted>()));
+    await expectLater(
+        bloc.stream, emitsThrough(isA<UpdateDownloadCompleted>()));
 
     repo.installResult = left(
       UpdateInstallFailure(
@@ -114,14 +114,16 @@ void main() {
     await expectLater(bloc.stream, emits(isA<UpdateInstallCompleted>()));
   });
 
-  test('buildApkPath falls back from tempDir and clearCachedUpdates deletes all',
+  test(
+      'buildApkPath falls back from tempDir and clearCachedUpdates deletes all',
       () async {
     final sandbox = await Directory.systemTemp.createTemp('cah_update_test_');
     addTearDown(() async {
       if (await sandbox.exists()) await sandbox.delete(recursive: true);
     });
 
-    final supportDir = Directory('${sandbox.path}${Platform.pathSeparator}support');
+    final supportDir =
+        Directory('${sandbox.path}${Platform.pathSeparator}support');
     final externalDir =
         Directory('${sandbox.path}${Platform.pathSeparator}external');
 
@@ -131,8 +133,10 @@ void main() {
       getExternalDir: () async => externalDir,
     );
 
-    final apkPath = await local.buildApkPath(fileName: 'Cards_Against_Humanity');
-    expect(apkPath, startsWith('${supportDir.path}${Platform.pathSeparator}updates'));
+    final apkPath =
+        await local.buildApkPath(fileName: 'Cards_Against_Humanity');
+    expect(apkPath,
+        startsWith('${supportDir.path}${Platform.pathSeparator}updates'));
     await File(apkPath).writeAsString('apk-bytes');
     expect(await File(apkPath).exists(), isTrue);
 
@@ -195,7 +199,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      tester.widget<Text>(find.text('Nuova versione disponibile!')).style?.color,
+      tester
+          .widget<Text>(find.text('Nuova versione disponibile!'))
+          .style
+          ?.color,
       equals(orange),
     );
     expect(
@@ -382,7 +389,14 @@ void main() {
       await tester.pump();
       await tester.pump();
 
-      final dialogSize = tester.getSize(find.byType(Dialog));
+      final dialogSize = tester.getSize(
+        find
+            .descendant(
+              of: find.byType(Dialog),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
       final ringSize = tester.getSize(find.byType(CircularProgressIndicator));
       final percentText = tester.widget<Text>(find.textContaining('%'));
       return (
@@ -410,5 +424,57 @@ void main() {
     // Confirm short landscape viewport renders without overflow.
     final landscape = await measureDialog(const Size(568, 320));
     expect(landscape.ring.width, equals(small.ring.width));
+  });
+
+  testWidgets('AppAlertDialog limits width to at most 50% on tablet screens',
+      (tester) async {
+    Future<double> measureAlertWidth(Size screenSize) async {
+      tester.view.physicalSize = screenSize;
+      tester.view.devicePixelRatio = 1.0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          key: ValueKey(screenSize),
+          home: Scaffold(
+            body: Center(
+              child: AppAlertDialog(
+                image: const Image(
+                  image: AssetImage('assets/dialog/update.png'),
+                ),
+                title: 'Titolo molto lungo per espandere il dialogo al massimo',
+                child: SizedBox(
+                  width: screenSize.width,
+                  child: const Text('Contenuto di test'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return tester
+          .getSize(
+            find
+                .descendant(
+                  of: find.byType(Dialog),
+                  matching: find.byType(Material),
+                )
+                .first,
+          )
+          .width;
+    }
+
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final phoneWidth = await measureAlertWidth(const Size(400, 800));
+    final smallTabletWidth = await measureAlertWidth(const Size(600, 1024));
+    final tabletPortraitWidth = await measureAlertWidth(const Size(800, 1280));
+    final tabletLandscapeWidth = await measureAlertWidth(const Size(1280, 800));
+
+    expect(phoneWidth, greaterThan(400 * 0.5));
+    expect(smallTabletWidth, lessThanOrEqualTo(600 * 0.5));
+    expect(tabletPortraitWidth, lessThanOrEqualTo(800 * 0.5));
+    expect(tabletLandscapeWidth, lessThanOrEqualTo(1280 * 0.5));
   });
 }
